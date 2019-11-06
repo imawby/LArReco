@@ -1,7 +1,7 @@
 <pandora>
     <!-- GLOBAL SETTINGS -->
     <IsMonitoringEnabled>true</IsMonitoringEnabled>
-    <ShouldDisplayAlgorithmInfo>false</ShouldDisplayAlgorithmInfo>
+    <ShouldDisplayAlgorithmInfo>true</ShouldDisplayAlgorithmInfo>
     <SingleHitTypeClusteringMode>true</SingleHitTypeClusteringMode>
 
     <!-- ALGORITHM SETTINGS -->
@@ -136,6 +136,10 @@
             <tool type = "LArMissingTrack"/>
         </TrackTools>
     </algorithm>
+<algorithm type = "LArPfoValidation">
+  <CaloHitListName>CaloHitList2D</CaloHitListName>
+  <PfoListName>TrackParticles3D</PfoListName>
+</algorithm>
     <algorithm type = "LArThreeDLongitudinalTracks">
         <InputClusterListNameU>ClustersU</InputClusterListNameU>
         <InputClusterListNameV>ClustersV</InputClusterListNameV>
@@ -345,6 +349,8 @@
         <VertexListName>DaughterVertices3D</VertexListName> 
     </algorithm>
 
+
+
     <!-- Output list management -->
     <algorithm type = "LArPostProcessing">
         <PfoListNames>NeutrinoParticles3D TrackParticles3D ShowerParticles3D</PfoListNames>
@@ -353,4 +359,9 @@
         <CaloHitListNames>CaloHitListU CaloHitListV CaloHitListW CaloHitList2D</CaloHitListNames>
         <CurrentPfoListReplacement>NeutrinoParticles3D</CurrentPfoListReplacement>
     </algorithm>
+
+
 </pandora>
+
+
+
