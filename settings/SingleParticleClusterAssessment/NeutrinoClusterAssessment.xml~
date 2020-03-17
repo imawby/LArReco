@@ -14,6 +14,7 @@
         <CurrentCaloHitListReplacement>CaloHitList2D</CurrentCaloHitListReplacement>
     </algorithm>
 
+
     <!-- TwoDReconstruction -->
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
@@ -36,24 +37,8 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersU</ClusterListNames>
-  <AlgorithmPositionString>BEFORE_TEST</AlgorithmPositionString>
-</algorithm>
-
-
-<!-- TEST -->
-<!--algorithm type = "LArTest">
-<ClusterListName>ClustersU</ClusterListName>
-<CaloHitListName>CaloHitListU</CaloHitListName>
-</algorithm-->
-
-
 <algorithm type = "LArHitWidthClusterMerging">
   <ClusterListName>ClustersU</ClusterListName>
-  <UseSlidingLinearFit>false</UseSlidingLinearFit>
   <MinClusterWeight>0.5</MinClusterWeight>
 </algorithm>
 
@@ -75,8 +60,29 @@
   <AlgorithmPositionString>AFTER_CROSS_GAPS</AlgorithmPositionString>
 </algorithm-->
 
-<!-- -->
+<algorithm type = "LArTwoDParticleCreation">
+  <ClusterListNameU>ClustersU</ClusterListNameU>
+  <MinHitsInCluster>0</MinHitsInCluster>
+  <OutputPfoListName>PfosU</OutputPfoListName>
+</algorithm>
 
+<algorithm type = "LArParticleEfficiency">
+  <CaloHitListName>CaloHitListU</CaloHitListName>
+  <PfoListNames>PfosU</PfoListNames>
+  <RecordVertices>false</RecordVertices>
+  <WriteToTree>false</WriteToTree>
+  <TreeName>Jam1</TreeName>
+  <FileName>Transverse.root</FileName>
+  <PrintToScreen>true</PrintToScreen>
+  <ParticlesInEvent>1</ParticlesInEvent>
+  <VisualiseMCParticles>true</VisualiseMCParticles>
+  <VisualisePfos>true</VisualisePfos>
+  <IsThreeViewMode>false</IsThreeViewMode>
+</algorithm>
+
+
+
+<!-- -->
 
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
@@ -99,16 +105,9 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersV</ClusterListNames>
-  <AlgorithmPositionString>BEFORE_V_CLUSTERING</AlgorithmPositionString>
-</algorithm>
-
 <algorithm type = "LArHitWidthClusterMerging">
   <ClusterListName>ClustersV</ClusterListName>
-  <UseSlidingLinearFit>true</UseSlidingLinearFit>
-  <MinClusterWeight>1</MinClusterWeight>
+  <MinClusterWeight>0.5</MinClusterWeight>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
@@ -128,6 +127,28 @@
   <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
   <AlgorithmPositionString>AFTER_CROSS_GAPS</AlgorithmPositionString>
 </algorithm-->
+
+<algorithm type = "LArTwoDParticleCreation">
+  <ClusterListNameU>ClustersV</ClusterListNameU>
+  <MinHitsInCluster>0</MinHitsInCluster>
+  <OutputPfoListName>PfosV</OutputPfoListName>
+</algorithm>
+
+<algorithm type = "LArParticleEfficiency">
+  <CaloHitListName>CaloHitListV</CaloHitListName>
+  <PfoListNames>PfosV</PfoListNames>
+  <RecordVertices>false</RecordVertices>
+  <WriteToTree>false</WriteToTree>
+  <TreeName>Jam1</TreeName>
+  <FileName>Transverse.root</FileName>
+  <PrintToScreen>true</PrintToScreen>
+  <ParticlesInEvent>1</ParticlesInEvent>
+  <VisualiseMCParticles>true</VisualiseMCParticles>
+  <VisualisePfos>true</VisualisePfos>
+  <IsThreeViewMode>false</IsThreeViewMode>
+</algorithm>
+
+
 
 <!-- -->
 
@@ -155,7 +176,6 @@
 
 <algorithm type = "LArHitWidthClusterMerging">
   <ClusterListName>ClustersW</ClusterListName>
-  <UseSlidingLinearFit>false</UseSlidingLinearFit>
   <MinClusterWeight>0.5</MinClusterWeight>
 </algorithm>
 
@@ -177,6 +197,28 @@
   <AlgorithmPositionString>AFTER_CROSS_GAPS</AlgorithmPositionString>
 </algorithm-->
 
+<algorithm type = "LArTwoDParticleCreation">
+  <ClusterListNameU>ClustersW</ClusterListNameU>
+  <MinHitsInCluster>0</MinHitsInCluster>
+  <OutputPfoListName>PfosW</OutputPfoListName>
+</algorithm>
+
+<algorithm type = "LArParticleEfficiency">
+  <CaloHitListName>CaloHitListW</CaloHitListName>
+  <PfoListNames>PfosW</PfoListNames>
+  <RecordVertices>false</RecordVertices>
+  <WriteToTree>false</WriteToTree>
+  <TreeName>Jam1</TreeName>
+  <FileName>Transverse.root</FileName>
+  <PrintToScreen>true</PrintToScreen>
+  <ParticlesInEvent>1</ParticlesInEvent>
+  <VisualiseMCParticles>true</VisualiseMCParticles>
+  <VisualisePfos>true</VisualisePfos>
+  <IsThreeViewMode>false</IsThreeViewMode>
+</algorithm>
+
+
+<!-- -->
 
 
     <!-- VertexAlgorithms -->
@@ -232,6 +274,8 @@
         <InputClusterListNameV>ClustersV</InputClusterListNameV>
         <InputClusterListNameW>ClustersW</InputClusterListNameW>
         <OutputPfoListName>TrackParticles3D</OutputPfoListName>
+        <!--MinClusterCaloHits>0</MinClusterCaloHits-->
+        <!--MinClusterLength>0.0</MinClusterLength-->
         <TrackTools>
             <tool type = "LArTransverseTensorVisualization">
                 <MinClusterConnections>0</MinClusterConnections>
@@ -253,26 +297,12 @@
         </TrackTools>
     </algorithm>
 
-<algorithm type = "LArParticleEfficiency">
-  <CaloHitListName>CaloHitList2D</CaloHitListName>
-  <PfoListNames>TrackParticles3D</PfoListNames>
-  <VertexListName>NeutrinoVertices3D</VertexListName>
-  <WriteToTree>false</WriteToTree>
-  <TreeName>Jam1</TreeName>
-  <FileName>Transverse.root</FileName>
-  <PrintToScreen>true</PrintToScreen>
-  <ParticlesInEvent>1</ParticlesInEvent>
-  <VisualiseMCParticles>true</VisualiseMCParticles>
-  <IsThreeViewMode>true</IsThreeViewMode>
-</algorithm>
-
 <algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
   <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
   <AlgorithmPositionString>AFTER_TRANSVERSE</AlgorithmPositionString>
 </algorithm>
-
 
     <algorithm type = "LArThreeDLongitudinalTracks">
         <InputClusterListNameU>ClustersU</InputClusterListNameU>
@@ -285,19 +315,6 @@
         </TrackTools>
     </algorithm>
 
-<algorithm type = "LArParticleEfficiency">
-  <CaloHitListName>CaloHitList2D</CaloHitListName>
-  <PfoListNames>TrackParticles3D</PfoListNames>
-  <VertexListName>NeutrinoVertices3D</VertexListName>
-  <WriteToTree>false</WriteToTree>
-  <TreeName>Jam2</TreeName>
-  <FileName>Longitudinal.root</FileName>
-  <PrintToScreen>true</PrintToScreen>
-  <ParticlesInEvent>1</ParticlesInEvent>
-  <VisualiseMCParticles>false</VisualiseMCParticles>
-  <VisualisePfos>false</VisualisePfos>
-</algorithm>
-
 <algorithm type = "LArVisualMonitoring">
   <ShowCurrentPfos>true</ShowCurrentPfos>
   <ShowDetector>true</ShowDetector>
@@ -307,11 +324,11 @@
 </algorithm>
 
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowCurrentPfos>true</ShowCurrentPfos>
   <ShowDetector>true</ShowDetector>
   <ShowCurrentMCParticles>true</ShowCurrentMCParticles>
-</algorithm>
+</algorithm-->
 
     <algorithm type = "LArThreeDTrackFragments">
         <MinClusterLength>5.</MinClusterLength>
@@ -324,19 +341,6 @@
         </TrackTools>
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
-
-<algorithm type = "LArParticleEfficiency">
-  <CaloHitListName>CaloHitList2D</CaloHitListName>
-  <PfoListNames>TrackParticles3D</PfoListNames>
-  <VertexListName>NeutrinoVertices3D</VertexListName>
-  <WriteToTree>false</WriteToTree>
-  <TreeName>Jam3</TreeName>
-  <FileName>Fragments.root</FileName>
-  <PrintToScreen>true</PrintToScreen>
-  <ParticlesInEvent>1</ParticlesInEvent>
-  <VisualiseMCParticles>false</VisualiseMCParticles>
-  <VisualisePfos>false</VisualisePfos>
-</algorithm>
 
 <algorithm type = "LArVisualMonitoring">
   <ShowCurrentPfos>true</ShowCurrentPfos>
@@ -560,19 +564,6 @@
         <VertexListName>DaughterVertices3D</VertexListName> 
     </algorithm>
 
-
-<algorithm type = "LArParticleEfficiency">
-  <CaloHitListName>CaloHitList2D</CaloHitListName>
-  <PfoListNames>TrackParticles3D ShowerParticles3D</PfoListNames>
-  <VertexListName>NeutrinoVertices3D</VertexListName>
-  <WriteToTree>false</WriteToTree>
-  <TreeName>Jam4</TreeName>
-  <FileName>PandoraEnd.root</FileName>
-  <PrintToScreen>true</PrintToScreen>
-  <ParticlesInEvent>1</ParticlesInEvent>
-  <VisualiseMCParticles>false</VisualiseMCParticles>
-  <VisualisePfos>false</VisualisePfos>
-</algorithm>
 
 
     <!-- Output list management -->

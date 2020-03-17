@@ -6,7 +6,7 @@
 
     <!-- ALGORITHM SETTINGS -->
     <algorithm type = "LArEventReading"/>
-    <algorithm type = "LArPreProcessing">
+    <algorithm type = "LArHitSplitPreProcessing">
         <OutputCaloHitListNameU>CaloHitListU</OutputCaloHitListNameU>
         <OutputCaloHitListNameV>CaloHitListV</OutputCaloHitListNameV>
         <OutputCaloHitListNameW>CaloHitListW</OutputCaloHitListNameW>
@@ -33,7 +33,7 @@
 
     <algorithm type = "LArMaster">
         <CRSettingsFile>PandoraSettings_Cosmic_Standard.xml</CRSettingsFile>
-        <NuSettingsFile>PandoraSettings_Neutrino_DUNEFD.xml</NuSettingsFile>
+        <NuSettingsFile>PandoraSettings_Neutrino_DUNEFD_Clustering.xml</NuSettingsFile>
         <SlicingSettingsFile>PandoraSettings_Slicing_Standard.xml</SlicingSettingsFile>
         <StitchingTools>
             <tool type = "LArStitchingCosmicRayMerging"><ThreeDStitchingMode>true</ThreeDStitchingMode></tool>
@@ -75,24 +75,13 @@
   <OutputFile>Validation.root</OutputFile>
 </algorithm-->
 
-<!--algorithm type = "LArParticleEfficiency">
-  <CaloHitListName>CaloHitList2D</CaloHitListName>
-  <PfoListNames>RecreatedPfos</PfoListNames>
-  <WriteToTree>false</WriteToTree>
-  <TreeName>Jam1</TreeName>
-  <FileName>Transverse.root</FileName>
-  <PrintToScreen>true</PrintToScreen>
-  <ParticlesInEvent>1</ParticlesInEvent>
-  <VisualiseMCParticles>false</VisualiseMCParticles>
-  <VisualisePfos>false</VisualisePfos>
-</algorithm-->
-
-
-<!--algorithm type = "LArVisualMonitoring">
-  <PfoListNames>RecreatedPfos</PfoListNames>
+<algorithm type = "LArVisualMonitoring">
+  <ShowCurrentPfos>true</ShowCurrentPfos>
   <ShowDetector>true</ShowDetector>
+  <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
+  <ShowCurrentVertices>true</ShowCurrentVertices>
   <AlgorithmPositionString>PANDORA_END_MASTER_XML</AlgorithmPositionString>
-</algorithm-->
+</algorithm>
 
 <!--algorithm type = "LArPullData">
   <WriteToTree>false</WriteToTree>
@@ -102,6 +91,8 @@
   <WriteToFile>false</WriteToFile>
   <FileName>MCParticleData.txt</FileName>
 </algorithm-->
+
+
 
 
 </pandora>

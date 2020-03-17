@@ -1,7 +1,7 @@
 <pandora>
     <!-- GLOBAL SETTINGS -->
     <IsMonitoringEnabled>true</IsMonitoringEnabled>
-    <ShouldDisplayAlgorithmInfo>true</ShouldDisplayAlgorithmInfo>
+    <ShouldDisplayAlgorithmInfo>false</ShouldDisplayAlgorithmInfo>
     <SingleHitTypeClusteringMode>true</SingleHitTypeClusteringMode>
 
     <!-- ALGORITHM SETTINGS -->
@@ -31,9 +31,20 @@
   <ShowDetector>true</ShowDetector>
 </algorithm>
 
+<!--algorithm type = "LArParticleEfficiency">
+  <CaloHitListName>CaloHitList2D</CaloHitListName>
+  <WriteToTree>false</WriteToTree>
+  <TreeName>Jam</TreeName>
+  <FileName>Jam.root</FileName>
+  <PrintToScreen>false</PrintToScreen>
+  <ParticlesInEvent>1</ParticlesInEvent>
+  <VisualiseMCParticles>true</VisualiseMCParticles>
+  <VisualisePfos>false</VisualisePfos>
+</algorithm-->
+
     <algorithm type = "LArMaster">
         <CRSettingsFile>PandoraSettings_Cosmic_Standard.xml</CRSettingsFile>
-        <NuSettingsFile>PandoraSettings_Neutrino_DUNEFD.xml</NuSettingsFile>
+        <NuSettingsFile>PandoraSettings_Neutrino_DUNEFD_Without.xml</NuSettingsFile>
         <SlicingSettingsFile>PandoraSettings_Slicing_Standard.xml</SlicingSettingsFile>
         <StitchingTools>
             <tool type = "LArStitchingCosmicRayMerging"><ThreeDStitchingMode>true</ThreeDStitchingMode></tool>
@@ -75,24 +86,15 @@
   <OutputFile>Validation.root</OutputFile>
 </algorithm-->
 
-<!--algorithm type = "LArParticleEfficiency">
-  <CaloHitListName>CaloHitList2D</CaloHitListName>
-  <PfoListNames>RecreatedPfos</PfoListNames>
-  <WriteToTree>false</WriteToTree>
-  <TreeName>Jam1</TreeName>
-  <FileName>Transverse.root</FileName>
-  <PrintToScreen>true</PrintToScreen>
-  <ParticlesInEvent>1</ParticlesInEvent>
-  <VisualiseMCParticles>false</VisualiseMCParticles>
-  <VisualisePfos>false</VisualisePfos>
-</algorithm-->
 
-
-<!--algorithm type = "LArVisualMonitoring">
-  <PfoListNames>RecreatedPfos</PfoListNames>
+<algorithm type = "LArVisualMonitoring">
+  <ShowCurrentPfos>true</ShowCurrentPfos>
   <ShowDetector>true</ShowDetector>
-  <AlgorithmPositionString>PANDORA_END_MASTER_XML</AlgorithmPositionString>
-</algorithm-->
+  <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
+  <ShowCurrentVertices>true</ShowCurrentVertices>
+  <AlgorithmPositionString>END_(MASTER)</AlgorithmPositionString>
+</algorithm>
+
 
 <!--algorithm type = "LArPullData">
   <WriteToTree>false</WriteToTree>
@@ -102,6 +104,8 @@
   <WriteToFile>false</WriteToFile>
   <FileName>MCParticleData.txt</FileName>
 </algorithm-->
+
+
 
 
 </pandora>

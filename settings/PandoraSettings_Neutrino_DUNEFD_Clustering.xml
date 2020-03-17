@@ -22,61 +22,92 @@
         <ReplaceCurrentCaloHitList>true</ReplaceCurrentCaloHitList>
         <ReplaceCurrentClusterList>true</ReplaceCurrentClusterList>
     </algorithm>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+  <AlgorithmPositionString>A</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArLayerSplitting"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+  <AlgorithmPositionString>B</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArLongitudinalAssociation"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+  <AlgorithmPositionString>C</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArTransverseAssociation"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+  <AlgorithmPositionString>D</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArLongitudinalExtension"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+  <AlgorithmPositionString>E</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArTransverseExtension"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+  <AlgorithmPositionString>F</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArCrossGapsAssociation"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+  <AlgorithmPositionString>G</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArCrossGapsExtension"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+  <AlgorithmPositionString>H</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArOvershootSplitting"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+  <AlgorithmPositionString>I</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArBranchSplitting"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+  <AlgorithmPositionString>J</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArKinkSplitting"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+  <AlgorithmPositionString>K</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArTrackConsolidation">
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
-
 <algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersU</ClusterListNames>
-  <AlgorithmPositionString>BEFORE_TEST</AlgorithmPositionString>
+  <AlgorithmPositionString>ORIGINAL_U_CLUSTERS</AlgorithmPositionString>
 </algorithm>
-
-
-<!-- TEST -->
-<!--algorithm type = "LArTest">
-<ClusterListName>ClustersU</ClusterListName>
-<CaloHitListName>CaloHitListU</CaloHitListName>
-</algorithm-->
-
 
 <algorithm type = "LArHitWidthClusterMerging">
   <ClusterListName>ClustersU</ClusterListName>
-  <UseSlidingLinearFit>false</UseSlidingLinearFit>
   <MinClusterWeight>0.5</MinClusterWeight>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersU</ClusterListNames>
-  <AlgorithmPositionString>AFTER_U_CLUSTERING</AlgorithmPositionString>
-</algorithm>
-
-<!--algorithm type = "LArTestCrossGapsAssociation">
-<MaxUnmatchedSampleRun>10</MaxUnmatchedSampleRun>
-</algorithm>
-<algorithm type = "LArCrossGapsExtension"/>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersU</ClusterListNames>
   <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
-  <AlgorithmPositionString>AFTER_CROSS_GAPS</AlgorithmPositionString>
-</algorithm-->
-
-<!-- -->
-
+  <AlgorithmPositionString>AFTER_MY_ALGORITHM</AlgorithmPositionString>
+</algorithm>
 
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
@@ -85,16 +116,71 @@
         <ReplaceCurrentCaloHitList>true</ReplaceCurrentCaloHitList>
         <ReplaceCurrentClusterList>true</ReplaceCurrentClusterList>
     </algorithm>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+  <AlgorithmPositionString>A</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArLayerSplitting"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+  <AlgorithmPositionString>B</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArLongitudinalAssociation"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+  <AlgorithmPositionString>C</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArTransverseAssociation"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+  <AlgorithmPositionString>D</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArLongitudinalExtension"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+  <AlgorithmPositionString>E</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArTransverseExtension"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+  <AlgorithmPositionString>F</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArCrossGapsAssociation"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+  <AlgorithmPositionString>G</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArCrossGapsExtension"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+  <AlgorithmPositionString>H</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArOvershootSplitting"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+  <AlgorithmPositionString>I</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArBranchSplitting"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+  <AlgorithmPositionString>J</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArKinkSplitting"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+  <AlgorithmPositionString>K</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArTrackConsolidation">
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
@@ -102,34 +188,20 @@
 <algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersV</ClusterListNames>
-  <AlgorithmPositionString>BEFORE_V_CLUSTERING</AlgorithmPositionString>
+  <AlgorithmPositionString>ORIGINAL_V_CLUSTERS</AlgorithmPositionString>
 </algorithm>
 
 <algorithm type = "LArHitWidthClusterMerging">
   <ClusterListName>ClustersV</ClusterListName>
-  <UseSlidingLinearFit>true</UseSlidingLinearFit>
-  <MinClusterWeight>1</MinClusterWeight>
+  <MinClusterWeight>0.5</MinClusterWeight>
 </algorithm>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersV</ClusterListNames>
-  <AlgorithmPositionString>AFTER_V_CLUSTERING</AlgorithmPositionString>
-</algorithm>
-
-<!--algorithm type = "LArTestCrossGapsAssociation">
-<MaxUnmatchedSampleRun>10</MaxUnmatchedSampleRun>
-</algorithm>
-<algorithm type = "LArCrossGapsExtension"/>
 
 <algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersV</ClusterListNames>
   <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
-  <AlgorithmPositionString>AFTER_CROSS_GAPS</AlgorithmPositionString>
-</algorithm-->
-
-<!-- -->
+  <AlgorithmPositionString>AFTER_MY_ALGORITHM</AlgorithmPositionString>
+</algorithm>
 
 
     <algorithm type = "LArClusteringParent">
@@ -139,45 +211,92 @@
         <ReplaceCurrentCaloHitList>true</ReplaceCurrentCaloHitList>
         <ReplaceCurrentClusterList>true</ReplaceCurrentClusterList>
     </algorithm>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>A</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArLayerSplitting"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>B</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArLongitudinalAssociation"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>C</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArTransverseAssociation"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>D</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArLongitudinalExtension"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>E</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArTransverseExtension"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>F</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArCrossGapsAssociation"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>G</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArCrossGapsExtension"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>H</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArOvershootSplitting"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>I</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArBranchSplitting"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>J</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArKinkSplitting"/>
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>K</AlgorithmPositionString>
+</algorithm>
     <algorithm type = "LArTrackConsolidation">
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>ORIGINAL_W_CLUSTERS</AlgorithmPositionString>
+</algorithm>
+
 <algorithm type = "LArHitWidthClusterMerging">
   <ClusterListName>ClustersW</ClusterListName>
-  <UseSlidingLinearFit>false</UseSlidingLinearFit>
   <MinClusterWeight>0.5</MinClusterWeight>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersW</ClusterListNames>
-  <AlgorithmPositionString>AFTER_W_CLUSTERING</AlgorithmPositionString>
-</algorithm>
-
-<!--algorithm type = "LArTestCrossGapsAssociation">
-<MaxUnmatchedSampleRun>10</MaxUnmatchedSampleRun>
-</algorithm>
-<algorithm type = "LArCrossGapsExtension"/>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersW</ClusterListNames>
   <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
-  <AlgorithmPositionString>AFTER_CROSS_GAPS</AlgorithmPositionString>
-</algorithm-->
-
-
+  <AlgorithmPositionString>AFTER_MY_ALGORITHM</AlgorithmPositionString>
+</algorithm>
 
     <!-- VertexAlgorithms -->
     <algorithm type = "LArCutClusterCharacterisation">
@@ -220,7 +339,7 @@
 
 <algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
-  <ShowCurrentVertices>true</ShowCurrentVertices>
+  <ShowCurrentVertices>false</ShowCurrentVertices>
   <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
   <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
   <AlgorithmPositionString>BEFORE_3D_MATCHING</AlgorithmPositionString>
@@ -232,6 +351,8 @@
         <InputClusterListNameV>ClustersV</InputClusterListNameV>
         <InputClusterListNameW>ClustersW</InputClusterListNameW>
         <OutputPfoListName>TrackParticles3D</OutputPfoListName>
+        <!--MinClusterCaloHits>0</MinClusterCaloHits-->
+        <!--MinClusterLength>0.0</MinClusterLength-->
         <TrackTools>
             <tool type = "LArTransverseTensorVisualization">
                 <MinClusterConnections>0</MinClusterConnections>
@@ -239,6 +360,7 @@
                 <ShowEachIndividualElement>true</ShowEachIndividualElement>
                 <ShowContext>false</ShowContext>
             </tool>
+            <!--tool type = "LArIsobelTensorTool"/-->
             <tool type = "LArClearTracks"/>
             <tool type = "LArLongTracks"/>
             <tool type = "LArOvershootTracks"><SplitMode>true</SplitMode></tool>
@@ -253,6 +375,7 @@
         </TrackTools>
     </algorithm>
 
+
 <algorithm type = "LArParticleEfficiency">
   <CaloHitListName>CaloHitList2D</CaloHitListName>
   <PfoListNames>TrackParticles3D</PfoListNames>
@@ -263,16 +386,16 @@
   <PrintToScreen>true</PrintToScreen>
   <ParticlesInEvent>1</ParticlesInEvent>
   <VisualiseMCParticles>true</VisualiseMCParticles>
-  <IsThreeViewMode>true</IsThreeViewMode>
+  <VisualisePfos>false</VisualisePfos>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
+  <ShowCurrentPfos>true</ShowCurrentPfos>
   <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
   <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
+  <ShowCurrentVertices>false</ShowCurrentVertices>
   <AlgorithmPositionString>AFTER_TRANSVERSE</AlgorithmPositionString>
 </algorithm>
-
 
     <algorithm type = "LArThreeDLongitudinalTracks">
         <InputClusterListNameU>ClustersU</InputClusterListNameU>
@@ -307,11 +430,11 @@
 </algorithm>
 
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowCurrentPfos>true</ShowCurrentPfos>
   <ShowDetector>true</ShowDetector>
   <ShowCurrentMCParticles>true</ShowCurrentMCParticles>
-</algorithm>
+</algorithm-->
 
     <algorithm type = "LArThreeDTrackFragments">
         <MinClusterLength>5.</MinClusterLength>
@@ -565,7 +688,7 @@
   <CaloHitListName>CaloHitList2D</CaloHitListName>
   <PfoListNames>TrackParticles3D ShowerParticles3D</PfoListNames>
   <VertexListName>NeutrinoVertices3D</VertexListName>
-  <WriteToTree>false</WriteToTree>
+  <WriteToTree>true</WriteToTree>
   <TreeName>Jam4</TreeName>
   <FileName>PandoraEnd.root</FileName>
   <PrintToScreen>true</PrintToScreen>

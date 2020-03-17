@@ -1,9 +1,8 @@
 <pandora>
     <!-- GLOBAL SETTINGS -->
     <IsMonitoringEnabled>true</IsMonitoringEnabled>
-    <ShouldDisplayAlgorithmInfo>true</ShouldDisplayAlgorithmInfo>
+    <ShouldDisplayAlgorithmInfo>false</ShouldDisplayAlgorithmInfo>
     <SingleHitTypeClusteringMode>true</SingleHitTypeClusteringMode>
-
 
     <!-- ALGORITHM SETTINGS -->
     <algorithm type = "LArPreProcessing">
@@ -28,6 +27,9 @@
     <algorithm type = "LArLongitudinalExtension"/>
     <algorithm type = "LArTransverseExtension"/>
     <algorithm type = "LArCrossGapsAssociation"/>
+<algorithm type = "LArHitWidthClusterMerging">
+  <ClusterListName>ClustersU</ClusterListName>
+</algorithm>
     <algorithm type = "LArCrossGapsExtension"/>
     <algorithm type = "LArOvershootSplitting"/>
     <algorithm type = "LArBranchSplitting"/>
@@ -35,47 +37,6 @@
     <algorithm type = "LArTrackConsolidation">
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
-
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersU</ClusterListNames>
-  <AlgorithmPositionString>BEFORE_TEST</AlgorithmPositionString>
-</algorithm>
-
-
-<!-- TEST -->
-<!--algorithm type = "LArTest">
-<ClusterListName>ClustersU</ClusterListName>
-<CaloHitListName>CaloHitListU</CaloHitListName>
-</algorithm-->
-
-
-<algorithm type = "LArHitWidthClusterMerging">
-  <ClusterListName>ClustersU</ClusterListName>
-  <UseSlidingLinearFit>false</UseSlidingLinearFit>
-  <MinClusterWeight>0.5</MinClusterWeight>
-</algorithm>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersU</ClusterListNames>
-  <AlgorithmPositionString>AFTER_U_CLUSTERING</AlgorithmPositionString>
-</algorithm>
-
-<!--algorithm type = "LArTestCrossGapsAssociation">
-<MaxUnmatchedSampleRun>10</MaxUnmatchedSampleRun>
-</algorithm>
-<algorithm type = "LArCrossGapsExtension"/>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersU</ClusterListNames>
-  <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
-  <AlgorithmPositionString>AFTER_CROSS_GAPS</AlgorithmPositionString>
-</algorithm-->
-
-<!-- -->
 
 
     <algorithm type = "LArClusteringParent">
@@ -91,6 +52,9 @@
     <algorithm type = "LArLongitudinalExtension"/>
     <algorithm type = "LArTransverseExtension"/>
     <algorithm type = "LArCrossGapsAssociation"/>
+<algorithm type = "LArHitWidthClusterMerging">
+  <ClusterListName>ClustersV</ClusterListName>
+</algorithm>
     <algorithm type = "LArCrossGapsExtension"/>
     <algorithm type = "LArOvershootSplitting"/>
     <algorithm type = "LArBranchSplitting"/>
@@ -99,37 +63,6 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersV</ClusterListNames>
-  <AlgorithmPositionString>BEFORE_V_CLUSTERING</AlgorithmPositionString>
-</algorithm>
-
-<algorithm type = "LArHitWidthClusterMerging">
-  <ClusterListName>ClustersV</ClusterListName>
-  <UseSlidingLinearFit>true</UseSlidingLinearFit>
-  <MinClusterWeight>1</MinClusterWeight>
-</algorithm>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersV</ClusterListNames>
-  <AlgorithmPositionString>AFTER_V_CLUSTERING</AlgorithmPositionString>
-</algorithm>
-
-<!--algorithm type = "LArTestCrossGapsAssociation">
-<MaxUnmatchedSampleRun>10</MaxUnmatchedSampleRun>
-</algorithm>
-<algorithm type = "LArCrossGapsExtension"/>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersV</ClusterListNames>
-  <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
-  <AlgorithmPositionString>AFTER_CROSS_GAPS</AlgorithmPositionString>
-</algorithm-->
-
-<!-- -->
 
 
     <algorithm type = "LArClusteringParent">
@@ -145,6 +78,9 @@
     <algorithm type = "LArLongitudinalExtension"/>
     <algorithm type = "LArTransverseExtension"/>
     <algorithm type = "LArCrossGapsAssociation"/>
+<algorithm type = "LArHitWidthClusterMerging">
+  <ClusterListName>ClustersW</ClusterListName>
+</algorithm>
     <algorithm type = "LArCrossGapsExtension"/>
     <algorithm type = "LArOvershootSplitting"/>
     <algorithm type = "LArBranchSplitting"/>
@@ -152,30 +88,6 @@
     <algorithm type = "LArTrackConsolidation">
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
-
-<algorithm type = "LArHitWidthClusterMerging">
-  <ClusterListName>ClustersW</ClusterListName>
-  <UseSlidingLinearFit>false</UseSlidingLinearFit>
-  <MinClusterWeight>0.5</MinClusterWeight>
-</algorithm>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersW</ClusterListNames>
-  <AlgorithmPositionString>AFTER_W_CLUSTERING</AlgorithmPositionString>
-</algorithm>
-
-<!--algorithm type = "LArTestCrossGapsAssociation">
-<MaxUnmatchedSampleRun>10</MaxUnmatchedSampleRun>
-</algorithm>
-<algorithm type = "LArCrossGapsExtension"/>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersW</ClusterListNames>
-  <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
-  <AlgorithmPositionString>AFTER_CROSS_GAPS</AlgorithmPositionString>
-</algorithm-->
 
 
 
@@ -218,13 +130,6 @@
         <InputClusterListNames>ClustersU ClustersV ClustersW</InputClusterListNames>
     </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ShowCurrentVertices>true</ShowCurrentVertices>
-  <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
-  <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
-  <AlgorithmPositionString>BEFORE_3D_MATCHING</AlgorithmPositionString>
-</algorithm>
 
     <!-- ThreeDTrackAlgorithms -->
     <algorithm type = "LArThreeDTransverseTracks">
@@ -233,12 +138,6 @@
         <InputClusterListNameW>ClustersW</InputClusterListNameW>
         <OutputPfoListName>TrackParticles3D</OutputPfoListName>
         <TrackTools>
-            <tool type = "LArTransverseTensorVisualization">
-                <MinClusterConnections>0</MinClusterConnections>
-                <IgnoreUnavailableClusters>true</IgnoreUnavailableClusters>
-                <ShowEachIndividualElement>true</ShowEachIndividualElement>
-                <ShowContext>false</ShowContext>
-            </tool>
             <tool type = "LArClearTracks"/>
             <tool type = "LArLongTracks"/>
             <tool type = "LArOvershootTracks"><SplitMode>true</SplitMode></tool>
@@ -257,22 +156,14 @@
   <CaloHitListName>CaloHitList2D</CaloHitListName>
   <PfoListNames>TrackParticles3D</PfoListNames>
   <VertexListName>NeutrinoVertices3D</VertexListName>
-  <WriteToTree>false</WriteToTree>
-  <TreeName>Jam1</TreeName>
-  <FileName>Transverse.root</FileName>
-  <PrintToScreen>true</PrintToScreen>
+  <WriteToTree>true</WriteToTree>
+  <TreeName>Transverse1Tree</TreeName>
+  <FileName>Transverse1.root</FileName>
+  <PrintToScreen>false</PrintToScreen>
+  <FoldToPrimaries>false</FoldToPrimaries>
+  <VisualiseMCParticles>false</VisualiseMCParticles>
   <ParticlesInEvent>1</ParticlesInEvent>
-  <VisualiseMCParticles>true</VisualiseMCParticles>
-  <IsThreeViewMode>true</IsThreeViewMode>
 </algorithm>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
-  <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
-  <AlgorithmPositionString>AFTER_TRANSVERSE</AlgorithmPositionString>
-</algorithm>
-
 
     <algorithm type = "LArThreeDLongitudinalTracks">
         <InputClusterListNameU>ClustersU</InputClusterListNameU>
@@ -289,28 +180,13 @@
   <CaloHitListName>CaloHitList2D</CaloHitListName>
   <PfoListNames>TrackParticles3D</PfoListNames>
   <VertexListName>NeutrinoVertices3D</VertexListName>
-  <WriteToTree>false</WriteToTree>
-  <TreeName>Jam2</TreeName>
-  <FileName>Longitudinal.root</FileName>
-  <PrintToScreen>true</PrintToScreen>
-  <ParticlesInEvent>1</ParticlesInEvent>
+  <WriteToTree>true</WriteToTree>
+  <TreeName>Longitudinal1Tree</TreeName>
+  <FileName>Longitudinal1.root</FileName>
+  <PrintToScreen>false</PrintToScreen>
+  <FoldToPrimaries>false</FoldToPrimaries>
   <VisualiseMCParticles>false</VisualiseMCParticles>
-  <VisualisePfos>false</VisualisePfos>
-</algorithm>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowCurrentPfos>true</ShowCurrentPfos>
-  <ShowDetector>true</ShowDetector>
-  <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
-  <ShowCurrentVertices>false</ShowCurrentVertices>
-  <AlgorithmPositionString>AFTER_LONGITUDINAL</AlgorithmPositionString>
-</algorithm>
-
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowCurrentPfos>true</ShowCurrentPfos>
-  <ShowDetector>true</ShowDetector>
-  <ShowCurrentMCParticles>true</ShowCurrentMCParticles>
+  <ParticlesInEvent>1</ParticlesInEvent>
 </algorithm>
 
     <algorithm type = "LArThreeDTrackFragments">
@@ -329,49 +205,14 @@
   <CaloHitListName>CaloHitList2D</CaloHitListName>
   <PfoListNames>TrackParticles3D</PfoListNames>
   <VertexListName>NeutrinoVertices3D</VertexListName>
-  <WriteToTree>false</WriteToTree>
-  <TreeName>Jam3</TreeName>
-  <FileName>Fragments.root</FileName>
-  <PrintToScreen>true</PrintToScreen>
-  <ParticlesInEvent>1</ParticlesInEvent>
+  <WriteToTree>true</WriteToTree>
+  <TreeName>Fragments1Tree</TreeName>
+  <FileName>Fragments1.root</FileName>
+  <PrintToScreen>false</PrintToScreen>
+  <FoldToPrimaries>false</FoldToPrimaries>
   <VisualiseMCParticles>false</VisualiseMCParticles>
-  <VisualisePfos>false</VisualisePfos>
-</algorithm>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowCurrentPfos>true</ShowCurrentPfos>
-  <ShowDetector>true</ShowDetector>
-  <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
-  <ShowCurrentVertices>false</ShowCurrentVertices>
-  <AlgorithmPositionString>AFTER_FRAGMENTS</AlgorithmPositionString>
-</algorithm>
-
-
-<!--algorithm type = "LArParticleEfficiency">
-  <CaloHitListName>CaloHitList2D</CaloHitListName>
-  <PfoListName>TrackParticles3D</PfoListName>
-  <VertexListName>NeutrinoVertices3D</VertexListName>
-  <WriteToTree>false</WriteToTree>
-  <TreeName>Jam</TreeName>
-  <FileName>Jam.root</FileName>
-  <PrintToScreen>true</PrintToScreen>
   <ParticlesInEvent>1</ParticlesInEvent>
-  <VisualiseMCParticles>false</VisualiseMCParticles>
-  <VisualisePfos>true</VisualisePfos>
 </algorithm>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowCurrentPfos>true</ShowCurrentPfos>
-  <ShowDetector>true</ShowDetector>
-  <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
-</algorithm-->
-
-
-<!--algorithm type = "LArPfoValidation">
-  <CaloHitListName>CaloHitList2D</CaloHitListName>
-  <PfoListName>TrackParticles3D</PfoListName>
-</algorithm-->
-
 
     <!-- ThreeDShowerAlgorithms -->
     <algorithm type = "LArCutPfoCharacterisation">
@@ -407,6 +248,7 @@
         </ShowerTools>
     </algorithm>
 
+
     <!-- Repeat ThreeDTrackAlgorithms -->
     <algorithm type = "LArThreeDTransverseTracks">
         <InputClusterListNameU>ClustersU</InputClusterListNameU>
@@ -427,6 +269,7 @@
             <tool type = "LArMissingTrack"/>
         </TrackTools>
     </algorithm>
+
     <algorithm type = "LArThreeDLongitudinalTracks">
         <InputClusterListNameU>ClustersU</InputClusterListNameU>
         <InputClusterListNameV>ClustersV</InputClusterListNameV>
@@ -437,6 +280,7 @@
             <tool type = "LArMatchedEndPoints"/>
         </TrackTools>
     </algorithm>
+
     <algorithm type = "LArThreeDTrackFragments">
         <MinClusterLength>5.</MinClusterLength>
         <InputClusterListNameU>ClustersU</InputClusterListNameU>
@@ -516,6 +360,7 @@
         </HitCreationTools>
     </algorithm>
 
+
     <!-- ThreeDMopUpAlgorithms -->
     <algorithm type = "LArSlidingConePfoMopUp">
         <InputPfoListNames>TrackParticles3D ShowerParticles3D</InputPfoListNames>
@@ -530,6 +375,7 @@
         <DaughterListNames>ClustersU ClustersV ClustersW</DaughterListNames>
         <AddHitsAsIsolated>true</AddHitsAsIsolated>
     </algorithm>
+
 
     <!-- NeutrinoAlgorithms -->
     <algorithm type = "LArNeutrinoCreation">
@@ -560,20 +406,18 @@
         <VertexListName>DaughterVertices3D</VertexListName> 
     </algorithm>
 
-
 <algorithm type = "LArParticleEfficiency">
   <CaloHitListName>CaloHitList2D</CaloHitListName>
   <PfoListNames>TrackParticles3D ShowerParticles3D</PfoListNames>
   <VertexListName>NeutrinoVertices3D</VertexListName>
-  <WriteToTree>false</WriteToTree>
-  <TreeName>Jam4</TreeName>
-  <FileName>PandoraEnd.root</FileName>
-  <PrintToScreen>true</PrintToScreen>
+  <WriteToTree>true</WriteToTree>
+  <TreeName>PandoraEndTree</TreeName>
+  <FileName>PandoraEndTree.root</FileName>
+  <PrintToScreen>false</PrintToScreen>
   <ParticlesInEvent>1</ParticlesInEvent>
   <VisualiseMCParticles>false</VisualiseMCParticles>
   <VisualisePfos>false</VisualisePfos>
 </algorithm>
-
 
     <!-- Output list management -->
     <algorithm type = "LArPostProcessing">
@@ -583,6 +427,7 @@
         <CaloHitListNames>CaloHitListU CaloHitListV CaloHitListW CaloHitList2D</CaloHitListNames>
         <CurrentPfoListReplacement>NeutrinoParticles3D</CurrentPfoListReplacement>
     </algorithm>
+
 
 
 </pandora>
