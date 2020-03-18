@@ -37,24 +37,25 @@
     </algorithm>
 
 
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersU</ClusterListNames>
-  <AlgorithmPositionString>BEFORE_TEST</AlgorithmPositionString>
-</algorithm>
-
-
 <!-- TEST -->
 <!--algorithm type = "LArTest">
 <ClusterListName>ClustersU</ClusterListName>
 <CaloHitListName>CaloHitListU</CaloHitListName>
 </algorithm-->
 
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+  <AlgorithmPositionString>BEFORE_U_CLUSTERING</AlgorithmPositionString>
+</algorithm>
 
 <algorithm type = "LArHitWidthClusterMerging">
   <ClusterListName>ClustersU</ClusterListName>
   <UseSlidingLinearFit>false</UseSlidingLinearFit>
+  <HitWidthScalingFactor>1</HitWidthScalingFactor>
+  <MaxDirectionDeviationCosAngle>0.90</MaxDirectionDeviationCosAngle>
   <MinClusterWeight>0.5</MinClusterWeight>
+  <MaxConstituentHitWidth>0.5</MaxConstituentHitWidth>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
@@ -63,20 +64,7 @@
   <AlgorithmPositionString>AFTER_U_CLUSTERING</AlgorithmPositionString>
 </algorithm>
 
-<!--algorithm type = "LArTestCrossGapsAssociation">
-<MaxUnmatchedSampleRun>10</MaxUnmatchedSampleRun>
-</algorithm>
-<algorithm type = "LArCrossGapsExtension"/>
-
-<algorithm type = "LArVisualMonitoring">
-  <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersU</ClusterListNames>
-  <ShowCurrentMCParticles>false</ShowCurrentMCParticles>
-  <AlgorithmPositionString>AFTER_CROSS_GAPS</AlgorithmPositionString>
-</algorithm-->
-
 <!-- -->
-
 
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
@@ -99,6 +87,12 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
+<!-- TEST -->
+<!--algorithm type = "LArTest">
+<ClusterListName>ClustersU</ClusterListName>
+<CaloHitListName>CaloHitListU</CaloHitListName>
+</algorithm-->
+
 <algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersV</ClusterListNames>
@@ -107,8 +101,11 @@
 
 <algorithm type = "LArHitWidthClusterMerging">
   <ClusterListName>ClustersV</ClusterListName>
-  <UseSlidingLinearFit>true</UseSlidingLinearFit>
-  <MinClusterWeight>1</MinClusterWeight>
+  <UseSlidingLinearFit>false</UseSlidingLinearFit>
+  <HitWidthScalingFactor>1</HitWidthScalingFactor>
+  <MaxDirectionDeviationCosAngle>0.90</MaxDirectionDeviationCosAngle>
+  <MinClusterWeight>0.5</MinClusterWeight>
+  <MaxConstituentHitWidth>0.5</MaxConstituentHitWidth>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
@@ -153,10 +150,19 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+  <AlgorithmPositionString>BEFORE_V_CLUSTERING</AlgorithmPositionString>
+</algorithm>
+
 <algorithm type = "LArHitWidthClusterMerging">
   <ClusterListName>ClustersW</ClusterListName>
   <UseSlidingLinearFit>false</UseSlidingLinearFit>
+  <HitWidthScalingFactor>1</HitWidthScalingFactor>
+  <MaxDirectionDeviationCosAngle>0.90</MaxDirectionDeviationCosAngle>
   <MinClusterWeight>0.5</MinClusterWeight>
+  <MaxConstituentHitWidth>0.5</MaxConstituentHitWidth>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
