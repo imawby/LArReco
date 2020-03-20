@@ -53,7 +53,7 @@
   <ClusterListName>ClustersU</ClusterListName>
   <UseSlidingLinearFit>false</UseSlidingLinearFit>
   <HitWidthScalingFactor>1</HitWidthScalingFactor>
-  <MaxDirectionDeviationCosAngle>0.90</MaxDirectionDeviationCosAngle>
+  <MaxDirectionDeviationCosAngle>0.9</MaxDirectionDeviationCosAngle>
   <MinClusterWeight>0.5</MinClusterWeight>
   <MaxConstituentHitWidth>0.5</MaxConstituentHitWidth>
 </algorithm>
@@ -103,7 +103,7 @@
   <ClusterListName>ClustersV</ClusterListName>
   <UseSlidingLinearFit>false</UseSlidingLinearFit>
   <HitWidthScalingFactor>1</HitWidthScalingFactor>
-  <MaxDirectionDeviationCosAngle>0.90</MaxDirectionDeviationCosAngle>
+  <MaxDirectionDeviationCosAngle>0.9</MaxDirectionDeviationCosAngle>
   <MinClusterWeight>0.5</MinClusterWeight>
   <MaxConstituentHitWidth>0.5</MaxConstituentHitWidth>
 </algorithm>
@@ -152,15 +152,15 @@
 
 <algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
-  <ClusterListNames>ClustersV</ClusterListNames>
-  <AlgorithmPositionString>BEFORE_V_CLUSTERING</AlgorithmPositionString>
+  <ClusterListNames>ClustersW</ClusterListNames>
+  <AlgorithmPositionString>BEFORE_W_CLUSTERING</AlgorithmPositionString>
 </algorithm>
 
 <algorithm type = "LArHitWidthClusterMerging">
   <ClusterListName>ClustersW</ClusterListName>
   <UseSlidingLinearFit>false</UseSlidingLinearFit>
   <HitWidthScalingFactor>1</HitWidthScalingFactor>
-  <MaxDirectionDeviationCosAngle>0.90</MaxDirectionDeviationCosAngle>
+  <MaxDirectionDeviationCosAngle>0.9</MaxDirectionDeviationCosAngle>
   <MinClusterWeight>0.5</MinClusterWeight>
   <MaxConstituentHitWidth>0.5</MaxConstituentHitWidth>
 </algorithm>
