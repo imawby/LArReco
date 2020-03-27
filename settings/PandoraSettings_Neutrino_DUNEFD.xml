@@ -35,6 +35,17 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+</algorithm>
+
+<algorithm type = "EMTrack">
+  <CaloHitListName>CaloHitListU</CaloHitListName>
+  <MaxXSeparation>10</MaxXSeparation>
+  <MaxZSeparation>10</MaxZSeparation>
+</algorithm>
+
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
         <InputCaloHitListName>CaloHitListV</InputCaloHitListName>
@@ -55,6 +66,17 @@
     <algorithm type = "LArTrackConsolidation">
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
+
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+</algorithm>
+    
+<algorithm type = "EMTrack">
+  <CaloHitListName>CaloHitListV</CaloHitListName>
+  <MaxXSeparation>10</MaxXSeparation>
+  <MaxZSeparation>10</MaxZSeparation>
+</algorithm>
 
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
@@ -77,6 +99,18 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+</algorithm>
+
+<algorithm type = "EMTrack">
+  <CaloHitListName>CaloHitListW</CaloHitListName>
+  <MaxXSeparation>10</MaxXSeparation>
+  <MaxZSeparation>10</MaxZSeparation>
+</algorithm>
+
+    
     <!-- VertexAlgorithms -->
     <algorithm type = "LArCutClusterCharacterisation">
         <InputClusterListNames>ClustersU ClustersV ClustersW</InputClusterListNames>

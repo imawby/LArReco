@@ -1,7 +1,7 @@
 <pandora>
     <!-- GLOBAL SETTINGS -->
     <IsMonitoringEnabled>true</IsMonitoringEnabled>
-    <ShouldDisplayAlgorithmInfo>false</ShouldDisplayAlgorithmInfo>
+    <ShouldDisplayAlgorithmInfo>true</ShouldDisplayAlgorithmInfo>
     <SingleHitTypeClusteringMode>true</SingleHitTypeClusteringMode>
 
     <!-- ALGORITHM SETTINGS -->
@@ -39,6 +39,17 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
+<!--algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
+</algorithm-->
+    
+<!--algorithm type = "LArEMTrack">
+  <CaloHitListName>CaloHitListU</CaloHitListName>
+  <MaxXSeparation>10</MaxXSeparation>
+  <MaxZSeparation>10</MaxZSeparation>
+</algorithm-->
+
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
         <InputCaloHitListName>CaloHitListV</InputCaloHitListName>
@@ -63,6 +74,17 @@
     <algorithm type = "LArTrackConsolidation">
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
+    
+<!--algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
+</algorithm-->
+    
+<algorithm type = "LArEMTrack">
+  <CaloHitListName>CaloHitListV</CaloHitListName>
+  <MaxXSeparation>10</MaxXSeparation>
+  <MaxZSeparation>10</MaxZSeparation>
+</algorithm>
 
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
@@ -89,6 +111,17 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
+<!--algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
+</algorithm-->
+    
+<algorithm type = "LArEMTrack">
+  <CaloHitListName>CaloHitListW</CaloHitListName>
+  <MaxXSeparation>10</MaxXSeparation>
+  <MaxZSeparation>10</MaxZSeparation>
+</algorithm>
+    
     <!-- ThreeDTrackAlgorithms -->
     <algorithm type = "LArThreeDTransverseTracks">
         <InputClusterListNameU>ClustersU</InputClusterListNameU>
