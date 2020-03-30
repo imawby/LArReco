@@ -44,11 +44,11 @@
   <ClusterListNames>ClustersU</ClusterListNames>
 </algorithm-->
     
-<!--algorithm type = "LArEMTrack">
+<algorithm type = "LArEMTrack">
   <CaloHitListName>CaloHitListU</CaloHitListName>
   <MaxXSeparation>10</MaxXSeparation>
   <MaxZSeparation>10</MaxZSeparation>
-</algorithm-->
+</algorithm>
 
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
