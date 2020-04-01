@@ -39,15 +39,22 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
-<!--algorithm type = "LArVisualMonitoring">
+<algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersU</ClusterListNames>
-</algorithm-->
+</algorithm>
     
 <algorithm type = "LArEMTrack">
   <CaloHitListName>CaloHitListU</CaloHitListName>
-  <MaxXSeparation>10</MaxXSeparation>
-  <MaxZSeparation>10</MaxZSeparation>
+  <MaxXSeparation>5</MaxXSeparation>
+  <MaxZSeparation>5</MaxZSeparation>
+  <UseUnclusteredHits>true</UseUnclusteredHits>
+  <UseAxisDirection>true</UseAxisDirection>
+</algorithm>
+
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersU</ClusterListNames>
 </algorithm>
 
     <algorithm type = "LArClusteringParent">
@@ -75,15 +82,22 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
     
-<!--algorithm type = "LArVisualMonitoring">
+<algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersV</ClusterListNames>
-</algorithm-->
-    
+</algorithm>
+
 <algorithm type = "LArEMTrack">
   <CaloHitListName>CaloHitListV</CaloHitListName>
-  <MaxXSeparation>10</MaxXSeparation>
-  <MaxZSeparation>10</MaxZSeparation>
+  <MaxXSeparation>5</MaxXSeparation>
+  <MaxZSeparation>5</MaxZSeparation>
+  <UseUnclusteredHits>true</UseUnclusteredHits>
+  <UseAxisDirection>true</UseAxisDirection>
+</algorithm>
+
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersV</ClusterListNames>
 </algorithm>
 
     <algorithm type = "LArClusteringParent">
@@ -111,15 +125,22 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
-<!--algorithm type = "LArVisualMonitoring">
+<algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersW</ClusterListNames>
-</algorithm-->
-    
+</algorithm>
+
 <algorithm type = "LArEMTrack">
   <CaloHitListName>CaloHitListW</CaloHitListName>
-  <MaxXSeparation>10</MaxXSeparation>
-  <MaxZSeparation>10</MaxZSeparation>
+  <MaxXSeparation>5</MaxXSeparation>
+  <MaxZSeparation>5</MaxZSeparation>
+  <UseUnclusteredHits>true</UseUnclusteredHits>
+  <UseAxisDirection>true</UseAxisDirection>
+</algorithm>
+
+<algorithm type = "LArVisualMonitoring">
+  <ShowDetector>true</ShowDetector>
+  <ClusterListNames>ClustersW</ClusterListNames>
 </algorithm>
     
     <!-- ThreeDTrackAlgorithms -->
