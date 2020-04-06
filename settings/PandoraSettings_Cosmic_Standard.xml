@@ -39,7 +39,7 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersU</ClusterListNames>
 </algorithm>
@@ -50,12 +50,13 @@
   <MaxZSeparation>5</MaxZSeparation>
   <UseUnclusteredHits>true</UseUnclusteredHits>
   <UseAxisDirection>true</UseAxisDirection>
+  <SlidingFitWindow>20</SlidingFitWindow>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersU</ClusterListNames>
-</algorithm>
+</algorithm-->
 
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
@@ -91,8 +92,8 @@
   <CaloHitListName>CaloHitListV</CaloHitListName>
   <MaxXSeparation>5</MaxXSeparation>
   <MaxZSeparation>5</MaxZSeparation>
-  <UseUnclusteredHits>true</UseUnclusteredHits>
-  <UseAxisDirection>true</UseAxisDirection>
+  <SlidingFitWindow>20</SlidingFitWindow>
+  <LimitZ>true</LimitZ>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
@@ -125,7 +126,7 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersW</ClusterListNames>
 </algorithm>
@@ -134,14 +135,13 @@
   <CaloHitListName>CaloHitListW</CaloHitListName>
   <MaxXSeparation>5</MaxXSeparation>
   <MaxZSeparation>5</MaxZSeparation>
-  <UseUnclusteredHits>true</UseUnclusteredHits>
-  <UseAxisDirection>true</UseAxisDirection>
+  <SlidingFitWindow>20</SlidingFitWindow>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersW</ClusterListNames>
-</algorithm>
+</algorithm-->
     
     <!-- ThreeDTrackAlgorithms -->
     <algorithm type = "LArThreeDTransverseTracks">
