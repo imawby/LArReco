@@ -42,7 +42,7 @@
 <!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersU</ClusterListNames>
-</algorithm>
+</algorithm-->
     
 <algorithm type = "LArEMTrack">
   <CaloHitListName>CaloHitListU</CaloHitListName>
@@ -51,9 +51,10 @@
   <UseUnclusteredHits>true</UseUnclusteredHits>
   <UseAxisDirection>true</UseAxisDirection>
   <SlidingFitWindow>20</SlidingFitWindow>
+  <UseOtherCluster>true</UseOtherCluster>
 </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersU</ClusterListNames>
 </algorithm-->
@@ -83,10 +84,10 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
     
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersV</ClusterListNames>
-</algorithm>
+</algorithm-->
 
 <algorithm type = "LArEMTrack">
   <CaloHitListName>CaloHitListV</CaloHitListName>
@@ -94,12 +95,13 @@
   <MaxZSeparation>5</MaxZSeparation>
   <SlidingFitWindow>20</SlidingFitWindow>
   <LimitZ>true</LimitZ>
+  <UseOtherCluster>true</UseOtherCluster>
 </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersV</ClusterListNames>
-</algorithm>
+</algorithm-->
 
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
@@ -129,16 +131,17 @@
 <!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersW</ClusterListNames>
-</algorithm>
+</algorithm-->
 
 <algorithm type = "LArEMTrack">
   <CaloHitListName>CaloHitListW</CaloHitListName>
   <MaxXSeparation>5</MaxXSeparation>
   <MaxZSeparation>5</MaxZSeparation>
   <SlidingFitWindow>20</SlidingFitWindow>
+  <UseOtherCluster>true</UseOtherCluster>
 </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersW</ClusterListNames>
 </algorithm-->
