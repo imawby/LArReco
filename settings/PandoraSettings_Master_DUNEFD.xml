@@ -23,7 +23,11 @@
         <NuSettingsFile>PandoraSettings_Neutrino_DUNEFD.xml</NuSettingsFile>
         <SlicingSettingsFile>PandoraSettings_Slicing_Standard.xml</SlicingSettingsFile>
         <StitchingTools>
-            <tool type = "LArStitchingCosmicRayMerging"><ThreeDStitchingMode>true</ThreeDStitchingMode></tool>
+          <tool type = "LArStitchingCosmicRayMerging">
+            <ThreeDStitchingMode>true</ThreeDStitchingMode>
+            <WriteToTree>true</WriteToTree>
+            <IgnoreImpactParamterCut>false</IgnoreImpactParamterCut>
+          </tool>
             <tool type = "LArStitchingCosmicRayMerging"><ThreeDStitchingMode>false</ThreeDStitchingMode></tool>
         </StitchingTools>
         <CosmicRayTaggingTools>
@@ -41,6 +45,8 @@
         <VisualizeOverallRecoStatus>false</VisualizeOverallRecoStatus>
     </algorithm>
 
+
+    
     <algorithm type = "LArTestBeamEventValidation">
         <CaloHitListName>CaloHitList2D</CaloHitListName>
         <MCParticleListName>Input</MCParticleListName>

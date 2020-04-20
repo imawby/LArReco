@@ -42,10 +42,11 @@
 <!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersU</ClusterListNames>
-</algorithm-->
+</algorithm>
     
 <algorithm type = "LArEMTrack">
   <CaloHitListName>CaloHitListU</CaloHitListName>
+  <MinCaloHits>25</MinCaloHits>
   <MaxXSeparation>5</MaxXSeparation>
   <MaxZSeparation>5</MaxZSeparation>
   <UseUnclusteredHits>true</UseUnclusteredHits>
@@ -54,7 +55,7 @@
   <UseOtherCluster>true</UseOtherCluster>
 </algorithm>
 
-<!--algorithm type = "LArVisualMonitoring">
+<algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersU</ClusterListNames>
 </algorithm-->
@@ -87,10 +88,11 @@
 <!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersV</ClusterListNames>
-</algorithm-->
+</algorithm>
 
 <algorithm type = "LArEMTrack">
   <CaloHitListName>CaloHitListV</CaloHitListName>
+  <MinCaloHits>25</MinCaloHits>
   <MaxXSeparation>5</MaxXSeparation>
   <MaxZSeparation>5</MaxZSeparation>
   <SlidingFitWindow>20</SlidingFitWindow>
@@ -98,7 +100,7 @@
   <UseOtherCluster>true</UseOtherCluster>
 </algorithm>
 
-<!--algorithm type = "LArVisualMonitoring">
+<algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersV</ClusterListNames>
 </algorithm-->
@@ -131,17 +133,18 @@
 <!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersW</ClusterListNames>
-</algorithm-->
+</algorithm>
 
 <algorithm type = "LArEMTrack">
   <CaloHitListName>CaloHitListW</CaloHitListName>
+  <MinCaloHits>25</MinCaloHits>
   <MaxXSeparation>5</MaxXSeparation>
   <MaxZSeparation>5</MaxZSeparation>
   <SlidingFitWindow>20</SlidingFitWindow>
   <UseOtherCluster>true</UseOtherCluster>
 </algorithm>
 
-<!--algorithm type = "LArVisualMonitoring">
+<algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersW</ClusterListNames>
 </algorithm-->

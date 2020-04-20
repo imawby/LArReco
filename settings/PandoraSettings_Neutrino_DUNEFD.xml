@@ -1,7 +1,7 @@
 <pandora>
     <!-- GLOBAL SETTINGS -->
     <IsMonitoringEnabled>true</IsMonitoringEnabled>
-    <ShouldDisplayAlgorithmInfo>false</ShouldDisplayAlgorithmInfo>
+    <ShouldDisplayAlgorithmInfo>true</ShouldDisplayAlgorithmInfo>
     <SingleHitTypeClusteringMode>true</SingleHitTypeClusteringMode>
 
     <!-- ALGORITHM SETTINGS -->
@@ -40,11 +40,11 @@
   <ClusterListNames>ClustersU</ClusterListNames>
 </algorithm>
 
-<algorithm type = "EMTrack">
+<!--algorithm type = "EMTrack">
   <CaloHitListName>CaloHitListU</CaloHitListName>
   <MaxXSeparation>10</MaxXSeparation>
   <MaxZSeparation>10</MaxZSeparation>
-</algorithm>
+</algorithm-->
 
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
@@ -72,11 +72,11 @@
   <ClusterListNames>ClustersV</ClusterListNames>
 </algorithm>
     
-<algorithm type = "EMTrack">
+<!--algorithm type = "EMTrack">
   <CaloHitListName>CaloHitListV</CaloHitListName>
   <MaxXSeparation>10</MaxXSeparation>
   <MaxZSeparation>10</MaxZSeparation>
-</algorithm>
+</algorithm-->
 
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
@@ -104,11 +104,11 @@
   <ClusterListNames>ClustersW</ClusterListNames>
 </algorithm>
 
-<algorithm type = "EMTrack">
+<!--algorithm type = "EMTrack">
   <CaloHitListName>CaloHitListW</CaloHitListName>
   <MaxXSeparation>10</MaxXSeparation>
   <MaxZSeparation>10</MaxZSeparation>
-</algorithm>
+</algorithm-->
 
     
     <!-- VertexAlgorithms -->
@@ -157,6 +157,12 @@
         <InputClusterListNameW>ClustersW</InputClusterListNameW>
         <OutputPfoListName>TrackParticles3D</OutputPfoListName>
         <TrackTools>
+            <!--tool type = "LArTransverseTensorVisualization">
+                <MinClusterConnections>0</MinClusterConnections>
+                <IgnoreUnavailableClusters>true</IgnoreUnavailableClusters>
+                <ShowEachIndividualElement>true</ShowEachIndividualElement>
+                <ShowContext>false</ShowContext>
+            </tool-->
             <tool type = "LArClearTracks"/>
             <tool type = "LArLongTracks"/>
             <tool type = "LArOvershootTracks"><SplitMode>true</SplitMode></tool>
