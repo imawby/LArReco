@@ -369,10 +369,6 @@ void CountPfoMatches(const SimpleMCEvent &simpleMCEvent, const Parameters &param
             const float pTot(std::sqrt(simpleMCPrimary.m_momentum.m_x * simpleMCPrimary.m_momentum.m_x + simpleMCPrimary.m_momentum.m_y * simpleMCPrimary.m_momentum.m_y + simpleMCPrimary.m_momentum.m_z * simpleMCPrimary.m_momentum.m_z));
             primaryResult.m_trueMomentum = pTot;
 
-            std::cout << "PX: " << simpleMCPrimary.m_momentum.m_x << std::endl;
-            std::cout << "PY: " << simpleMCPrimary.m_momentum.m_y << std::endl;
-            std::cout << "PZ: " << simpleMCPrimary.m_momentum.m_z << std::endl;
-            
             float theta0XZ = std::atan2(simpleMCPrimary.m_momentum.m_x, simpleMCPrimary.m_momentum.m_z);
             theta0XZ *= (180.f / M_PI);
             primaryResult.m_trueTheta0XZ = theta0XZ;
@@ -380,9 +376,6 @@ void CountPfoMatches(const SimpleMCEvent &simpleMCEvent, const Parameters &param
             float theta0YZ = std::asin(simpleMCPrimary.m_momentum.m_y / pTot);
             theta0YZ *= (180.f / M_PI);
             primaryResult.m_trueTheta0YZ = theta0YZ;
-
-            std::cout << "THETA0XZ: " << theta0XZ << std::endl;
-            std::cout << "THETA0YZ: " << theta0YZ << std::endl;            
         }
 
         interactionTargetResultMap[interactionType].push_back(targetResult);
