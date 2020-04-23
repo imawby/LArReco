@@ -368,6 +368,14 @@ void CountPfoMatches(const SimpleMCEvent &simpleMCEvent, const Parameters &param
 
             const float pTot(std::sqrt(simpleMCPrimary.m_momentum.m_x * simpleMCPrimary.m_momentum.m_x + simpleMCPrimary.m_momentum.m_y * simpleMCPrimary.m_momentum.m_y + simpleMCPrimary.m_momentum.m_z * simpleMCPrimary.m_momentum.m_z));
             primaryResult.m_trueMomentum = pTot;
+
+            float theta0XZ = std::atan2(simpleMCPrimary.m_momentum.m_x, simpleMCPrimary.m_momentum.m_z);
+            theta0XZ *= (180.f / M_PI);
+            primaryResult.m_trueTheta0XZ = theta0XZ;
+            
+            float theta0YZ = std::asin(simpleMCPrimary.m_momentum.m_y / pTot);
+            theta0YZ *= (180.f / M_PI);
+            primaryResult.m_trueTheta0YZ = theta0YZ;
         }
 
         interactionTargetResultMap[interactionType].push_back(targetResult);
@@ -692,6 +700,43 @@ void FillPrimaryHistogramCollection(const std::string &histPrefix, const Primary
         primaryHistogramCollection.m_hMomentumEfficiency->GetYaxis()->SetTitle("Reconstruction Efficiency");
     }
 
+    const int nLArSoftAngleBins(100); const float minLArSoftAngleBin(-180.f); const float maxLArSoftAngleBin(180.f);
+    if (!primaryHistogramCollection.m_hTheta0XZAll)
+    {
+        primaryHistogramCollection.m_hTheta0XZAll = new TH1F((histPrefix + "Theta0XZAll").c_str(), "", nLArSoftAngleBins, minLArSoftAngleBin, maxLArSoftAngleBin);
+        primaryHistogramCollection.m_hTheta0XZAll->GetXaxis()->SetRangeUser(-180.f, +180.f);
+        primaryHistogramCollection.m_hTheta0XZAll->GetXaxis()->SetTitle("True Theta0XZ [degrees]");
+        primaryHistogramCollection.m_hTheta0XZAll->GetYaxis()->SetRangeUser(0., +1.01);
+        primaryHistogramCollection.m_hTheta0XZAll->GetYaxis()->SetTitle("Reconstruction All");
+    }
+    
+    if (!primaryHistogramCollection.m_hTheta0XZEfficiency)
+    {
+        primaryHistogramCollection.m_hTheta0XZEfficiency = new TH1F((histPrefix + "Theta0XZEfficiency").c_str(), "", nLArSoftAngleBins, minLArSoftAngleBin, maxLArSoftAngleBin);
+        primaryHistogramCollection.m_hTheta0XZEfficiency->GetXaxis()->SetRangeUser(-180.f, +180.f);
+        primaryHistogramCollection.m_hTheta0XZEfficiency->GetXaxis()->SetTitle("True Theta0XZ [degrees]");
+        primaryHistogramCollection.m_hTheta0XZEfficiency->GetYaxis()->SetRangeUser(0., +1.01);
+        primaryHistogramCollection.m_hTheta0XZEfficiency->GetYaxis()->SetTitle("Reconstruction Efficiency");
+    }
+
+    if (!primaryHistogramCollection.m_hTheta0YZAll)
+    {
+        primaryHistogramCollection.m_hTheta0YZAll = new TH1F((histPrefix + "Theta0YZAll").c_str(), "", nLArSoftAngleBins, minLArSoftAngleBin, maxLArSoftAngleBin);
+        primaryHistogramCollection.m_hTheta0YZAll->GetXaxis()->SetRangeUser(-180.f, +180.f);
+        primaryHistogramCollection.m_hTheta0YZAll->GetXaxis()->SetTitle("True Theta0YZ [degrees]");
+        primaryHistogramCollection.m_hTheta0YZAll->GetYaxis()->SetRangeUser(0., +1.01);
+        primaryHistogramCollection.m_hTheta0YZAll->GetYaxis()->SetTitle("Reconstruction All");
+    }
+
+    if (!primaryHistogramCollection.m_hTheta0YZEfficiency)
+    {
+        primaryHistogramCollection.m_hTheta0YZEfficiency = new TH1F((histPrefix + "Theta0YZEfficiency").c_str(), "", nLArSoftAngleBins, minLArSoftAngleBin, maxLArSoftAngleBin);
+        primaryHistogramCollection.m_hTheta0YZEfficiency->GetXaxis()->SetRangeUser(-180.f, +180.f);
+        primaryHistogramCollection.m_hTheta0YZEfficiency->GetXaxis()->SetTitle("True Theta0YZ [degrees]");
+        primaryHistogramCollection.m_hTheta0YZEfficiency->GetYaxis()->SetRangeUser(0., +1.01);
+        primaryHistogramCollection.m_hTheta0YZEfficiency->GetYaxis()->SetTitle("Reconstruction Efficiency");
+    }    
+
     if (!primaryHistogramCollection.m_hCompleteness)
     {
         primaryHistogramCollection.m_hCompleteness = new TH1F((histPrefix + "Completeness").c_str(), "", 51, -0.01, 1.01);
@@ -710,11 +755,15 @@ void FillPrimaryHistogramCollection(const std::string &histPrefix, const Primary
 
     primaryHistogramCollection.m_hHitsAll->Fill(primaryResult.m_nMCHitsTotal);
     primaryHistogramCollection.m_hMomentumAll->Fill(primaryResult.m_trueMomentum);
-
+    primaryHistogramCollection.m_hMomentumAll->Fill(primaryResult.m_trueTheta0XZ);
+    primaryHistogramCollection.m_hMomentumAll->Fill(primaryResult.m_trueTheta0YZ);
+                                                    
     if (primaryResult.m_nPfoMatches > 0)
     {
         primaryHistogramCollection.m_hHitsEfficiency->Fill(primaryResult.m_nMCHitsTotal);
         primaryHistogramCollection.m_hMomentumEfficiency->Fill(primaryResult.m_trueMomentum);
+        primaryHistogramCollection.m_hTheta0XZEfficiency->Fill(primaryResult.m_trueTheta0XZ);
+        primaryHistogramCollection.m_hTheta0YZEfficiency->Fill(primaryResult.m_trueTheta0YZ);
         primaryHistogramCollection.m_hCompleteness->Fill(primaryResult.m_bestMatchCompleteness);
         primaryHistogramCollection.m_hPurity->Fill(primaryResult.m_bestMatchPurity);
     }
@@ -752,6 +801,26 @@ void ProcessHistogramCollections(const InteractionPrimaryHistogramMap &interacti
                 const float error = (all > found) ? std::sqrt(efficiency * (1. - efficiency) / all) : 0.f;
                 primaryHistogramCollection.m_hMomentumEfficiency->SetBinContent(n + 1, efficiency);
                 primaryHistogramCollection.m_hMomentumEfficiency->SetBinError(n + 1, error);
+            }
+
+            for (int n = -1; n <= primaryHistogramCollection.m_hTheta0XZEfficiency->GetXaxis()->GetNbins(); ++n)
+            {
+                const float found = primaryHistogramCollection.m_hTheta0XZEfficiency->GetBinContent(n + 1);
+                const float all = primaryHistogramCollection.m_hTheta0XZAll->GetBinContent(n + 1);
+                const float efficiency = (all > 0.f) ? found / all : 0.f;
+                const float error = (all > found) ? std::sqrt(efficiency * (1. - efficiency) / all) : 0.f;
+                primaryHistogramCollection.m_hTheta0XZEfficiency->SetBinContent(n + 1, efficiency);
+                primaryHistogramCollection.m_hTheta0XZEfficiency->SetBinError(n + 1, error);
+            }
+
+            for (int n = -1; n <= primaryHistogramCollection.m_hTheta0YZEfficiency->GetXaxis()->GetNbins(); ++n)
+            {
+                const float found = primaryHistogramCollection.m_hTheta0YZEfficiency->GetBinContent(n + 1);
+                const float all = primaryHistogramCollection.m_hTheta0YZAll->GetBinContent(n + 1);
+                const float efficiency = (all > 0.f) ? found / all : 0.f;
+                const float error = (all > found) ? std::sqrt(efficiency * (1. - efficiency) / all) : 0.f;
+                primaryHistogramCollection.m_hTheta0YZEfficiency->SetBinContent(n + 1, efficiency);
+                primaryHistogramCollection.m_hTheta0YZEfficiency->SetBinError(n + 1, error);
             }
 
             primaryHistogramCollection.m_hCompleteness->Scale(1. / static_cast<double>(primaryHistogramCollection.m_hCompleteness->GetEntries()));

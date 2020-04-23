@@ -453,6 +453,8 @@ public:
     float                   m_bestMatchPurity;          ///< The purity of the best matched pfo
     bool                    m_isCorrectParticleId;      ///< Whether the best matched pfo has the correct particle id
     float                   m_trueMomentum;             ///< The true momentum of the mc primary
+    float                   m_trueTheta0XZ;             ///< The true theta0XZ of the mc primary (in degrees)
+    float                   m_trueTheta0YZ;             ///< The true theta0YZ of the mc primary (in degrees)
 };
 
 typedef std::map<ExpectedPrimary, PrimaryResult> PrimaryResultMap;
@@ -521,6 +523,10 @@ public:
     TH1F                   *m_hHitsEfficiency;          ///< The primary efficiency vs number of hits histogram
     TH1F                   *m_hMomentumAll;             ///< The number of primaries vs momentum histogram
     TH1F                   *m_hMomentumEfficiency;      ///< The primary efficiency vs momentum histogram
+    TH1F                   *m_hTheta0XZAll;             ///< The number of primaries vs theta0XZ histogram
+    TH1F                   *m_hTheta0XZEfficiency;      ///< The primary efficiency vs theta0XZ histogram
+    TH1F                   *m_hTheta0YZAll;             ///< The number of primaries vs theta0YZ histogram
+    TH1F                   *m_hTheta0YZEfficiency;      ///< The primary efficiency vs theta0YZ histogram
     TH1F                   *m_hCompleteness;            ///< The primary (best match) completeness histogram
     TH1F                   *m_hPurity;                  ///< The primary (best match) purity histogram
 };
@@ -805,7 +811,9 @@ PrimaryResult::PrimaryResult() :
     m_bestMatchCompleteness(0.f),
     m_bestMatchPurity(0.f),
     m_isCorrectParticleId(false),
-    m_trueMomentum(-1.f)
+    m_trueMomentum(-1.f),
+    m_trueTheta0XZ(0.f),
+    m_trueTheta0YZ(0.f)
 {
 }
 
@@ -829,6 +837,10 @@ PrimaryHistogramCollection::PrimaryHistogramCollection() :
     m_hHitsEfficiency(nullptr),
     m_hMomentumAll(nullptr),
     m_hMomentumEfficiency(nullptr),
+    m_hTheta0XZAll(nullptr),
+    m_hTheta0XZEfficiency(nullptr),
+    m_hTheta0YZAll(nullptr),
+    m_hTheta0YZEfficiency(nullptr),
     m_hCompleteness(nullptr),
     m_hPurity(nullptr)
 {
