@@ -84,14 +84,20 @@
         <ReplaceCurrentVertexList>true</ReplaceCurrentVertexList>
         <EnableCrossingCandidates>false</EnableCrossingCandidates>
     </algorithm>
-    <algorithm type = "LArEnergyKickVertexSelection">
+    <algorithm type = "LArBdtVertexSelection">
         <InputCaloHitListNames>CaloHitListU CaloHitListV CaloHitListW</InputCaloHitListNames>
         <InputClusterListNames>ClustersU ClustersV ClustersW</InputClusterListNames>
         <OutputVertexListName>NeutrinoVertices3D</OutputVertexListName>
         <ReplaceCurrentVertexList>true</ReplaceCurrentVertexList>
+        <MvaFileName>PandoraBdt_v08_33_00_SBND.xml</MvaFileName>
+        <RegionMvaName>VertexBDTRegion</RegionMvaName>
+        <VertexMvaName>VertexBDTVertex</VertexMvaName>
         <FeatureTools>
             <tool type = "LArEnergyKickFeature"/>
             <tool type = "LArLocalAsymmetryFeature"/>
+            <tool type = "LArGlobalAsymmetryFeature"/>
+            <tool type = "LArShowerAsymmetryFeature"/>
+            <tool type = "LArRPhiFeature"/>
         </FeatureTools>
     </algorithm>
     <algorithm type = "LArVertexSplitting">
@@ -291,8 +297,8 @@
 
     <!-- NeutrinoAlgorithms -->
     <algorithm type = "LArNeutrinoCreation">
-       <InputVertexListName>NeutrinoVertices3D</InputVertexListName>
-       <NeutrinoPfoListName>NeutrinoParticles3D</NeutrinoPfoListName>
+        <InputVertexListName>NeutrinoVertices3D</InputVertexListName>
+        <NeutrinoPfoListName>NeutrinoParticles3D</NeutrinoPfoListName>
     </algorithm>
     <algorithm type = "LArNeutrinoHierarchy">
         <NeutrinoPfoListName>NeutrinoParticles3D</NeutrinoPfoListName>

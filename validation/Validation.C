@@ -68,8 +68,6 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
 
         pTChain->SetBranchAddress("interactionType", &simpleMCTarget.m_interactionType);
         pTChain->SetBranchAddress("mcNuanceCode", &simpleMCTarget.m_mcNuanceCode);
-        pTChain->SetBranchAddress("isNeutrino", &simpleMCTarget.m_isNeutrino);
-        pTChain->SetBranchAddress("isBeamParticle", &simpleMCTarget.m_isBeamParticle);
         pTChain->SetBranchAddress("isCosmicRay", &simpleMCTarget.m_isCosmicRay);
         pTChain->SetBranchAddress("targetVertexX", &simpleMCTarget.m_targetVertex.m_x);
         pTChain->SetBranchAddress("targetVertexY", &simpleMCTarget.m_targetVertex.m_y);
@@ -77,21 +75,27 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
         pTChain->SetBranchAddress("recoVertexX", &simpleMCTarget.m_recoVertex.m_x);
         pTChain->SetBranchAddress("recoVertexY", &simpleMCTarget.m_recoVertex.m_y);
         pTChain->SetBranchAddress("recoVertexZ", &simpleMCTarget.m_recoVertex.m_z);
-        pTChain->SetBranchAddress("isCorrectNu", &simpleMCTarget.m_isCorrectNu);
-        pTChain->SetBranchAddress("isCorrectTB", &simpleMCTarget.m_isCorrectTB);
         pTChain->SetBranchAddress("isCorrectCR", &simpleMCTarget.m_isCorrectCR);
-        pTChain->SetBranchAddress("isFakeNu", &simpleMCTarget.m_isFakeNu);
         pTChain->SetBranchAddress("isFakeCR", &simpleMCTarget.m_isFakeCR);
-        if (!parameters.m_testBeamMode)
-        {
-            pTChain->SetBranchAddress("isSplitNu", &simpleMCTarget.m_isSplitNu);
-        }
         pTChain->SetBranchAddress("isSplitCR", &simpleMCTarget.m_isSplitCR);
         pTChain->SetBranchAddress("isLost", &simpleMCTarget.m_isLost);
         pTChain->SetBranchAddress("nTargetMatches", &simpleMCTarget.m_nTargetMatches);
-        pTChain->SetBranchAddress("nTargetNuMatches", &simpleMCTarget.m_nTargetNuMatches);
         pTChain->SetBranchAddress("nTargetCRMatches", &simpleMCTarget.m_nTargetCRMatches);
         pTChain->SetBranchAddress("nTargetPrimaries", &simpleMCTarget.m_nTargetPrimaries);
+
+        if (parameters.m_testBeamMode)
+        {
+            pTChain->SetBranchAddress("isBeamParticle", &simpleMCTarget.m_isBeamParticle);
+            pTChain->SetBranchAddress("isCorrectTB", &simpleMCTarget.m_isCorrectTB);
+        }
+        else
+        {
+            pTChain->SetBranchAddress("isNeutrino", &simpleMCTarget.m_isNeutrino);
+            pTChain->SetBranchAddress("isCorrectNu", &simpleMCTarget.m_isCorrectNu);
+            pTChain->SetBranchAddress("isFakeNu", &simpleMCTarget.m_isFakeNu);
+            pTChain->SetBranchAddress("isSplitNu", &simpleMCTarget.m_isSplitNu);
+            pTChain->SetBranchAddress("nTargetNuMatches", &simpleMCTarget.m_nTargetNuMatches);
+        }
 
         IntVector *pMCPrimaryId(nullptr), *pMCPrimaryPdg(nullptr), *pNMCHitsTotal(nullptr), *pNMCHitsU(nullptr), *pNMCHitsV(nullptr), *pNMCHitsW(nullptr);
         FloatVector *pMCPrimaryE(nullptr), *pMCPrimaryPX(nullptr), *pMCPrimaryPY(nullptr), *pMCPrimaryPZ(nullptr);
@@ -118,7 +122,6 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
         pTChain->SetBranchAddress("mcPrimaryNHitsV", &pNMCHitsV);
         pTChain->SetBranchAddress("mcPrimaryNHitsW", &pNMCHitsW);
         pTChain->SetBranchAddress("nPrimaryMatchedPfos", &pNPrimaryMatchedPfos);
-        pTChain->SetBranchAddress("nPrimaryMatchedNuPfos", &pNPrimaryMatchedNuPfos);
         pTChain->SetBranchAddress("nPrimaryMatchedCRPfos", &pNPrimaryMatchedCRPfos);
         pTChain->SetBranchAddress("bestMatchPfoNHitsTotal", &pBestMatchPfoNHitsTotal);
         pTChain->SetBranchAddress("bestMatchPfoNHitsU", &pBestMatchPfoNHitsU);
@@ -126,8 +129,6 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
         pTChain->SetBranchAddress("bestMatchPfoNHitsW", &pBestMatchPfoNHitsW);
         pTChain->SetBranchAddress("bestMatchPfoId", &pBestMatchPfoId);
         pTChain->SetBranchAddress("bestMatchPfoPdg", &pBestMatchPfoPdg);
-        pTChain->SetBranchAddress("bestMatchPfoIsRecoNu", &pBestMatchPfoIsRecoNu);
-        pTChain->SetBranchAddress("bestMatchPfoRecoNuId", &pBestMatchPfoRecoNuId);
         pTChain->SetBranchAddress("bestMatchPfoNSharedHitsTotal", &pBestMatchPfoNSharedHitsTotal);
         pTChain->SetBranchAddress("bestMatchPfoNSharedHitsU", &pBestMatchPfoNSharedHitsU);
         pTChain->SetBranchAddress("bestMatchPfoNSharedHitsV", &pBestMatchPfoNSharedHitsV);
@@ -135,10 +136,13 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
 
         if (parameters.m_testBeamMode)
         {
-            pTChain->SetBranchAddress("bestMatchPfoIsTestBeam", &pBestMatchPfoIsTestBeam);
+            pTChain->SetBranchAddress("bestMatchPfoIsTB", &pBestMatchPfoIsTestBeam);
         }
         else
         {
+            pTChain->SetBranchAddress("nPrimaryMatchedNuPfos", &pNPrimaryMatchedNuPfos);
+            pTChain->SetBranchAddress("bestMatchPfoIsRecoNu", &pBestMatchPfoIsRecoNu);
+            pTChain->SetBranchAddress("bestMatchPfoRecoNuId", &pBestMatchPfoRecoNuId);
             pTChain->SetBranchAddress("nTargetGoodNuMatches", &simpleMCTarget.m_nTargetGoodNuMatches);
             pTChain->SetBranchAddress("nTargetNuSplits", &simpleMCTarget.m_nTargetNuSplits);
             pTChain->SetBranchAddress("nTargetNuLosses", &simpleMCTarget.m_nTargetNuLosses);
@@ -169,12 +173,9 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
             simpleMCPrimary.m_nMCHitsV = pNMCHitsV->at(iPrimary);
             simpleMCPrimary.m_nMCHitsW = pNMCHitsW->at(iPrimary);
             simpleMCPrimary.m_nPrimaryMatchedPfos = pNPrimaryMatchedPfos->at(iPrimary);
-            simpleMCPrimary.m_nPrimaryMatchedNuPfos = pNPrimaryMatchedNuPfos->at(iPrimary);
             simpleMCPrimary.m_nPrimaryMatchedCRPfos = pNPrimaryMatchedCRPfos->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoId = pBestMatchPfoId->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoPdgCode = pBestMatchPfoPdg->at(iPrimary);
-            simpleMCPrimary.m_bestMatchPfoIsRecoNu = pBestMatchPfoIsRecoNu->at(iPrimary);
-            simpleMCPrimary.m_bestMatchPfoRecoNuId = pBestMatchPfoRecoNuId->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoNHitsTotal = pBestMatchPfoNHitsTotal->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoNHitsU = pBestMatchPfoNHitsU->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoNHitsV = pBestMatchPfoNHitsV->at(iPrimary);
@@ -187,6 +188,12 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
             if (parameters.m_testBeamMode)
             {
                 simpleMCPrimary.m_bestMatchPfoIsTestBeam = pBestMatchPfoIsTestBeam->at(iPrimary);
+            }
+            else
+            {
+                simpleMCPrimary.m_nPrimaryMatchedNuPfos = pNPrimaryMatchedNuPfos->at(iPrimary);
+                simpleMCPrimary.m_bestMatchPfoIsRecoNu = pBestMatchPfoIsRecoNu->at(iPrimary);
+                simpleMCPrimary.m_bestMatchPfoRecoNuId = pBestMatchPfoRecoNuId->at(iPrimary);
             }
 
             simpleMCTarget.m_mcPrimaryList.push_back(simpleMCPrimary);
@@ -361,6 +368,21 @@ void CountPfoMatches(const SimpleMCEvent &simpleMCEvent, const Parameters &param
 
             const float pTot(std::sqrt(simpleMCPrimary.m_momentum.m_x * simpleMCPrimary.m_momentum.m_x + simpleMCPrimary.m_momentum.m_y * simpleMCPrimary.m_momentum.m_y + simpleMCPrimary.m_momentum.m_z * simpleMCPrimary.m_momentum.m_z));
             primaryResult.m_trueMomentum = pTot;
+
+            std::cout << "PX: " << simpleMCPrimary.m_momentum.m_x << std::endl;
+            std::cout << "PY: " << simpleMCPrimary.m_momentum.m_y << std::endl;
+            std::cout << "PZ: " << simpleMCPrimary.m_momentum.m_z << std::endl;
+            
+            float theta0XZ = std::atan2(simpleMCPrimary.m_momentum.m_x, simpleMCPrimary.m_momentum.m_z);
+            theta0XZ *= (180.f / M_PI);
+            primaryResult.m_trueTheta0XZ = theta0XZ;
+            
+            float theta0YZ = std::asin(simpleMCPrimary.m_momentum.m_y / pTot);
+            theta0YZ *= (180.f / M_PI);
+            primaryResult.m_trueTheta0YZ = theta0YZ;
+
+            std::cout << "THETA0XZ: " << theta0XZ << std::endl;
+            std::cout << "THETA0YZ: " << theta0YZ << std::endl;            
         }
 
         interactionTargetResultMap[interactionType].push_back(targetResult);
@@ -562,6 +584,10 @@ void AnalyseInteractionTargetResultMap(const InteractionTargetResultMap &interac
                     const std::string histPrefix(parameters.m_histPrefix + ToString(interactionType) + "_" + ToString(expectedPrimary) + "_");
                     PrimaryHistogramCollection &histogramCollection(interactionPrimaryHistogramMap[interactionType][expectedPrimary]);
                     FillPrimaryHistogramCollection(histPrefix, primaryResult, histogramCollection);
+
+                    const std::string histPrefixAll(parameters.m_histPrefix + ToString(ALL_INTERACTIONS) + "_" + ToString(expectedPrimary) + "_");
+                    PrimaryHistogramCollection &histogramCollectionAll(interactionPrimaryHistogramMap[ALL_INTERACTIONS][expectedPrimary]);
+                    FillPrimaryHistogramCollection(histPrefixAll, primaryResult, histogramCollectionAll);
                 }
             }
 
@@ -570,6 +596,10 @@ void AnalyseInteractionTargetResultMap(const InteractionTargetResultMap &interac
                 const std::string histPrefix(parameters.m_histPrefix + ToString(interactionType) + "_");
                 TargetHistogramCollection &histogramCollection(interactionTargetHistogramMap[interactionType]);
                 FillTargetHistogramCollection(histPrefix, targetResult, histogramCollection);
+
+                const std::string histPrefixAll(parameters.m_histPrefix + ToString(ALL_INTERACTIONS) + "_");
+                TargetHistogramCollection &histogramCollectionAll(interactionTargetHistogramMap[ALL_INTERACTIONS]);
+                FillTargetHistogramCollection(histPrefixAll, targetResult, histogramCollectionAll);
             }
         }
 
@@ -677,6 +707,43 @@ void FillPrimaryHistogramCollection(const std::string &histPrefix, const Primary
         primaryHistogramCollection.m_hMomentumEfficiency->GetYaxis()->SetTitle("Reconstruction Efficiency");
     }
 
+    const int nLArSoftAngleBins(100); const float minLArSoftAngleBin(-180.f); const float maxLArSoftAngleBin(180.f);
+    if (!primaryHistogramCollection.m_hTheta0XZAll)
+    {
+        primaryHistogramCollection.m_hTheta0XZAll = new TH1F((histPrefix + "Theta0XZAll").c_str(), "", nLArSoftAngleBins, minLArSoftAngleBin, maxLArSoftAngleBin);
+        primaryHistogramCollection.m_hTheta0XZAll->GetXaxis()->SetRangeUser(-180.f, +180.f);
+        primaryHistogramCollection.m_hTheta0XZAll->GetXaxis()->SetTitle("True Theta0XZ [degrees]");
+        primaryHistogramCollection.m_hTheta0XZAll->GetYaxis()->SetRangeUser(0., +1.01);
+        primaryHistogramCollection.m_hTheta0XZAll->GetYaxis()->SetTitle("Reconstruction All");
+    }
+    
+    if (!primaryHistogramCollection.m_hTheta0XZEfficiency)
+    {
+        primaryHistogramCollection.m_hTheta0XZEfficiency = new TH1F((histPrefix + "Theta0XZEfficiency").c_str(), "", nLArSoftAngleBins, minLArSoftAngleBin, maxLArSoftAngleBin);
+        primaryHistogramCollection.m_hTheta0XZEfficiency->GetXaxis()->SetRangeUser(-180.f, +180.f);
+        primaryHistogramCollection.m_hTheta0XZEfficiency->GetXaxis()->SetTitle("True Theta0XZ [degrees]");
+        primaryHistogramCollection.m_hTheta0XZEfficiency->GetYaxis()->SetRangeUser(0., +1.01);
+        primaryHistogramCollection.m_hTheta0XZEfficiency->GetYaxis()->SetTitle("Reconstruction Efficiency");
+    }
+
+    if (!primaryHistogramCollection.m_hTheta0YZAll)
+    {
+        primaryHistogramCollection.m_hTheta0YZAll = new TH1F((histPrefix + "Theta0YZAll").c_str(), "", nLArSoftAngleBins, minLArSoftAngleBin, maxLArSoftAngleBin);
+        primaryHistogramCollection.m_hTheta0YZAll->GetXaxis()->SetRangeUser(-180.f, +180.f);
+        primaryHistogramCollection.m_hTheta0YZAll->GetXaxis()->SetTitle("True Theta0YZ [degrees]");
+        primaryHistogramCollection.m_hTheta0YZAll->GetYaxis()->SetRangeUser(0., +1.01);
+        primaryHistogramCollection.m_hTheta0YZAll->GetYaxis()->SetTitle("Reconstruction All");
+    }
+
+    if (!primaryHistogramCollection.m_hTheta0YZEfficiency)
+    {
+        primaryHistogramCollection.m_hTheta0YZEfficiency = new TH1F((histPrefix + "Theta0YZEfficiency").c_str(), "", nLArSoftAngleBins, minLArSoftAngleBin, maxLArSoftAngleBin);
+        primaryHistogramCollection.m_hTheta0YZEfficiency->GetXaxis()->SetRangeUser(-180.f, +180.f);
+        primaryHistogramCollection.m_hTheta0YZEfficiency->GetXaxis()->SetTitle("True Theta0YZ [degrees]");
+        primaryHistogramCollection.m_hTheta0YZEfficiency->GetYaxis()->SetRangeUser(0., +1.01);
+        primaryHistogramCollection.m_hTheta0YZEfficiency->GetYaxis()->SetTitle("Reconstruction Efficiency");
+    }    
+
     if (!primaryHistogramCollection.m_hCompleteness)
     {
         primaryHistogramCollection.m_hCompleteness = new TH1F((histPrefix + "Completeness").c_str(), "", 51, -0.01, 1.01);
@@ -695,11 +762,15 @@ void FillPrimaryHistogramCollection(const std::string &histPrefix, const Primary
 
     primaryHistogramCollection.m_hHitsAll->Fill(primaryResult.m_nMCHitsTotal);
     primaryHistogramCollection.m_hMomentumAll->Fill(primaryResult.m_trueMomentum);
-
+    primaryHistogramCollection.m_hTheta0XZAll->Fill(primaryResult.m_trueTheta0XZ);
+    primaryHistogramCollection.m_hTheta0YZAll->Fill(primaryResult.m_trueTheta0YZ);
+                                                    
     if (primaryResult.m_nPfoMatches > 0)
     {
         primaryHistogramCollection.m_hHitsEfficiency->Fill(primaryResult.m_nMCHitsTotal);
         primaryHistogramCollection.m_hMomentumEfficiency->Fill(primaryResult.m_trueMomentum);
+        primaryHistogramCollection.m_hTheta0XZEfficiency->Fill(primaryResult.m_trueTheta0XZ);
+        primaryHistogramCollection.m_hTheta0YZEfficiency->Fill(primaryResult.m_trueTheta0YZ);
         primaryHistogramCollection.m_hCompleteness->Fill(primaryResult.m_bestMatchCompleteness);
         primaryHistogramCollection.m_hPurity->Fill(primaryResult.m_bestMatchPurity);
     }
@@ -737,6 +808,26 @@ void ProcessHistogramCollections(const InteractionPrimaryHistogramMap &interacti
                 const float error = (all > found) ? std::sqrt(efficiency * (1. - efficiency) / all) : 0.f;
                 primaryHistogramCollection.m_hMomentumEfficiency->SetBinContent(n + 1, efficiency);
                 primaryHistogramCollection.m_hMomentumEfficiency->SetBinError(n + 1, error);
+            }
+
+            for (int n = -1; n <= primaryHistogramCollection.m_hTheta0XZEfficiency->GetXaxis()->GetNbins(); ++n)
+            {
+                const float found = primaryHistogramCollection.m_hTheta0XZEfficiency->GetBinContent(n + 1);
+                const float all = primaryHistogramCollection.m_hTheta0XZAll->GetBinContent(n + 1);
+                const float efficiency = (all > 0.f) ? found / all : 0.f;
+                const float error = (all > found) ? std::sqrt(efficiency * (1. - efficiency) / all) : 0.f;
+                primaryHistogramCollection.m_hTheta0XZEfficiency->SetBinContent(n + 1, efficiency);
+                primaryHistogramCollection.m_hTheta0XZEfficiency->SetBinError(n + 1, error);
+            }
+
+            for (int n = -1; n <= primaryHistogramCollection.m_hTheta0YZEfficiency->GetXaxis()->GetNbins(); ++n)
+            {
+                const float found = primaryHistogramCollection.m_hTheta0YZEfficiency->GetBinContent(n + 1);
+                const float all = primaryHistogramCollection.m_hTheta0YZAll->GetBinContent(n + 1);
+                const float efficiency = (all > 0.f) ? found / all : 0.f;
+                const float error = (all > found) ? std::sqrt(efficiency * (1. - efficiency) / all) : 0.f;
+                primaryHistogramCollection.m_hTheta0YZEfficiency->SetBinContent(n + 1, efficiency);
+                primaryHistogramCollection.m_hTheta0YZEfficiency->SetBinError(n + 1, error);
             }
 
             primaryHistogramCollection.m_hCompleteness->Scale(1. / static_cast<double>(primaryHistogramCollection.m_hCompleteness->GetEntries()));
