@@ -700,10 +700,10 @@ void FillPrimaryHistogramCollection(const std::string &histPrefix, const Primary
         primaryHistogramCollection.m_hMomentumEfficiency->GetYaxis()->SetTitle("Reconstruction Efficiency");
     }
 
-    const int nLArSoftAngleBins(100); const float minLArSoftAngleBin(-180.f); const float maxLArSoftAngleBin(180.f);
+    const int nTheta0XZBins(100); const float minTheta0XZBin(-180.f); const float maxTheta0YZBin(180.f);
     if (!primaryHistogramCollection.m_hTheta0XZAll)
     {
-        primaryHistogramCollection.m_hTheta0XZAll = new TH1F((histPrefix + "Theta0XZAll").c_str(), "", nLArSoftAngleBins, minLArSoftAngleBin, maxLArSoftAngleBin);
+        primaryHistogramCollection.m_hTheta0XZAll = new TH1F((histPrefix + "Theta0XZAll").c_str(), "", nTheta0XZBins, minTheta0XZBin, maxTheta0XZBin);
         primaryHistogramCollection.m_hTheta0XZAll->GetXaxis()->SetRangeUser(-180.f, +180.f);
         primaryHistogramCollection.m_hTheta0XZAll->GetXaxis()->SetTitle("True Theta0XZ [degrees]");
         primaryHistogramCollection.m_hTheta0XZAll->GetYaxis()->SetRangeUser(0., +1.01);
@@ -712,16 +712,17 @@ void FillPrimaryHistogramCollection(const std::string &histPrefix, const Primary
     
     if (!primaryHistogramCollection.m_hTheta0XZEfficiency)
     {
-        primaryHistogramCollection.m_hTheta0XZEfficiency = new TH1F((histPrefix + "Theta0XZEfficiency").c_str(), "", nLArSoftAngleBins, minLArSoftAngleBin, maxLArSoftAngleBin);
+        primaryHistogramCollection.m_hTheta0XZEfficiency = new TH1F((histPrefix + "Theta0XZEfficiency").c_str(), "", nTheta0XZBins, minTheta0XZBin, maxTheta0XZBin);
         primaryHistogramCollection.m_hTheta0XZEfficiency->GetXaxis()->SetRangeUser(-180.f, +180.f);
         primaryHistogramCollection.m_hTheta0XZEfficiency->GetXaxis()->SetTitle("True Theta0XZ [degrees]");
         primaryHistogramCollection.m_hTheta0XZEfficiency->GetYaxis()->SetRangeUser(0., +1.01);
         primaryHistogramCollection.m_hTheta0XZEfficiency->GetYaxis()->SetTitle("Reconstruction Efficiency");
     }
 
+    const int nTheta0YZBins(50); const float minTheta0YZBin(-90.f); const float maxTheta0YZBin(90.f);
     if (!primaryHistogramCollection.m_hTheta0YZAll)
     {
-        primaryHistogramCollection.m_hTheta0YZAll = new TH1F((histPrefix + "Theta0YZAll").c_str(), "", nLArSoftAngleBins, minLArSoftAngleBin, maxLArSoftAngleBin);
+        primaryHistogramCollection.m_hTheta0YZAll = new TH1F((histPrefix + "Theta0YZAll").c_str(), "", nTheta0YZBins, minTheta0YZBin, maxTheta0YZBin);
         primaryHistogramCollection.m_hTheta0YZAll->GetXaxis()->SetRangeUser(-180.f, +180.f);
         primaryHistogramCollection.m_hTheta0YZAll->GetXaxis()->SetTitle("True Theta0YZ [degrees]");
         primaryHistogramCollection.m_hTheta0YZAll->GetYaxis()->SetRangeUser(0., +1.01);
@@ -730,7 +731,7 @@ void FillPrimaryHistogramCollection(const std::string &histPrefix, const Primary
 
     if (!primaryHistogramCollection.m_hTheta0YZEfficiency)
     {
-        primaryHistogramCollection.m_hTheta0YZEfficiency = new TH1F((histPrefix + "Theta0YZEfficiency").c_str(), "", nLArSoftAngleBins, minLArSoftAngleBin, maxLArSoftAngleBin);
+        primaryHistogramCollection.m_hTheta0YZEfficiency = new TH1F((histPrefix + "Theta0YZEfficiency").c_str(), "", nTheta0YZBins, minTheta0YZBin, maxTheta0YZBin);
         primaryHistogramCollection.m_hTheta0YZEfficiency->GetXaxis()->SetRangeUser(-180.f, +180.f);
         primaryHistogramCollection.m_hTheta0YZEfficiency->GetXaxis()->SetTitle("True Theta0YZ [degrees]");
         primaryHistogramCollection.m_hTheta0YZEfficiency->GetYaxis()->SetRangeUser(0., +1.01);
