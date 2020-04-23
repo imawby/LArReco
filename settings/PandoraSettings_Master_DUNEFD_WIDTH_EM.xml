@@ -25,8 +25,8 @@
         <StitchingTools>
           <tool type = "LArStitchingCosmicRayMerging">
             <ThreeDStitchingMode>true</ThreeDStitchingMode>
-            <WriteToTree>true</WriteToTree>
-            <IgnoreImpactParameterCut>true</IgnoreImpactParameterCut>
+            <WriteToTree>false</WriteToTree>
+            <IgnoreImpactParameterCut>false</IgnoreImpactParameterCut>
           </tool>
             <tool type = "LArStitchingCosmicRayMerging"><ThreeDStitchingMode>false</ThreeDStitchingMode></tool>
         </StitchingTools>

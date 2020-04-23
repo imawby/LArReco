@@ -23,8 +23,18 @@
         <NuSettingsFile>PandoraSettings_TestBeam_ProtoDUNE.xml</NuSettingsFile>
         <SlicingSettingsFile>PandoraSettings_Slicing_ProtoDUNE.xml</SlicingSettingsFile>
         <StitchingTools>
-            <tool type = "LArStitchingCosmicRayMerging"><ThreeDStitchingMode>true</ThreeDStitchingMode></tool>
-            <tool type = "LArStitchingCosmicRayMerging"><ThreeDStitchingMode>false</ThreeDStitchingMode></tool>
+          <tool type = "LArStitchingCosmicRayMerging">
+            <ThreeDStitchingMode>true</ThreeDStitchingMode>
+            <WriteToTree>true</WriteToTree>
+            <FileName>X0Distribution_1.root</FileName>
+            <TreeName>X0Distribution_1</TreeName>
+          </tool>
+          <tool type = "LArStitchingCosmicRayMerging">
+            <ThreeDStitchingMode>false</ThreeDStitchingMode>
+            <WriteToTree>true</WriteToTree>
+            <FileName>X0Distribution_2.root</FileName>
+            <TreeName>X0Distribution_2</TreeName>
+          </tool>
         </StitchingTools>
         <CosmicRayTaggingTools>
             <tool type = "LArCosmicRayTagging"/>

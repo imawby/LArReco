@@ -65,7 +65,7 @@
 
 <algorithm type = "LArHitWidthClusterMerging">
   <MaxXMergeDistance>10</MaxXMergeDistance>
-  <!--MinDirectionDeviationCosAngle>0.97</MinDirectionDeviationCosAngle-->
+  <MinDirectionDeviationCosAngle>0.97</MinDirectionDeviationCosAngle>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
@@ -123,7 +123,7 @@
 
 <algorithm type = "LArHitWidthClusterMerging">
   <MaxXMergeDistance>10</MaxXMergeDistance>
-  <!--MinDirectionDeviationCosAngle>0.97</MinDirectionDeviationCosAngle-->
+  <MinDirectionDeviationCosAngle>0.97</MinDirectionDeviationCosAngle>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
@@ -181,7 +181,7 @@
 
 <algorithm type = "LArHitWidthClusterMerging">
   <MaxXMergeDistance>10</MaxXMergeDistance>
-  <!--MinDirectionDeviationCosAngle>0.97</MinDirectionDeviationCosAngle-->
+  <MinDirectionDeviationCosAngle>0.97</MinDirectionDeviationCosAngle>
 </algorithm>
 
 <algorithm type = "LArVisualMonitoring">
