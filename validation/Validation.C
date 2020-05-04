@@ -700,7 +700,7 @@ void FillPrimaryHistogramCollection(const std::string &histPrefix, const Primary
         primaryHistogramCollection.m_hMomentumEfficiency->GetYaxis()->SetTitle("Reconstruction Efficiency");
     }
 
-    const int nTheta0XZBins(100); const float minTheta0XZBin(-180.f); const float maxTheta0YZBin(180.f);
+    const int nTheta0XZBins(100); const float minTheta0XZBin(-180.f); const float maxTheta0XZBin(180.f);
     if (!primaryHistogramCollection.m_hTheta0XZAll)
     {
         primaryHistogramCollection.m_hTheta0XZAll = new TH1F((histPrefix + "Theta0XZAll").c_str(), "", nTheta0XZBins, minTheta0XZBin, maxTheta0XZBin);
