@@ -27,6 +27,8 @@
 #include <getopt.h>
 #include <iostream>
 #include <string>
+#include <unistd.h>
+#include <sys/time.h>
 
 using namespace pandora;
 using namespace lar_reco;
@@ -107,7 +109,14 @@ void ProcessEvents(const Parameters &parameters, const Pandora *const pPrimaryPa
         if (parameters.m_shouldDisplayEventNumber)
             std::cout << std::endl << "   PROCESSING EVENT: " << (nEvents - 1) << std::endl << std::endl;
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::ProcessEvent(*pPrimaryPandora));
+        struct timeval startTime, endTime;
+        (void) gettimeofday(&startTime, NULL);
+
+        PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::ProcessEvent(*pPrimaryPandora));
+
+        (void) gettimeofday(&endTime, NULL);
+        std::cerr << (endTime.tv_sec + (endTime.tv_usec / 1.e6) - startTime.tv_sec - (startTime.tv_usec / 1.e6)) << std::endl;
+
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Reset(*pPrimaryPandora));
     }
 }

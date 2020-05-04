@@ -38,9 +38,6 @@
     <algorithm type = "LArTrackConsolidation">
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
-
-
-
     
 <!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
@@ -55,23 +52,24 @@
   <SlidingFitWindow>20</SlidingFitWindow>
   <UseOtherCluster>true</UseOtherCluster>
   <LimitZ>true</LimitZ>
+  <MinClusterSparseness>0</MinClusterSparseness>
   <AbortIfNoPosition>true</AbortIfNoPosition>
 </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersU</ClusterListNames>
-</algorithm>
+</algorithm-->
 
 <algorithm type = "LArHitWidthClusterMerging">
   <MaxXMergeDistance>10</MaxXMergeDistance>
-  <MinDirectionDeviationCosAngle>0.97</MinDirectionDeviationCosAngle>
+  <!--MinDirectionDeviationCosAngle>0.97</MinDirectionDeviationCosAngle-->
 </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersU</ClusterListNames>
-</algorithm>
+</algorithm-->
 
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
@@ -98,12 +96,11 @@
         <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
     </algorithm>
 
-
     
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersV</ClusterListNames>
-</algorithm>
+</algorithm-->
 
 <algorithm type = "LArEMTrack">
   <CaloHitListName>CaloHitListV</CaloHitListName>
@@ -116,20 +113,21 @@
   <AbortIfNoPosition>true</AbortIfNoPosition>
 </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersV</ClusterListNames>
-</algorithm>
+</algorithm-->
 
 <algorithm type = "LArHitWidthClusterMerging">
   <MaxXMergeDistance>10</MaxXMergeDistance>
-  <MinDirectionDeviationCosAngle>0.97</MinDirectionDeviationCosAngle>
+  <!--MinDirectionDeviationCosAngle>0.97</MinDirectionDeviationCosAngle-->
+  <MinClusterSparseness>0</MinClusterSparseness>
 </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersV</ClusterListNames>
-</algorithm>
+</algorithm-->
 
     <algorithm type = "LArClusteringParent">
         <algorithm type = "LArTrackClusterCreation" description = "ClusterFormation"/>
@@ -158,10 +156,10 @@
 
 
     
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersW</ClusterListNames>
-</algorithm>
+</algorithm-->
 
 <algorithm type = "LArEMTrack">
   <CaloHitListName>CaloHitListW</CaloHitListName>
@@ -174,20 +172,21 @@
   <AbortIfNoPosition>true</AbortIfNoPosition>
 </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersW</ClusterListNames>
-</algorithm>
+</algorithm-->
 
 <algorithm type = "LArHitWidthClusterMerging">
   <MaxXMergeDistance>10</MaxXMergeDistance>
-  <MinDirectionDeviationCosAngle>0.97</MinDirectionDeviationCosAngle>
+  <!--MinDirectionDeviationCosAngle>0.97</MinDirectionDeviationCosAngle-->
+  <MinClusterSparseness>0</MinClusterSparseness>
 </algorithm>
 
-<algorithm type = "LArVisualMonitoring">
+<!--algorithm type = "LArVisualMonitoring">
   <ShowDetector>true</ShowDetector>
   <ClusterListNames>ClustersW</ClusterListNames>
-</algorithm>
+</algorithm-->
 
 
     
