@@ -323,6 +323,7 @@ void CountPfoMatches(const SimpleMCEvent &simpleMCEvent, const Parameters &param
         targetResult.m_isCorrect = (simpleMCTarget.m_isNeutrino && simpleMCTarget.m_isCorrectNu) ||
             (simpleMCTarget.m_isBeamParticle && simpleMCTarget.m_isCorrectTB) ||
             (simpleMCTarget.m_isCosmicRay && simpleMCTarget.m_isCorrectCR);
+        targetResult.m_isCosmicRay = simpleMCTarget.m_isCosmicRay;
 
         if (simpleMCTarget.m_nTargetMatches > 0)
         {
@@ -547,6 +548,7 @@ void AnalyseInteractionTargetResultMap(const InteractionTargetResultMap &interac
 
     InteractionPrimaryHistogramMap interactionPrimaryHistogramMap;
     InteractionTargetHistogramMap interactionTargetHistogramMap;
+    InteractionCosmicRayTargetHistogramMap interactionCosmicRayTargetHistogramMap;
 
     for (const InteractionTargetResultMap::value_type &interactionMapEntry : interactionTargetResultMap)
     {
@@ -593,6 +595,13 @@ void AnalyseInteractionTargetResultMap(const InteractionTargetResultMap &interac
                 const std::string histPrefixAll(parameters.m_histPrefix + ToString(ALL_INTERACTIONS) + "_");
                 TargetHistogramCollection &histogramCollectionAll(interactionTargetHistogramMap[ALL_INTERACTIONS]);
                 FillTargetHistogramCollection(histPrefixAll, targetResult, histogramCollectionAll);
+
+
+                if (targetResult.m_isCosmicRay)
+                {
+                    CosmicRayTargetHistogramCollection &histogramCollectionCR(interactionCosmicRayTargetHistogramMap[interactionType]);
+                    FillCosmicRayTargetHistogramCollection(histPrefix, targetResult, histogramCollectionCR);
+                }
             }
         }
 
@@ -653,6 +662,49 @@ void FillTargetHistogramCollection(const std::string &histPrefix, const TargetRe
     targetHistogramCollection.m_hVtxDeltaY->Fill(targetResult.m_vertexOffset.m_y);
     targetHistogramCollection.m_hVtxDeltaZ->Fill(targetResult.m_vertexOffset.m_z);
     targetHistogramCollection.m_hVtxDeltaR->Fill(std::sqrt(targetResult.m_vertexOffset.m_x * targetResult.m_vertexOffset.m_x + targetResult.m_vertexOffset.m_y * targetResult.m_vertexOffset.m_y + targetResult.m_vertexOffset.m_z * targetResult.m_vertexOffset.m_z));
+    
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const TargetResult &targetResult, CosmicRayTargetHistogramCollection &targetHistogramCollection)
+{
+
+    const PrimaryResultMap &primaryResultMap(targetResult.m_primaryResultMap);
+
+    std::cout << "PRIMARY RESULT MAP SIZE: " << primaryResultMap.size()  << std::endl;
+
+
+    std::cout << "JAM: " << histPrefix << std::endl;
+    std::cout << targetHistogramCollection.m_hEnergyAll << std::endl;
+    
+    /*
+    for (const PrimaryResultMap::value_type &primaryMapEntry : primaryResultMap)
+    {
+        const ExpectedPrimary expectedPrimary(primaryMapEntry.first);
+        const PrimaryResult &primaryResult(primaryMapEntry.second);
+
+        std::cout << 
+    */
+    
+    /*
+    if (!targetHistogramCollection.m_hIsCorrectEventFractionEnergy)
+    {
+        targetHistogramCollection.m_hIsCorrectEventFractionEnergy = new TH1F((histPrefix + "IsCorrectEventFraction").c_str(), "", 1000, 0., 10 000.);
+        targetHistogramCollection.m_hIsCorrectEventFractionEnergy->GetXaxis()->SetTitle("Target Energy [GeV]");
+        targetHistogramCollection.m_hIsCorrectEventFractionEnergy->GetYaxis()->SetTitle("isCorrect Event Fraction");
+    }
+
+    if (!targetHistogramCollection.m_hEnergyAll)
+    {
+        targetHistogramCollection.m_hEnergyAll = new TH1F((histPrefix + "TargetEnergy").c_str(), "", 1000, 0., 10 000.);
+        targetHistogramCollection.m_hEnergyAll->GetXaxis()->SetTitle("Target Energy [GeV]");
+        targetHistogramCollection.m_hEnergyAll->GetYaxis()->SetTitle("Number of Events");
+    }
+    */
+
+
+    
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -700,7 +752,7 @@ void FillPrimaryHistogramCollection(const std::string &histPrefix, const Primary
         primaryHistogramCollection.m_hMomentumEfficiency->GetYaxis()->SetTitle("Reconstruction Efficiency");
     }
 
-    const int nTheta0XZBins(100); const float minTheta0XZBin(-180.f); const float maxTheta0YZBin(180.f);
+    const int nTheta0XZBins(100); const float minTheta0XZBin(-180.f); const float maxTheta0XZBin(180.f);
     if (!primaryHistogramCollection.m_hTheta0XZAll)
     {
         primaryHistogramCollection.m_hTheta0XZAll = new TH1F((histPrefix + "Theta0XZAll").c_str(), "", nTheta0XZBins, minTheta0XZBin, maxTheta0XZBin);

@@ -478,6 +478,7 @@ public:
     bool                    m_hasRecoVertex;            ///< Whether a reco vertex is matched to the target
     SimpleThreeVector       m_vertexOffset;             ///< The offset between the reco and true target vertices
     PrimaryResultMap        m_primaryResultMap;         ///< The primary result map
+    bool m_isCosmicRay;
 };
 
 typedef std::vector<TargetResult> TargetResultList; // ATTN Not terribly efficient, but that's not the main aim here
@@ -498,13 +499,29 @@ public:
      */
     TargetHistogramCollection();
 
-    TH1F                   *m_hVtxDeltaX;               ///< The vtx delta x histogram
-    TH1F                   *m_hVtxDeltaY;               ///< The vtx delta y histogram
-    TH1F                   *m_hVtxDeltaZ;               ///< The vtx delta z histogram
-    TH1F                   *m_hVtxDeltaR;               ///< The vtx delta r histogram
+    TH1F                   *m_hVtxDeltaX;                      ///< The vtx delta x histogram
+    TH1F                   *m_hVtxDeltaY;                      ///< The vtx delta y histogram
+    TH1F                   *m_hVtxDeltaZ;                      ///< The vtx delta z histogram
+    TH1F                   *m_hVtxDeltaR;                      ///< The vtx delta r histogram
 };
 
 typedef std::map<InteractionType, TargetHistogramCollection> InteractionTargetHistogramMap;
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+class CosmicRayTargetHistogramCollection
+{
+public:
+    /**
+     *  @brief  Default constructor
+     */
+    CosmicRayTargetHistogramCollection();
+
+    TH1F                   *m_hIsCorrectEventFractionEnergy;   ///< The isCorrectEventFraction vs target energy
+    TH1F                   *m_hEnergyAll;                      ///< The target energy distribution
+};
+
+typedef std::map<InteractionType, CosmicRayTargetHistogramCollection> InteractionCosmicRayTargetHistogramMap;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -530,6 +547,7 @@ public:
     TH1F                   *m_hCompleteness;            ///< The primary (best match) completeness histogram
     TH1F                   *m_hPurity;                  ///< The primary (best match) purity histogram
 };
+
 
 typedef std::map<ExpectedPrimary, PrimaryHistogramCollection> PrimaryHistogramMap;
 typedef std::map<InteractionType, PrimaryHistogramMap> InteractionPrimaryHistogramMap;
@@ -648,6 +666,9 @@ void AnalyseInteractionTargetResultMap(const InteractionTargetResultMap &interac
  *  @param  targetHistogramCollection the target histogram collection
  */
 void FillTargetHistogramCollection(const std::string &histPrefix, const TargetResult &targetResult, TargetHistogramCollection &targetHistogramCollection);
+
+
+void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const TargetResult &targetResult, CosmicRayTargetHistogramCollection &cosmicRayTargetHistogramCollection);
 
 /**
  *  @brief  Fill histograms in the provided histogram collection, using information in the provided primary result
@@ -825,7 +846,8 @@ TargetResult::TargetResult() :
     m_eventNumber(-1),
     m_isCorrect(false),
     m_hasRecoVertex(false),
-    m_vertexOffset(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max())
+    m_vertexOffset(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max()),
+    m_isCosmicRay()
 {
 }
 
@@ -856,5 +878,15 @@ TargetHistogramCollection::TargetHistogramCollection() :
     m_hVtxDeltaR(nullptr)
 {
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+CosmicRayTargetHistogramCollection::CosmicRayTargetHistogramCollection() :
+    m_hIsCorrectEventFractionEnergy(nullptr),
+    m_hEnergyAll(nullptr)
+{
+}
+
 
 #endif // #ifndef NEW_LAR_VALIDATION_H
