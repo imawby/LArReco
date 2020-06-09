@@ -672,11 +672,14 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
 
     const PrimaryResultMap &primaryResultMap(targetResult.m_primaryResultMap);
 
-    std::cout << "PRIMARY RESULT MAP SIZE: " << primaryResultMap.size()  << std::endl;
+    if (primaryResultMap.size() != 1)
+    {
+        std::cout << "PRIMARY RESULT MAP SIZE: " << primaryResultMap.size()  << std::endl;
 
 
-    std::cout << "JAM: " << histPrefix << std::endl;
-    std::cout << targetHistogramCollection.m_hEnergyAll << std::endl;
+        std::cout << "JAM: " << histPrefix << std::endl;
+        std::cout << targetHistogramCollection.m_hEnergyAll << std::endl;
+    }
     
     /*
     for (const PrimaryResultMap::value_type &primaryMapEntry : primaryResultMap)
