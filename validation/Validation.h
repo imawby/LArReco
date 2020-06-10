@@ -455,6 +455,8 @@ public:
     float                   m_trueMomentum;             ///< The true momentum of the mc primary
     float                   m_trueTheta0XZ;             ///< The true theta0XZ of the mc primary (in degrees)
     float                   m_trueTheta0YZ;             ///< The true theta0YZ of the mc primary (in degrees)
+    float                   m_trueEnergy;
+    int                     m_pdgCode;
 };
 
 typedef std::map<ExpectedPrimary, PrimaryResult> PrimaryResultMap;
@@ -667,7 +669,6 @@ void AnalyseInteractionTargetResultMap(const InteractionTargetResultMap &interac
  */
 void FillTargetHistogramCollection(const std::string &histPrefix, const TargetResult &targetResult, TargetHistogramCollection &targetHistogramCollection);
 
-
 void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const TargetResult &targetResult, CosmicRayTargetHistogramCollection &cosmicRayTargetHistogramCollection);
 
 /**
@@ -685,6 +686,8 @@ void FillPrimaryHistogramCollection(const std::string &histPrefix, const Primary
  *  @param  interactionPrimaryHistogramMap the interaction primary histogram map
  */
 void ProcessHistogramCollections(const InteractionPrimaryHistogramMap &interactionPrimaryHistogramMap);
+
+void ProcessCosmicRayHistogramCollections(const InteractionCosmicRayTargetHistogramMap &interactionCRHistogramMap);
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -834,7 +837,9 @@ PrimaryResult::PrimaryResult() :
     m_isCorrectParticleId(false),
     m_trueMomentum(-1.f),
     m_trueTheta0XZ(0.f),
-    m_trueTheta0YZ(0.f)
+    m_trueTheta0YZ(0.f),
+    m_trueEnergy(0.f),
+    m_pdgCode(-1)
 {
 }
 

@@ -377,6 +377,10 @@ void CountPfoMatches(const SimpleMCEvent &simpleMCEvent, const Parameters &param
             float theta0YZ = std::asin(simpleMCPrimary.m_momentum.m_y / pTot);
             theta0YZ *= (180.f / M_PI);
             primaryResult.m_trueTheta0YZ = theta0YZ;
+
+            primaryResult.m_trueEnergy = simpleMCPrimary.m_energy;
+            primaryResult.m_pdgCode = simpleMCPrimary.m_pdgCode;
+
         }
 
         interactionTargetResultMap[interactionType].push_back(targetResult);
@@ -616,7 +620,10 @@ void AnalyseInteractionTargetResultMap(const InteractionTargetResultMap &interac
     }
 
     if (parameters.m_histogramOutput)
+    {
         ProcessHistogramCollections(interactionPrimaryHistogramMap);
+        ProcessCosmicRayHistogramCollections(interactionCosmicRayTargetHistogramMap);
+    }
 
     if (!parameters.m_mapFileName.empty()) mapFile.close();
     if (!parameters.m_eventFileName.empty()) eventFile.close();
@@ -672,42 +679,64 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
 
     const PrimaryResultMap &primaryResultMap(targetResult.m_primaryResultMap);
 
-    if (primaryResultMap.size() != 1)
-    {
-        std::cout << "PRIMARY RESULT MAP SIZE: " << primaryResultMap.size()  << std::endl;
-
-
-        std::cout << "JAM: " << histPrefix << std::endl;
-        std::cout << targetHistogramCollection.m_hEnergyAll << std::endl;
-    }
-    
-    /*
+    float cosmicRayEnergy(0.f);    
+    unsigned int mcMuonCount(0);
     for (const PrimaryResultMap::value_type &primaryMapEntry : primaryResultMap)
     {
-        const ExpectedPrimary expectedPrimary(primaryMapEntry.first);
         const PrimaryResult &primaryResult(primaryMapEntry.second);
 
-        std::cout << 
-    */
-    
-    /*
-    if (!targetHistogramCollection.m_hIsCorrectEventFractionEnergy)
-    {
-        targetHistogramCollection.m_hIsCorrectEventFractionEnergy = new TH1F((histPrefix + "IsCorrectEventFraction").c_str(), "", 1000, 0., 10 000.);
-        targetHistogramCollection.m_hIsCorrectEventFractionEnergy->GetXaxis()->SetTitle("Target Energy [GeV]");
-        targetHistogramCollection.m_hIsCorrectEventFractionEnergy->GetYaxis()->SetTitle("isCorrect Event Fraction");
+        if (std::abs(primaryResult.m_pdgCode) == 13)
+        {
+            mcMuonCount++;
+            cosmicRayEnergy = primaryResult.m_trueEnergy;
+        }
     }
+
+    // ISOBEL - MAYBE I SHOULD MAKE SURE I DO NOT HAVE MORE THAN ONE PARTICLE?
+    
+    std::cout << "ENERGY: " << cosmicRayEnergy << std::endl;
+    std::cout << "CORRECT EVENT?: " << targetResult.m_isCorrect << std::endl;
 
     if (!targetHistogramCollection.m_hEnergyAll)
     {
-        targetHistogramCollection.m_hEnergyAll = new TH1F((histPrefix + "TargetEnergy").c_str(), "", 1000, 0., 10 000.);
-        targetHistogramCollection.m_hEnergyAll->GetXaxis()->SetTitle("Target Energy [GeV]");
+        targetHistogramCollection.m_hEnergyAll = new TH1F((histPrefix + "CosmicRayEnergy").c_str(), "", 1000, 0., 10000.);
+        targetHistogramCollection.m_hEnergyAll->GetXaxis()->SetTitle("CR Energy [GeV]");
         targetHistogramCollection.m_hEnergyAll->GetYaxis()->SetTitle("Number of Events");
     }
-    */
-
-
     
+    if (!targetHistogramCollection.m_hIsCorrectEventFractionEnergy)
+    {
+        targetHistogramCollection.m_hIsCorrectEventFractionEnergy = new TH1F((histPrefix + "CorrectEventFractionEnergy").c_str(), "", 1000, 0., 10000.);
+        targetHistogramCollection.m_hIsCorrectEventFractionEnergy->GetXaxis()->SetTitle("CR Energy [GeV]");
+        targetHistogramCollection.m_hIsCorrectEventFractionEnergy->GetYaxis()->SetTitle("Correct Event Fraction");
+    }
+
+    targetHistogramCollection.m_hEnergyAll->Fill(cosmicRayEnergy);
+    
+    if (targetResult.m_isCorrect)
+    {
+        targetHistogramCollection.m_hIsCorrectEventFractionEnergy->Fill(cosmicRayEnergy);
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void ProcessCosmicRayHistogramCollections(const InteractionCosmicRayTargetHistogramMap &interactionCRHistogramMap)
+{
+    for (InteractionCosmicRayTargetHistogramMap::const_iterator iter = interactionCRHistogramMap.begin(), iterEnd = interactionCRHistogramMap.end(); iter != iterEnd; ++iter)
+    {
+        const CosmicRayTargetHistogramCollection &cosmicRayTargetHistogramCollection(iter->second);
+
+        for (int n = -1; n <= cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionEnergy->GetXaxis()->GetNbins(); ++n)
+        {
+            const float found = cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionEnergy->GetBinContent(n + 1);
+            const float all = cosmicRayTargetHistogramCollection.m_hEnergyAll->GetBinContent(n + 1);
+            const float efficiency = (all > 0.f) ? found / all : 0.f;
+            const float error = (all > found) ? std::sqrt(efficiency * (1. - efficiency) / all) : 0.f;
+            cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionEnergy->SetBinContent(n + 1, efficiency);
+            cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionEnergy->SetBinError(n + 1, error);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
