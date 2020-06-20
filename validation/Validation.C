@@ -7,6 +7,7 @@
  */
 #include "TChain.h"
 #include "TH1F.h"
+#include "TH2F.h"
 
 #include "Validation.h"
 
@@ -104,6 +105,7 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
         IntVector *pBestMatchPfoId(nullptr), *pBestMatchPfoPdg(nullptr), *pBestMatchPfoIsRecoNu(nullptr), *pBestMatchPfoRecoNuId(nullptr), *pBestMatchPfoIsTestBeam(nullptr);
         IntVector *pBestMatchPfoNHitsTotal(nullptr), *pBestMatchPfoNHitsU(nullptr), *pBestMatchPfoNHitsV(nullptr), *pBestMatchPfoNHitsW(nullptr);
         IntVector *pBestMatchPfoNSharedHitsTotal(nullptr), *pBestMatchPfoNSharedHitsU(nullptr), *pBestMatchPfoNSharedHitsV(nullptr), *pBestMatchPfoNSharedHitsW(nullptr);
+        FloatVector *pBestMatchPfoTrackLength(nullptr);
 
         pTChain->SetBranchAddress("mcPrimaryId", &pMCPrimaryId);
         pTChain->SetBranchAddress("mcPrimaryPdg", &pMCPrimaryPdg);
@@ -133,7 +135,8 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
         pTChain->SetBranchAddress("bestMatchPfoNSharedHitsU", &pBestMatchPfoNSharedHitsU);
         pTChain->SetBranchAddress("bestMatchPfoNSharedHitsV", &pBestMatchPfoNSharedHitsV);
         pTChain->SetBranchAddress("bestMatchPfoNSharedHitsW", &pBestMatchPfoNSharedHitsW);
-
+        pTChain->SetBranchAddress("bestMatchPfoTrackLength", &pBestMatchPfoTrackLength);
+        
         if (parameters.m_testBeamMode)
         {
             pTChain->SetBranchAddress("bestMatchPfoIsTB", &pBestMatchPfoIsTestBeam);
@@ -184,7 +187,8 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
             simpleMCPrimary.m_bestMatchPfoNSharedHitsU = pBestMatchPfoNSharedHitsU->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoNSharedHitsV = pBestMatchPfoNSharedHitsV->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoNSharedHitsW = pBestMatchPfoNSharedHitsW->at(iPrimary);
-
+            simpleMCPrimary.m_bestMatchPfoTrackLength = pBestMatchPfoTrackLength->at(iPrimary);
+            
             if (parameters.m_testBeamMode)
             {
                 simpleMCPrimary.m_bestMatchPfoIsTestBeam = pBestMatchPfoIsTestBeam->at(iPrimary);
@@ -380,6 +384,10 @@ void CountPfoMatches(const SimpleMCEvent &simpleMCEvent, const Parameters &param
 
             primaryResult.m_trueEnergy = simpleMCPrimary.m_energy;
             primaryResult.m_pdgCode = simpleMCPrimary.m_pdgCode;
+
+            primaryResult.m_trueTrackLength = std::sqrt((simpleMCPrimary.m_vertex.m_x - simpleMCPrimary.m_endpoint.m_x) * (simpleMCPrimary.m_vertex.m_x - simpleMCPrimary.m_endpoint.m_x) + (simpleMCPrimary.m_vertex.m_y - simpleMCPrimary.m_endpoint.m_y) * (simpleMCPrimary.m_vertex.m_y - simpleMCPrimary.m_endpoint.m_y) + (simpleMCPrimary.m_vertex.m_z - simpleMCPrimary.m_endpoint.m_z) * (simpleMCPrimary.m_vertex.m_z - simpleMCPrimary.m_endpoint.m_z));
+
+            primaryResult.m_bestMatchTrackLength = simpleMCPrimary.m_bestMatchPfoTrackLength;
 
         }
 
@@ -674,12 +682,19 @@ void FillTargetHistogramCollection(const std::string &histPrefix, const TargetRe
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const TargetResult &targetResult, CosmicRayTargetHistogramCollection &targetHistogramCollection)
+void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const TargetResult &targetResult, CosmicRayTargetHistogramCollection &cosmicRayTargetHistogramCollection)
 {
-
     const PrimaryResultMap &primaryResultMap(targetResult.m_primaryResultMap);
 
-    float cosmicRayEnergy(0.f);    
+    float cosmicRayEnergy(0.f);
+    float cosmicRayTheta0XZ(0.f);
+    float cosmicRayTheta0YZ(0.f);
+    float cosmicRayTrackLength(0.f);
+    
+    float cosmicBestMatchCompleteness(0.f);
+    float cosmicBestMatchPurity(0.f);
+    float cosmicBestMatchTrackLength(0.f);
+    
     unsigned int mcMuonCount(0);
     for (const PrimaryResultMap::value_type &primaryMapEntry : primaryResultMap)
     {
@@ -689,34 +704,98 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
         {
             mcMuonCount++;
             cosmicRayEnergy = primaryResult.m_trueEnergy;
+            cosmicRayTheta0XZ = primaryResult.m_trueTheta0XZ;
+            cosmicRayTheta0YZ = primaryResult.m_trueTheta0YZ;
+
+            cosmicRayTrackLength = primaryResult.m_trueTrackLength;
+            cosmicBestMatchTrackLength = primaryResult.m_bestMatchTrackLength;
+            
+            if (primaryResult.m_nPfoMatches > 0)
+            {
+                cosmicBestMatchCompleteness =  primaryResult.m_bestMatchCompleteness;
+                cosmicBestMatchPurity = primaryResult.m_bestMatchPurity;
+            }
         }
     }
-
-    // ISOBEL - MAYBE I SHOULD MAKE SURE I DO NOT HAVE MORE THAN ONE PARTICLE?
     
-    std::cout << "ENERGY: " << cosmicRayEnergy << std::endl;
-    std::cout << "CORRECT EVENT?: " << targetResult.m_isCorrect << std::endl;
-
-    if (!targetHistogramCollection.m_hEnergyAll)
-    {
-        targetHistogramCollection.m_hEnergyAll = new TH1F((histPrefix + "CosmicRayEnergy").c_str(), "", 1000, 0., 10000.);
-        targetHistogramCollection.m_hEnergyAll->GetXaxis()->SetTitle("CR Energy [GeV]");
-        targetHistogramCollection.m_hEnergyAll->GetYaxis()->SetTitle("Number of Events");
-    }
+    std::cout << "/////////////////////////////////////////" << std::endl;
+    std::cout << "\033[31m"  << "COSMIC RAY ENERGY: " << "\033[33m" << cosmicRayEnergy << "\033[0m" << std::endl;
+    std::cout << "\033[31m"  << "COSMIC RAY THETA 0XZ: " << "\033[33m" << cosmicRayTheta0XZ << "\033[0m" << std::endl;
+    std::cout << "\033[31m"  << "COSMIC RAY THETA 0YZ: " << "\033[33m" << cosmicRayTheta0YZ << "\033[0m" << std::endl;
+    std::cout << "\033[31m"  << "COSMIC RAY BEST MATCH COMPLETENESS: " << "\033[33m" << cosmicBestMatchCompleteness << "\033[0m" << std::endl;
+    std::cout << "\033[31m"  << "COSMIC RAY BEST MATCH PURITY: " << "\033[33m" << cosmicBestMatchPurity << "\033[0m" << std::endl;
+    std::cout << "\033[31m"  << "COSMIC RAY TRUE TRACK LENGTH: " << "\033[33m" << cosmicRayTrackLength << "\033[0m" << std::endl;
+    std::cout << "\033[31m"  << "COSMIC RAY BEST MATCH TRACK LENGTH: " << "\033[33m" << cosmicBestMatchTrackLength << "\033[0m" << std::endl;
+    std::cout << "\033[31m"  << "isCorrect: " << "\033[33m" << targetResult.m_isCorrect << "\033[0m" << std::endl;
+    std::cout << "/////////////////////////////////////////" << std::endl;
     
-    if (!targetHistogramCollection.m_hIsCorrectEventFractionEnergy)
+    if (mcMuonCount > 1)
     {
-        targetHistogramCollection.m_hIsCorrectEventFractionEnergy = new TH1F((histPrefix + "CorrectEventFractionEnergy").c_str(), "", 1000, 0., 10000.);
-        targetHistogramCollection.m_hIsCorrectEventFractionEnergy->GetXaxis()->SetTitle("CR Energy [GeV]");
-        targetHistogramCollection.m_hIsCorrectEventFractionEnergy->GetYaxis()->SetTitle("Correct Event Fraction");
+        std::cout << "\033[31m" << "ISOBEL MORE THAN ONE PRIMARY MUON" << "\033[0m"  << std::endl;
+        return;
     }
 
-    targetHistogramCollection.m_hEnergyAll->Fill(cosmicRayEnergy);
+    if (!cosmicRayTargetHistogramCollection.m_hEnergyAll)
+    {
+        cosmicRayTargetHistogramCollection.m_hEnergyAll = new TH1F((histPrefix + "CosmicRayEnergy").c_str(), "", 100, 0., 2500.);
+        cosmicRayTargetHistogramCollection.m_hEnergyAll->GetXaxis()->SetTitle("CR Energy [GeV]");
+        cosmicRayTargetHistogramCollection.m_hEnergyAll->GetYaxis()->SetTitle("Number of Events");
+    }
+    
+    if (!cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionEnergy)
+    {
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionEnergy = new TH1F((histPrefix + "CorrectEventFractionEnergy").c_str(), "", 100, 0., 2500.);
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionEnergy->GetXaxis()->SetTitle("CR Energy [GeV]");
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionEnergy->GetYaxis()->SetTitle("Correct Event Fraction");
+    }
+
+    if (!cosmicRayTargetHistogramCollection.m_hTheta0XZAll)
+    {
+        cosmicRayTargetHistogramCollection.m_hTheta0XZAll = new TH1F((histPrefix + "CosmicRayTheta0XZ").c_str(), "", 100, -360., 360.);
+        cosmicRayTargetHistogramCollection.m_hTheta0XZAll->GetXaxis()->SetTitle("#theta_{0XZ} [degrees]");
+        cosmicRayTargetHistogramCollection.m_hTheta0XZAll->GetYaxis()->SetTitle("Number of Events");
+    }
+
+    if (!cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ)
+    {
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ = new TH1F((histPrefix + "CorrectEventFractionTheta0XZ").c_str(), "", 100, -360., 360.);
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ->GetXaxis()->SetTitle("#theta_{0XZ} [degrees]");
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ->GetYaxis()->SetTitle("Correct Event Fraction");
+    }
+
+    if (!cosmicRayTargetHistogramCollection.m_hTheta0YZAll)
+    {
+        cosmicRayTargetHistogramCollection.m_hTheta0YZAll = new TH1F((histPrefix + "CosmicRayTheta0YZ").c_str(), "", 100, -360., 360.);
+        cosmicRayTargetHistogramCollection.m_hTheta0YZAll->GetXaxis()->SetTitle("#theta_{0YZ} [degrees]");
+        cosmicRayTargetHistogramCollection.m_hTheta0YZAll->GetYaxis()->SetTitle("Number of Events");
+    }
+
+    if (!cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ)
+    {
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ = new TH1F((histPrefix + "CorrectEventFractionTheta0YZ").c_str(), "", 100, -360., 360.);
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ->GetXaxis()->SetTitle("#theta_{0YZ} [degrees]");
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ->GetYaxis()->SetTitle("Correct Event Fraction");
+    }
+
+    if (!cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength)
+    {
+        cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength = new TH2F((histPrefix + "TrueVsBestMatchTrackLength").c_str(), "", 100, 0, 2000., 100, 0, 2000.);
+        cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength->GetXaxis()->SetTitle("True Track Length [cm]");
+        cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength->GetYaxis()->SetTitle("Best Match Track Length [cm]");
+    }
+
+    cosmicRayTargetHistogramCollection.m_hEnergyAll->Fill(cosmicRayEnergy);
+    cosmicRayTargetHistogramCollection.m_hTheta0XZAll->Fill(cosmicRayTheta0XZ);
+    cosmicRayTargetHistogramCollection.m_hTheta0YZAll->Fill(cosmicRayTheta0YZ);
+    cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength->Fill(cosmicRayTrackLength, cosmicBestMatchTrackLength);
     
     if (targetResult.m_isCorrect)
     {
-        targetHistogramCollection.m_hIsCorrectEventFractionEnergy->Fill(cosmicRayEnergy);
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionEnergy->Fill(cosmicRayEnergy);
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ->Fill(cosmicRayTheta0XZ);
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ->Fill(cosmicRayTheta0YZ);
     }
+
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -735,6 +814,26 @@ void ProcessCosmicRayHistogramCollections(const InteractionCosmicRayTargetHistog
             const float error = (all > found) ? std::sqrt(efficiency * (1. - efficiency) / all) : 0.f;
             cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionEnergy->SetBinContent(n + 1, efficiency);
             cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionEnergy->SetBinError(n + 1, error);
+        }
+
+        for (int n = -1; n <= cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ->GetXaxis()->GetNbins(); ++n)
+        {
+            const float found = cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ->GetBinContent(n + 1);
+            const float all = cosmicRayTargetHistogramCollection.m_hTheta0XZAll->GetBinContent(n + 1);
+            const float efficiency = (all > 0.f) ? found / all : 0.f;
+            const float error = (all > found) ? std::sqrt(efficiency * (1. - efficiency) / all) : 0.f;
+            cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ->SetBinContent(n + 1, efficiency);
+            cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ->SetBinError(n + 1, error);
+        }
+
+        for (int n = -1; n <= cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ->GetXaxis()->GetNbins(); ++n)
+        {
+            const float found = cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ->GetBinContent(n + 1);
+            const float all = cosmicRayTargetHistogramCollection.m_hTheta0YZAll->GetBinContent(n + 1);
+            const float efficiency = (all > 0.f) ? found / all : 0.f;
+            const float error = (all > found) ? std::sqrt(efficiency * (1. - efficiency) / all) : 0.f;
+            cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ->SetBinContent(n + 1, efficiency);
+            cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ->SetBinError(n + 1, error);
         }
     }
 }
@@ -837,7 +936,61 @@ void FillPrimaryHistogramCollection(const std::string &histPrefix, const Primary
         primaryHistogramCollection.m_hPurity->GetYaxis()->SetRangeUser(0., +1.01);
         primaryHistogramCollection.m_hPurity->GetYaxis()->SetTitle("Fraction of Events");
     }
+    
+    if (!primaryHistogramCollection.m_hCompletenessWithEnergy)
+    {
+        primaryHistogramCollection.m_hCompletenessWithEnergy = new TH2F((histPrefix + "CompletenessWithEnergy").c_str(), "", 100, 0., 2500., 51, -0.01, 1.01);
+        primaryHistogramCollection.m_hCompletenessWithEnergy->GetXaxis()->SetTitle("CR Energy [GeV]");
+        primaryHistogramCollection.m_hCompletenessWithEnergy->GetYaxis()->SetTitle("Completeness");
+        primaryHistogramCollection.m_hCompletenessWithEnergy->GetZaxis()->SetTitle("Fraction of Events");
+        primaryHistogramCollection.m_hCompletenessWithEnergy->GetYaxis()->SetRangeUser(0., +1.01);
+    }
 
+    if (!primaryHistogramCollection.m_hPurityWithEnergy)
+    {
+        primaryHistogramCollection.m_hPurityWithEnergy = new TH2F((histPrefix + "PurityWithEnergy").c_str(), "", 100, 0., 2500., 51, -0.01, 1.01);
+        primaryHistogramCollection.m_hPurityWithEnergy->GetXaxis()->SetTitle("CR Energy [GeV]");
+        primaryHistogramCollection.m_hPurityWithEnergy->GetYaxis()->SetTitle("Purity");
+        primaryHistogramCollection.m_hPurityWithEnergy->GetZaxis()->SetTitle("Fraction of Events");
+        primaryHistogramCollection.m_hPurityWithEnergy->GetYaxis()->SetRangeUser(0., +1.01);
+    }
+
+    if (!primaryHistogramCollection.m_hCompletenessWithTheta0XZ)
+    {
+        primaryHistogramCollection.m_hCompletenessWithTheta0XZ = new TH2F((histPrefix + "CompletenessWithTheta0XZ").c_str(), "", 100, -180., 180., 51, -0.01, 1.01);
+        primaryHistogramCollection.m_hCompletenessWithTheta0XZ->GetXaxis()->SetTitle("#theta_{0XZ} [degrees]");
+        primaryHistogramCollection.m_hCompletenessWithTheta0XZ->GetYaxis()->SetTitle("Completeness");
+        primaryHistogramCollection.m_hCompletenessWithTheta0XZ->GetZaxis()->SetTitle("Fraction of Events");
+        primaryHistogramCollection.m_hCompletenessWithTheta0XZ->GetYaxis()->SetRangeUser(0., +1.01);
+    }
+
+    if (!primaryHistogramCollection.m_hPurityWithTheta0XZ)
+    {
+        primaryHistogramCollection.m_hPurityWithTheta0XZ = new TH2F((histPrefix + "PurityWithTheta0XZ").c_str(), "", 100, -180., 180., 51, -0.01, 1.01);
+        primaryHistogramCollection.m_hPurityWithTheta0XZ->GetXaxis()->SetTitle("#theta_{0XZ} [degrees]");
+        primaryHistogramCollection.m_hPurityWithTheta0XZ->GetYaxis()->SetTitle("Purity");
+        primaryHistogramCollection.m_hPurityWithTheta0XZ->GetZaxis()->SetTitle("Fraction of Events");
+        primaryHistogramCollection.m_hPurityWithTheta0XZ->GetYaxis()->SetRangeUser(0., +1.01);
+    }
+
+    if (!primaryHistogramCollection.m_hCompletenessWithTheta0YZ)
+    {
+        primaryHistogramCollection.m_hCompletenessWithTheta0YZ = new TH2F((histPrefix + "CompletenessWithTheta0YZ").c_str(), "", 50, -90., 90., 51, -0.01, 1.01);
+        primaryHistogramCollection.m_hCompletenessWithTheta0YZ->GetXaxis()->SetTitle("#theta_{0YZ} [degrees]");
+        primaryHistogramCollection.m_hCompletenessWithTheta0YZ->GetYaxis()->SetTitle("Completeness");
+        primaryHistogramCollection.m_hCompletenessWithTheta0YZ->GetZaxis()->SetTitle("Fraction of Events");
+        primaryHistogramCollection.m_hCompletenessWithTheta0YZ->GetYaxis()->SetRangeUser(0., +1.01);
+    }
+
+    if (!primaryHistogramCollection.m_hPurityWithTheta0YZ)
+    {
+        primaryHistogramCollection.m_hPurityWithTheta0YZ = new TH2F((histPrefix + "PurityWithTheta0YZ").c_str(), "", 100, -90., 90., 51, -0.01, 1.01);
+        primaryHistogramCollection.m_hPurityWithTheta0YZ->GetXaxis()->SetTitle("#theta_{0YZ} [degrees]");
+        primaryHistogramCollection.m_hPurityWithTheta0YZ->GetYaxis()->SetTitle("Purity");
+        primaryHistogramCollection.m_hPurityWithTheta0YZ->GetZaxis()->SetTitle("Fraction of Events");
+        primaryHistogramCollection.m_hPurityWithTheta0YZ->GetYaxis()->SetRangeUser(0., +1.01);
+    }
+    
     primaryHistogramCollection.m_hHitsAll->Fill(primaryResult.m_nMCHitsTotal);
     primaryHistogramCollection.m_hMomentumAll->Fill(primaryResult.m_trueMomentum);
     primaryHistogramCollection.m_hTheta0XZAll->Fill(primaryResult.m_trueTheta0XZ);
@@ -851,6 +1004,12 @@ void FillPrimaryHistogramCollection(const std::string &histPrefix, const Primary
         primaryHistogramCollection.m_hTheta0YZEfficiency->Fill(primaryResult.m_trueTheta0YZ);
         primaryHistogramCollection.m_hCompleteness->Fill(primaryResult.m_bestMatchCompleteness);
         primaryHistogramCollection.m_hPurity->Fill(primaryResult.m_bestMatchPurity);
+        primaryHistogramCollection.m_hCompletenessWithEnergy->Fill(primaryResult.m_trueEnergy, primaryResult.m_bestMatchCompleteness);
+        primaryHistogramCollection.m_hPurityWithEnergy->Fill(primaryResult.m_trueEnergy, primaryResult.m_bestMatchPurity);
+        primaryHistogramCollection.m_hCompletenessWithTheta0XZ->Fill(primaryResult.m_trueTheta0XZ, primaryResult.m_bestMatchCompleteness);
+        primaryHistogramCollection.m_hPurityWithTheta0XZ->Fill(primaryResult.m_trueTheta0XZ, primaryResult.m_bestMatchPurity);
+        primaryHistogramCollection.m_hCompletenessWithTheta0YZ->Fill(primaryResult.m_trueTheta0YZ, primaryResult.m_bestMatchCompleteness);
+        primaryHistogramCollection.m_hPurityWithTheta0YZ->Fill(primaryResult.m_trueTheta0YZ, primaryResult.m_bestMatchPurity);
     }
 }
 

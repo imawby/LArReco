@@ -124,6 +124,7 @@ public:
     int                 m_bestMatchPfoNSharedHitsU;     ///< The best match pfo number of u matched hits
     int                 m_bestMatchPfoNSharedHitsV;     ///< The best match pfo number of v matched hits
     int                 m_bestMatchPfoNSharedHitsW;     ///< The best match pfo number of w matched hits
+    float               m_bestMatchPfoTrackLength;
 };
 
 typedef std::vector<SimpleMCPrimary> SimpleMCPrimaryList;
@@ -457,6 +458,8 @@ public:
     float                   m_trueTheta0YZ;             ///< The true theta0YZ of the mc primary (in degrees)
     float                   m_trueEnergy;
     int                     m_pdgCode;
+    float                   m_trueTrackLength;
+    float                   m_bestMatchTrackLength;
 };
 
 typedef std::map<ExpectedPrimary, PrimaryResult> PrimaryResultMap;
@@ -480,7 +483,7 @@ public:
     bool                    m_hasRecoVertex;            ///< Whether a reco vertex is matched to the target
     SimpleThreeVector       m_vertexOffset;             ///< The offset between the reco and true target vertices
     PrimaryResultMap        m_primaryResultMap;         ///< The primary result map
-    bool m_isCosmicRay;
+    bool                    m_isCosmicRay;
 };
 
 typedef std::vector<TargetResult> TargetResultList; // ATTN Not terribly efficient, but that's not the main aim here
@@ -489,6 +492,7 @@ typedef std::map<InteractionType, TargetResultList> InteractionTargetResultMap;
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 class TH1F;
+class TH2F;
 
 /**
  *  @brief  TargetHistogramCollection class
@@ -519,8 +523,13 @@ public:
      */
     CosmicRayTargetHistogramCollection();
 
-    TH1F                   *m_hIsCorrectEventFractionEnergy;   ///< The isCorrectEventFraction vs target energy
-    TH1F                   *m_hEnergyAll;                      ///< The target energy distribution
+    TH1F                   *m_hIsCorrectEventFractionEnergy;     ///< The isCorrectEventFraction vs target energy
+    TH1F                   *m_hEnergyAll;                        ///< The target energy distribution
+    TH1F                   *m_hIsCorrectEventFractionTheta0XZ;   ///< The isCorrectEventFraction vs target theta0XZ
+    TH1F                   *m_hTheta0XZAll;                      ///< The target theta0XZ distribution
+    TH1F                   *m_hIsCorrectEventFractionTheta0YZ;   ///< The isCorrectEventFraction vs target theta0YZ
+    TH1F                   *m_hTheta0YZAll;                      ///< The target theta0YZ distribution
+    TH2F                   *m_hTrueVsBestMatchTrackLength;
 };
 
 typedef std::map<InteractionType, CosmicRayTargetHistogramCollection> InteractionCosmicRayTargetHistogramMap;
@@ -538,16 +547,22 @@ public:
      */
     PrimaryHistogramCollection();
 
-    TH1F                   *m_hHitsAll;                 ///< The number of primaries vs number of hits histogram
-    TH1F                   *m_hHitsEfficiency;          ///< The primary efficiency vs number of hits histogram
-    TH1F                   *m_hMomentumAll;             ///< The number of primaries vs momentum histogram
-    TH1F                   *m_hMomentumEfficiency;      ///< The primary efficiency vs momentum histogram
-    TH1F                   *m_hTheta0XZAll;             ///< The number of primaries vs theta0XZ histogram
-    TH1F                   *m_hTheta0XZEfficiency;      ///< The primary efficiency vs theta0XZ histogram
-    TH1F                   *m_hTheta0YZAll;             ///< The number of primaries vs theta0YZ histogram
-    TH1F                   *m_hTheta0YZEfficiency;      ///< The primary efficiency vs theta0YZ histogram
-    TH1F                   *m_hCompleteness;            ///< The primary (best match) completeness histogram
-    TH1F                   *m_hPurity;                  ///< The primary (best match) purity histogram
+    TH1F                   *m_hHitsAll;                   ///< The number of primaries vs number of hits histogram
+    TH1F                   *m_hHitsEfficiency;            ///< The primary efficiency vs number of hits histogram
+    TH1F                   *m_hMomentumAll;               ///< The number of primaries vs momentum histogram
+    TH1F                   *m_hMomentumEfficiency;        ///< The primary efficiency vs momentum histogram
+    TH1F                   *m_hTheta0XZAll;               ///< The number of primaries vs theta0XZ histogram
+    TH1F                   *m_hTheta0XZEfficiency;        ///< The primary efficiency vs theta0XZ histogram
+    TH1F                   *m_hTheta0YZAll;               ///< The number of primaries vs theta0YZ histogram
+    TH1F                   *m_hTheta0YZEfficiency;        ///< The primary efficiency vs theta0YZ histogram
+    TH1F                   *m_hCompleteness;              ///< The primary (best match) completeness histogram
+    TH1F                   *m_hPurity;                    ///< The primary (best match) purity histogram
+    TH2F                   *m_hCompletenessWithEnergy;    ///< The primary (best match) completeness as a function of true energy
+    TH2F                   *m_hPurityWithEnergy;          ///< The primary (best match) purity as a function of true energy
+    TH2F                   *m_hCompletenessWithTheta0XZ;  ///< The primary (best match) completeness as a function of true theta0XZ
+    TH2F                   *m_hPurityWithTheta0XZ;        ///< The primary (best match) purity as a function of true theta0XZ
+    TH2F                   *m_hCompletenessWithTheta0YZ;  ///< The primary (best match) completeness as a function of true theta0YZ
+    TH2F                   *m_hPurityWithTheta0YZ;        ///< The primary (best match) purity as a function of true theta0YZ
 };
 
 
@@ -768,7 +783,8 @@ SimpleMCPrimary::SimpleMCPrimary() :
     m_bestMatchPfoNSharedHitsTotal(0),
     m_bestMatchPfoNSharedHitsU(0),
     m_bestMatchPfoNSharedHitsV(0),
-    m_bestMatchPfoNSharedHitsW(0)
+    m_bestMatchPfoNSharedHitsW(0),
+    m_bestMatchPfoTrackLength(0.f)
 {
 }
 
@@ -839,7 +855,9 @@ PrimaryResult::PrimaryResult() :
     m_trueTheta0XZ(0.f),
     m_trueTheta0YZ(0.f),
     m_trueEnergy(0.f),
-    m_pdgCode(-1)
+    m_pdgCode(-1),
+    m_trueTrackLength(0.f),
+    m_bestMatchTrackLength(0.f)
 {
 }
 
@@ -869,7 +887,13 @@ PrimaryHistogramCollection::PrimaryHistogramCollection() :
     m_hTheta0YZAll(nullptr),
     m_hTheta0YZEfficiency(nullptr),
     m_hCompleteness(nullptr),
-    m_hPurity(nullptr)
+    m_hPurity(nullptr),
+    m_hCompletenessWithEnergy(nullptr),
+    m_hPurityWithEnergy(nullptr),
+    m_hCompletenessWithTheta0XZ(nullptr),
+    m_hPurityWithTheta0XZ(nullptr),
+    m_hCompletenessWithTheta0YZ(nullptr),
+    m_hPurityWithTheta0YZ(nullptr)
 {
 }
 
@@ -889,7 +913,12 @@ TargetHistogramCollection::TargetHistogramCollection() :
 
 CosmicRayTargetHistogramCollection::CosmicRayTargetHistogramCollection() :
     m_hIsCorrectEventFractionEnergy(nullptr),
-    m_hEnergyAll(nullptr)
+    m_hEnergyAll(nullptr),
+    m_hIsCorrectEventFractionTheta0XZ(nullptr),
+    m_hTheta0XZAll(nullptr),
+    m_hIsCorrectEventFractionTheta0YZ(nullptr),
+    m_hTheta0YZAll(nullptr),
+    m_hTrueVsBestMatchTrackLength(nullptr)
 {
 }
 
