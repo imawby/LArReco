@@ -101,7 +101,7 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
         IntVector *pMCPrimaryId(nullptr), *pMCPrimaryPdg(nullptr), *pNMCHitsTotal(nullptr), *pNMCHitsU(nullptr), *pNMCHitsV(nullptr), *pNMCHitsW(nullptr);
         FloatVector *pMCPrimaryE(nullptr), *pMCPrimaryPX(nullptr), *pMCPrimaryPY(nullptr), *pMCPrimaryPZ(nullptr);
         FloatVector *pMCPrimaryVtxX(nullptr), *pMCPrimaryVtxY(nullptr), *pMCPrimaryVtxZ(nullptr), *pMCPrimaryEndX(nullptr), *pMCPrimaryEndY(nullptr), *pMCPrimaryEndZ(nullptr);
-        IntVector *pNPrimaryMatchedPfos(nullptr), *pNPrimaryMatchedNuPfos(nullptr), *pNPrimaryMatchedCRPfos(nullptr);
+        IntVector *pNPrimaryMatchedPfos(nullptr), *pNPrimaryMatchedNuPfos(nullptr), *pNPrimaryMatchedCRPfos(nullptr);//, *pNAllPrimaryMatchedPfos(nullptr);
         IntVector *pBestMatchPfoId(nullptr), *pBestMatchPfoPdg(nullptr), *pBestMatchPfoIsRecoNu(nullptr), *pBestMatchPfoRecoNuId(nullptr), *pBestMatchPfoIsTestBeam(nullptr);
         IntVector *pBestMatchPfoNHitsTotal(nullptr), *pBestMatchPfoNHitsU(nullptr), *pBestMatchPfoNHitsV(nullptr), *pBestMatchPfoNHitsW(nullptr);
         IntVector *pBestMatchPfoNSharedHitsTotal(nullptr), *pBestMatchPfoNSharedHitsU(nullptr), *pBestMatchPfoNSharedHitsV(nullptr), *pBestMatchPfoNSharedHitsW(nullptr);
@@ -124,6 +124,7 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
         pTChain->SetBranchAddress("mcPrimaryNHitsV", &pNMCHitsV);
         pTChain->SetBranchAddress("mcPrimaryNHitsW", &pNMCHitsW);
         pTChain->SetBranchAddress("nPrimaryMatchedPfos", &pNPrimaryMatchedPfos);
+        //pTChain->SetBranchAddress("nAllPrimaryMatchedPfos", &pNAllPrimaryMatchedPfos);
         pTChain->SetBranchAddress("nPrimaryMatchedCRPfos", &pNPrimaryMatchedCRPfos);
         pTChain->SetBranchAddress("bestMatchPfoNHitsTotal", &pBestMatchPfoNHitsTotal);
         pTChain->SetBranchAddress("bestMatchPfoNHitsU", &pBestMatchPfoNHitsU);
@@ -177,6 +178,7 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
             simpleMCPrimary.m_nMCHitsW = pNMCHitsW->at(iPrimary);
             simpleMCPrimary.m_nPrimaryMatchedPfos = pNPrimaryMatchedPfos->at(iPrimary);
             simpleMCPrimary.m_nPrimaryMatchedCRPfos = pNPrimaryMatchedCRPfos->at(iPrimary);
+            //simpleMCPrimary.m_nAllPrimaryMatchedPfos = pNAllPrimaryMatchedPfos->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoId = pBestMatchPfoId->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoPdgCode = pBestMatchPfoPdg->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoNHitsTotal = pBestMatchPfoNHitsTotal->at(iPrimary);
@@ -361,6 +363,7 @@ void CountPfoMatches(const SimpleMCEvent &simpleMCEvent, const Parameters &param
             else ++countingDetails.m_nMatch3Plus;
 
             primaryResult.m_nPfoMatches = simpleMCPrimary.m_nPrimaryMatchedPfos;
+            //primaryResult.m_nAllPfoMatches = simpleMCPrimary.m_nAllPrimaryMatchedPfos;
             primaryResult.m_nMCHitsTotal = simpleMCPrimary.m_nMCHitsTotal;
             primaryResult.m_nBestMatchSharedHitsTotal = simpleMCPrimary.m_bestMatchPfoNSharedHitsTotal;
             primaryResult.m_nBestMatchRecoHitsTotal = simpleMCPrimary.m_bestMatchPfoNHitsTotal;
@@ -694,6 +697,9 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
     float cosmicBestMatchCompleteness(0.f);
     float cosmicBestMatchPurity(0.f);
     float cosmicBestMatchTrackLength(0.f);
+
+    unsigned int cosmicNPfoMatches(0);
+    //unsigned int cosmicNAllPfoMatches(0);
     
     unsigned int mcMuonCount(0);
     for (const PrimaryResultMap::value_type &primaryMapEntry : primaryResultMap)
@@ -709,6 +715,9 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
 
             cosmicRayTrackLength = primaryResult.m_trueTrackLength;
             cosmicBestMatchTrackLength = primaryResult.m_bestMatchTrackLength;
+
+            cosmicNPfoMatches = primaryResult.m_nPfoMatches;
+            //cosmicNAllPfoMatches = primaryResult.m_nAllPfoMatches;
             
             if (primaryResult.m_nPfoMatches > 0)
             {
@@ -717,7 +726,7 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
             }
         }
     }
-    
+    /*
     std::cout << "/////////////////////////////////////////" << std::endl;
     std::cout << "\033[31m"  << "COSMIC RAY ENERGY: " << "\033[33m" << cosmicRayEnergy << "\033[0m" << std::endl;
     std::cout << "\033[31m"  << "COSMIC RAY THETA 0XZ: " << "\033[33m" << cosmicRayTheta0XZ << "\033[0m" << std::endl;
@@ -726,9 +735,11 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
     std::cout << "\033[31m"  << "COSMIC RAY BEST MATCH PURITY: " << "\033[33m" << cosmicBestMatchPurity << "\033[0m" << std::endl;
     std::cout << "\033[31m"  << "COSMIC RAY TRUE TRACK LENGTH: " << "\033[33m" << cosmicRayTrackLength << "\033[0m" << std::endl;
     std::cout << "\033[31m"  << "COSMIC RAY BEST MATCH TRACK LENGTH: " << "\033[33m" << cosmicBestMatchTrackLength << "\033[0m" << std::endl;
+    std::cout << "\033[31m"  << "COSMIC RAY NUMBER OF ABOVE THRESHOLD PFO MATCHES: " << "\033[33m" << cosmicNPfoMatches << "\033[0m" << std::endl;
+    //std::cout << "\033[31m"  << "COSMIC RAY NUMBER OF ALL PFO MATCHES: " << "\033[33m" << cosmicNAllPfoMatches << "\033[0m" << std::endl;
     std::cout << "\033[31m"  << "isCorrect: " << "\033[33m" << targetResult.m_isCorrect << "\033[0m" << std::endl;
     std::cout << "/////////////////////////////////////////" << std::endl;
-    
+    */
     if (mcMuonCount > 1)
     {
         std::cout << "\033[31m" << "ISOBEL MORE THAN ONE PRIMARY MUON" << "\033[0m"  << std::endl;
@@ -751,43 +762,71 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
 
     if (!cosmicRayTargetHistogramCollection.m_hTheta0XZAll)
     {
-        cosmicRayTargetHistogramCollection.m_hTheta0XZAll = new TH1F((histPrefix + "CosmicRayTheta0XZ").c_str(), "", 100, -360., 360.);
+        cosmicRayTargetHistogramCollection.m_hTheta0XZAll = new TH1F((histPrefix + "CosmicRayTheta0XZ").c_str(), "", 100, -180., 180.);
         cosmicRayTargetHistogramCollection.m_hTheta0XZAll->GetXaxis()->SetTitle("#theta_{0XZ} [degrees]");
         cosmicRayTargetHistogramCollection.m_hTheta0XZAll->GetYaxis()->SetTitle("Number of Events");
     }
 
     if (!cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ)
     {
-        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ = new TH1F((histPrefix + "CorrectEventFractionTheta0XZ").c_str(), "", 100, -360., 360.);
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ = new TH1F((histPrefix + "CorrectEventFractionTheta0XZ").c_str(), "", 100, -180., 180.);
         cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ->GetXaxis()->SetTitle("#theta_{0XZ} [degrees]");
         cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ->GetYaxis()->SetTitle("Correct Event Fraction");
     }
 
     if (!cosmicRayTargetHistogramCollection.m_hTheta0YZAll)
     {
-        cosmicRayTargetHistogramCollection.m_hTheta0YZAll = new TH1F((histPrefix + "CosmicRayTheta0YZ").c_str(), "", 100, -360., 360.);
+        cosmicRayTargetHistogramCollection.m_hTheta0YZAll = new TH1F((histPrefix + "CosmicRayTheta0YZ").c_str(), "", 50, -90., 90.);
         cosmicRayTargetHistogramCollection.m_hTheta0YZAll->GetXaxis()->SetTitle("#theta_{0YZ} [degrees]");
         cosmicRayTargetHistogramCollection.m_hTheta0YZAll->GetYaxis()->SetTitle("Number of Events");
     }
 
     if (!cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ)
     {
-        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ = new TH1F((histPrefix + "CorrectEventFractionTheta0YZ").c_str(), "", 100, -360., 360.);
+        cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ = new TH1F((histPrefix + "CorrectEventFractionTheta0YZ").c_str(), "", 50, -90., 90.);
         cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ->GetXaxis()->SetTitle("#theta_{0YZ} [degrees]");
         cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ->GetYaxis()->SetTitle("Correct Event Fraction");
     }
 
-    if (!cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength)
+    if (!cosmicRayTargetHistogramCollection.m_hTrueTrackLengthAll)
     {
-        cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength = new TH2F((histPrefix + "TrueVsBestMatchTrackLength").c_str(), "", 100, 0, 2000., 100, 0, 2000.);
-        cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength->GetXaxis()->SetTitle("True Track Length [cm]");
-        cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength->GetYaxis()->SetTitle("Best Match Track Length [cm]");
+        cosmicRayTargetHistogramCollection.m_hTrueTrackLengthAll = new TH1F((histPrefix + "TrueTrackLengthAll").c_str(), "", 100, 0, 2200.);
+        cosmicRayTargetHistogramCollection.m_hTrueTrackLengthAll->GetXaxis()->SetTitle("True Track Length [cm]");
+        cosmicRayTargetHistogramCollection.m_hTrueTrackLengthAll->GetYaxis()->SetTitle("Number of Events");
     }
 
+    if (!cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength)
+    {
+        cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength = new TH2F((histPrefix + "TrueVsBestMatchTrackLength").c_str(), "", 100, 0, 2200., 100, 0, 2200.);
+        cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength->GetXaxis()->SetTitle("Best Match Length [cm]");
+        cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength->GetYaxis()->SetTitle("True Track Length [cm]");
+    }
+
+    const int nAboveThresholdPfoMatchesBins(6); const int nAboveThresholdPfoMatchesEdges(nAboveThresholdPfoMatchesBins + 1);
+    float aboveThresholdPfoMatchesBinning[nAboveThresholdPfoMatchesEdges] = {-0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 10.5};
+    if (!cosmicRayTargetHistogramCollection.m_hNPfoMatches)
+    {
+        cosmicRayTargetHistogramCollection.m_hNPfoMatches = new TH1F((histPrefix + "NAboveThresholdPfoMatches").c_str(), "", nAboveThresholdPfoMatchesBins, aboveThresholdPfoMatchesBinning);
+        cosmicRayTargetHistogramCollection.m_hNPfoMatches->GetXaxis()->SetTitle("Number of All Pfo Matches");
+        cosmicRayTargetHistogramCollection.m_hNPfoMatches->GetYaxis()->SetTitle("Fraction of Events");
+    }
+    /*
+    
+    if (!cosmicRayTargetHistogramCollection.m_hNAllPfoMatches)
+    {
+        cosmicRayTargetHistogramCollection.m_hNAllPfoMatches = new TH1F((histPrefix + "NAllPfoMatches").c_str(), "", 151, 0.5, 150.5);
+        cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->GetXaxis()->SetTitle("Number of All Pfo Matches [cm]");
+        cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->GetYaxis()->SetTitle("Fraction of Events");
+    }
+    */
+    
     cosmicRayTargetHistogramCollection.m_hEnergyAll->Fill(cosmicRayEnergy);
+    cosmicRayTargetHistogramCollection.m_hTrueTrackLengthAll->Fill(cosmicBestMatchTrackLength);
     cosmicRayTargetHistogramCollection.m_hTheta0XZAll->Fill(cosmicRayTheta0XZ);
     cosmicRayTargetHistogramCollection.m_hTheta0YZAll->Fill(cosmicRayTheta0YZ);
-    cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength->Fill(cosmicRayTrackLength, cosmicBestMatchTrackLength);
+    cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength->Fill(cosmicBestMatchTrackLength, cosmicRayTrackLength);
+    cosmicRayTargetHistogramCollection.m_hNPfoMatches->Fill(cosmicNPfoMatches);
+    //cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->Fill(cosmicNAllPfoMatches);
     
     if (targetResult.m_isCorrect)
     {
@@ -835,6 +874,9 @@ void ProcessCosmicRayHistogramCollections(const InteractionCosmicRayTargetHistog
             cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ->SetBinContent(n + 1, efficiency);
             cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ->SetBinError(n + 1, error);
         }
+
+        cosmicRayTargetHistogramCollection.m_hNPfoMatches->Scale(1. / static_cast<double>(cosmicRayTargetHistogramCollection.m_hNPfoMatches->GetEntries()));
+        //cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->Scale(1. / static_cast<double>(cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->GetEntries()));
     }
 }
 

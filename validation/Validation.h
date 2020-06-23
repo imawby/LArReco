@@ -111,6 +111,7 @@ public:
     int                 m_nPrimaryMatchedPfos;          ///< The number of matched pfos
     int                 m_nPrimaryMatchedNuPfos;        ///< The number of matched nu pfos
     int                 m_nPrimaryMatchedCRPfos;        ///< The number of matched cr pfos
+    int                 m_nAllPrimaryMatchedPfos;
     int                 m_bestMatchPfoId;               ///< The best match pfo identifier
     int                 m_bestMatchPfoPdgCode;          ///< The best match pfo pdg code
     int                 m_bestMatchPfoIsRecoNu;         ///< Whether best match pfo is reconstructed as part of a neutrino hierarchy
@@ -447,6 +448,7 @@ public:
     PrimaryResult();
 
     unsigned int            m_nPfoMatches;              ///< The total number of pfo matches for a given primary
+    unsigned int            m_nAllPfoMatches;
     unsigned int            m_nMCHitsTotal;             ///< The number of hits in the mc primary
     unsigned int            m_nBestMatchSharedHitsTotal;///< The number of hits shared by the mc primary and the best matched pfo
     unsigned int            m_nBestMatchRecoHitsTotal;  ///< The number of hits in the best matched pfo
@@ -529,7 +531,10 @@ public:
     TH1F                   *m_hTheta0XZAll;                      ///< The target theta0XZ distribution
     TH1F                   *m_hIsCorrectEventFractionTheta0YZ;   ///< The isCorrectEventFraction vs target theta0YZ
     TH1F                   *m_hTheta0YZAll;                      ///< The target theta0YZ distribution
+    TH1F                   *m_hTrueTrackLengthAll;
     TH2F                   *m_hTrueVsBestMatchTrackLength;
+    TH1F                   *m_hNPfoMatches;
+    TH1F                   *m_hNAllPfoMatches;
 };
 
 typedef std::map<InteractionType, CosmicRayTargetHistogramCollection> InteractionCosmicRayTargetHistogramMap;
@@ -771,6 +776,7 @@ SimpleMCPrimary::SimpleMCPrimary() :
     m_nPrimaryMatchedPfos(0),
     m_nPrimaryMatchedNuPfos(0),
     m_nPrimaryMatchedCRPfos(0),
+    m_nAllPrimaryMatchedPfos(0),
     m_bestMatchPfoId(-1),
     m_bestMatchPfoPdgCode(0),
     m_bestMatchPfoIsRecoNu(0),
@@ -845,6 +851,7 @@ CountingDetails::CountingDetails() :
 
 PrimaryResult::PrimaryResult() :
     m_nPfoMatches(0),
+    m_nAllPfoMatches(0),
     m_nMCHitsTotal(0),
     m_nBestMatchSharedHitsTotal(0),
     m_nBestMatchRecoHitsTotal(0),
@@ -918,7 +925,10 @@ CosmicRayTargetHistogramCollection::CosmicRayTargetHistogramCollection() :
     m_hTheta0XZAll(nullptr),
     m_hIsCorrectEventFractionTheta0YZ(nullptr),
     m_hTheta0YZAll(nullptr),
-    m_hTrueVsBestMatchTrackLength(nullptr)
+    m_hTrueTrackLengthAll(nullptr),
+    m_hTrueVsBestMatchTrackLength(nullptr),
+    m_hNPfoMatches(nullptr),
+    m_hNAllPfoMatches(nullptr)
 {
 }
 
