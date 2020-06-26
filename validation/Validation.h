@@ -29,6 +29,8 @@ public:
     int                     m_nEventsToProcess;         ///< The number of events to process
     bool                    m_applyUbooneFiducialCut;   ///< Whether to apply uboone fiducial volume cut to true neutrino vertex position
     bool                    m_applySBNDFiducialCut;     ///< Whether to apply sbnd fiducial volume cut to true neutrino vertex position
+    bool                    m_applyDUNEFDFiducialCut;
+    bool                    m_applyFiducialCutToCosmicRays; 
     bool                    m_correctTrackShowerId;     ///< Whether to demand that pfos are correctly flagged as tracks or showers
     float                   m_vertexXCorrection;        ///< The vertex x correction, added to reported mc neutrino endpoint x value, in cm
     bool                    m_histogramOutput;          ///< Whether to produce output histograms
@@ -644,6 +646,15 @@ bool PassUbooneFiducialCut(const SimpleMCTarget &simpleMCTarget);
 bool PassSBNDFiducialCut(const SimpleMCTarget &simpleMCTarget);
 
 /**
+ *  @brief  Whether a simple mc event passes DUNE FD fiducial cut, applied to target vertices
+ *
+ *  @param  simpleMCTarget the simple mc target
+ *
+ *  @return boolean
+ */
+bool PassDUNEFDFiducialCut(const SimpleMCTarget &simpleMCTarget);
+
+/**
  *  @brief  Work out which of the primary particles (expected for a given interaction types) corresponds to the provided primary id
  *          ATTN: Relies on fact that primary list is sorted by number of true hits
  *
@@ -718,6 +729,8 @@ Parameters::Parameters() :
     m_nEventsToProcess(std::numeric_limits<int>::max()),
     m_applyUbooneFiducialCut(false),
     m_applySBNDFiducialCut(false),
+    m_applyDUNEFDFiducialCut(false),
+    m_applyFiducialCutToCosmicRays(false),
     m_correctTrackShowerId(false),
     m_vertexXCorrection(0.495694f),
     m_histogramOutput(false),

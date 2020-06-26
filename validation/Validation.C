@@ -101,7 +101,7 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
         IntVector *pMCPrimaryId(nullptr), *pMCPrimaryPdg(nullptr), *pNMCHitsTotal(nullptr), *pNMCHitsU(nullptr), *pNMCHitsV(nullptr), *pNMCHitsW(nullptr);
         FloatVector *pMCPrimaryE(nullptr), *pMCPrimaryPX(nullptr), *pMCPrimaryPY(nullptr), *pMCPrimaryPZ(nullptr);
         FloatVector *pMCPrimaryVtxX(nullptr), *pMCPrimaryVtxY(nullptr), *pMCPrimaryVtxZ(nullptr), *pMCPrimaryEndX(nullptr), *pMCPrimaryEndY(nullptr), *pMCPrimaryEndZ(nullptr);
-        IntVector *pNPrimaryMatchedPfos(nullptr), *pNPrimaryMatchedNuPfos(nullptr), *pNPrimaryMatchedCRPfos(nullptr);//, *pNAllPrimaryMatchedPfos(nullptr);
+        IntVector *pNPrimaryMatchedPfos(nullptr), *pNPrimaryMatchedNuPfos(nullptr), *pNPrimaryMatchedCRPfos(nullptr), *pNAllPrimaryMatchedPfos(nullptr);
         IntVector *pBestMatchPfoId(nullptr), *pBestMatchPfoPdg(nullptr), *pBestMatchPfoIsRecoNu(nullptr), *pBestMatchPfoRecoNuId(nullptr), *pBestMatchPfoIsTestBeam(nullptr);
         IntVector *pBestMatchPfoNHitsTotal(nullptr), *pBestMatchPfoNHitsU(nullptr), *pBestMatchPfoNHitsV(nullptr), *pBestMatchPfoNHitsW(nullptr);
         IntVector *pBestMatchPfoNSharedHitsTotal(nullptr), *pBestMatchPfoNSharedHitsU(nullptr), *pBestMatchPfoNSharedHitsV(nullptr), *pBestMatchPfoNSharedHitsW(nullptr);
@@ -124,7 +124,7 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
         pTChain->SetBranchAddress("mcPrimaryNHitsV", &pNMCHitsV);
         pTChain->SetBranchAddress("mcPrimaryNHitsW", &pNMCHitsW);
         pTChain->SetBranchAddress("nPrimaryMatchedPfos", &pNPrimaryMatchedPfos);
-        //pTChain->SetBranchAddress("nAllPrimaryMatchedPfos", &pNAllPrimaryMatchedPfos);
+        pTChain->SetBranchAddress("nAllPrimaryMatchedPfos", &pNAllPrimaryMatchedPfos);
         pTChain->SetBranchAddress("nPrimaryMatchedCRPfos", &pNPrimaryMatchedCRPfos);
         pTChain->SetBranchAddress("bestMatchPfoNHitsTotal", &pBestMatchPfoNHitsTotal);
         pTChain->SetBranchAddress("bestMatchPfoNHitsU", &pBestMatchPfoNHitsU);
@@ -178,7 +178,7 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
             simpleMCPrimary.m_nMCHitsW = pNMCHitsW->at(iPrimary);
             simpleMCPrimary.m_nPrimaryMatchedPfos = pNPrimaryMatchedPfos->at(iPrimary);
             simpleMCPrimary.m_nPrimaryMatchedCRPfos = pNPrimaryMatchedCRPfos->at(iPrimary);
-            //simpleMCPrimary.m_nAllPrimaryMatchedPfos = pNAllPrimaryMatchedPfos->at(iPrimary);
+            simpleMCPrimary.m_nAllPrimaryMatchedPfos = pNAllPrimaryMatchedPfos->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoId = pBestMatchPfoId->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoPdgCode = pBestMatchPfoPdg->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoNHitsTotal = pBestMatchPfoNHitsTotal->at(iPrimary);
@@ -323,6 +323,9 @@ void CountPfoMatches(const SimpleMCEvent &simpleMCEvent, const Parameters &param
             (parameters.m_triggeredBeamOnly && simpleMCTarget.m_isBeamParticle && simpleMCTarget.m_mcNuanceCode != 2001))
             continue;
 
+	if (simpleMCTarget.m_isCosmicRay && parameters.m_applyFiducialCutToCosmicRays && !PassFiducialCut(simpleMCTarget, parameters))
+	  continue;
+
         TargetResult targetResult;
         targetResult.m_fileIdentifier = simpleMCEvent.m_fileIdentifier;
         targetResult.m_eventNumber = simpleMCEvent.m_eventNumber;
@@ -363,7 +366,7 @@ void CountPfoMatches(const SimpleMCEvent &simpleMCEvent, const Parameters &param
             else ++countingDetails.m_nMatch3Plus;
 
             primaryResult.m_nPfoMatches = simpleMCPrimary.m_nPrimaryMatchedPfos;
-            //primaryResult.m_nAllPfoMatches = simpleMCPrimary.m_nAllPrimaryMatchedPfos;
+            primaryResult.m_nAllPfoMatches = simpleMCPrimary.m_nAllPrimaryMatchedPfos;
             primaryResult.m_nMCHitsTotal = simpleMCPrimary.m_nMCHitsTotal;
             primaryResult.m_nBestMatchSharedHitsTotal = simpleMCPrimary.m_bestMatchPfoNSharedHitsTotal;
             primaryResult.m_nBestMatchRecoHitsTotal = simpleMCPrimary.m_bestMatchPfoNHitsTotal;
@@ -411,6 +414,9 @@ bool PassFiducialCut(const SimpleMCTarget &simpleMCTarget, const Parameters &par
     if (parameters.m_applySBNDFiducialCut)
         return PassSBNDFiducialCut(simpleMCTarget);
 
+    if (parameters.m_applyDUNEFDFiducialCut)
+      return PassDUNEFDFiducialCut(simpleMCTarget);
+
     return true;
 }
 
@@ -447,6 +453,30 @@ bool PassSBNDFiducialCut(const SimpleMCTarget &simpleMCTarget)
     }
 
     return false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PassDUNEFDFiducialCut(const SimpleMCTarget &simpleMCTarget)
+{
+  const float xMin(-745.f), xMax(745.f), yMin(-604.f), yMax(604.f), zMin(-1.f), zMax(5809.f);
+  const float xBorder(10.f), yBorder(20.f), zBorder(10.f);
+
+
+  std::cout << "VERTEX X: " << simpleMCTarget.m_targetVertex.m_x << std::endl;
+  std::cout << "VERTEX Y: " << simpleMCTarget.m_targetVertex.m_y << std::endl;
+  std::cout << "VERTEX Z: " << simpleMCTarget.m_targetVertex.m_z << std::endl;
+  
+  if ((simpleMCTarget.m_targetVertex.m_x < (xMax - xBorder)) && (simpleMCTarget.m_targetVertex.m_x > (xMin + xBorder)) &&
+      (simpleMCTarget.m_targetVertex.m_y < (yMax - yBorder)) && (simpleMCTarget.m_targetVertex.m_y > (yMin + yBorder)) &&
+      (simpleMCTarget.m_targetVertex.m_z < (zMax - zBorder)) && (simpleMCTarget.m_targetVertex.m_z > (zMin + zBorder)))
+  {
+      std::cout << "INSIDE THE DETECTOR" << std::endl;
+      return true;
+  }
+
+  std::cout << "OUTSIDE THE DETECTOR" << std::endl;
+  return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -598,9 +628,15 @@ void AnalyseInteractionTargetResultMap(const InteractionTargetResultMap &interac
                     const std::string histPrefixAll(parameters.m_histPrefix + ToString(ALL_INTERACTIONS) + "_" + ToString(expectedPrimary) + "_");
                     PrimaryHistogramCollection &histogramCollectionAll(interactionPrimaryHistogramMap[ALL_INTERACTIONS][expectedPrimary]);
                     FillPrimaryHistogramCollection(histPrefixAll, primaryResult, histogramCollectionAll);
+
+                    if (targetResult.m_isCosmicRay && expectedPrimary == 0 && primaryResultMap.size() == 1)
+                    {
+                        CosmicRayTargetHistogramCollection &histogramCollectionCR(interactionCosmicRayTargetHistogramMap[interactionType]);
+                        FillCosmicRayTargetHistogramCollection(histPrefix, targetResult, histogramCollectionCR);
+                    }
                 }
             }
-
+	    
             if (parameters.m_histogramOutput)
             {
                 const std::string histPrefix(parameters.m_histPrefix + ToString(interactionType) + "_");
@@ -610,14 +646,8 @@ void AnalyseInteractionTargetResultMap(const InteractionTargetResultMap &interac
                 const std::string histPrefixAll(parameters.m_histPrefix + ToString(ALL_INTERACTIONS) + "_");
                 TargetHistogramCollection &histogramCollectionAll(interactionTargetHistogramMap[ALL_INTERACTIONS]);
                 FillTargetHistogramCollection(histPrefixAll, targetResult, histogramCollectionAll);
-
-
-                if (targetResult.m_isCosmicRay)
-                {
-                    CosmicRayTargetHistogramCollection &histogramCollectionCR(interactionCosmicRayTargetHistogramMap[interactionType]);
-                    FillCosmicRayTargetHistogramCollection(histPrefix, targetResult, histogramCollectionCR);
-                }
             }
+	    
         }
 
         std::cout << ToString(interactionType) << std::endl << "-nEvents " << targetResultList.size() << ", nCorrect " << nCorrectEvents
@@ -699,7 +729,7 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
     float cosmicBestMatchTrackLength(0.f);
 
     unsigned int cosmicNPfoMatches(0);
-    //unsigned int cosmicNAllPfoMatches(0);
+    unsigned int cosmicNAllPfoMatches(0);
     
     unsigned int mcMuonCount(0);
     for (const PrimaryResultMap::value_type &primaryMapEntry : primaryResultMap)
@@ -717,13 +747,14 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
             cosmicBestMatchTrackLength = primaryResult.m_bestMatchTrackLength;
 
             cosmicNPfoMatches = primaryResult.m_nPfoMatches;
-            //cosmicNAllPfoMatches = primaryResult.m_nAllPfoMatches;
+            cosmicNAllPfoMatches = primaryResult.m_nAllPfoMatches;
             
             if (primaryResult.m_nPfoMatches > 0)
             {
                 cosmicBestMatchCompleteness =  primaryResult.m_bestMatchCompleteness;
                 cosmicBestMatchPurity = primaryResult.m_bestMatchPurity;
             }
+	 
         }
     }
     /*
@@ -740,9 +771,10 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
     std::cout << "\033[31m"  << "isCorrect: " << "\033[33m" << targetResult.m_isCorrect << "\033[0m" << std::endl;
     std::cout << "/////////////////////////////////////////" << std::endl;
     */
-    if (mcMuonCount > 1)
+    
+    if (mcMuonCount != 1)
     {
-        std::cout << "\033[31m" << "ISOBEL MORE THAN ONE PRIMARY MUON" << "\033[0m"  << std::endl;
+      //std::cout << "\033[31m" << "ISOBEL MORE THAN ONE PRIMARY MUON" << "\033[0m"  << std::endl;
         return;
     }
 
@@ -810,7 +842,7 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
         cosmicRayTargetHistogramCollection.m_hNPfoMatches->GetXaxis()->SetTitle("Number of All Pfo Matches");
         cosmicRayTargetHistogramCollection.m_hNPfoMatches->GetYaxis()->SetTitle("Fraction of Events");
     }
-    /*
+    
     
     if (!cosmicRayTargetHistogramCollection.m_hNAllPfoMatches)
     {
@@ -818,7 +850,7 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
         cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->GetXaxis()->SetTitle("Number of All Pfo Matches [cm]");
         cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->GetYaxis()->SetTitle("Fraction of Events");
     }
-    */
+    
     
     cosmicRayTargetHistogramCollection.m_hEnergyAll->Fill(cosmicRayEnergy);
     cosmicRayTargetHistogramCollection.m_hTrueTrackLengthAll->Fill(cosmicBestMatchTrackLength);
@@ -826,7 +858,7 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
     cosmicRayTargetHistogramCollection.m_hTheta0YZAll->Fill(cosmicRayTheta0YZ);
     cosmicRayTargetHistogramCollection.m_hTrueVsBestMatchTrackLength->Fill(cosmicBestMatchTrackLength, cosmicRayTrackLength);
     cosmicRayTargetHistogramCollection.m_hNPfoMatches->Fill(cosmicNPfoMatches);
-    //cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->Fill(cosmicNAllPfoMatches);
+    cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->Fill(cosmicNAllPfoMatches);
     
     if (targetResult.m_isCorrect)
     {
@@ -834,7 +866,7 @@ void FillCosmicRayTargetHistogramCollection(const std::string &histPrefix, const
         cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0XZ->Fill(cosmicRayTheta0XZ);
         cosmicRayTargetHistogramCollection.m_hIsCorrectEventFractionTheta0YZ->Fill(cosmicRayTheta0YZ);
     }
-
+    
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -876,7 +908,7 @@ void ProcessCosmicRayHistogramCollections(const InteractionCosmicRayTargetHistog
         }
 
         cosmicRayTargetHistogramCollection.m_hNPfoMatches->Scale(1. / static_cast<double>(cosmicRayTargetHistogramCollection.m_hNPfoMatches->GetEntries()));
-        //cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->Scale(1. / static_cast<double>(cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->GetEntries()));
+        cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->Scale(1. / static_cast<double>(cosmicRayTargetHistogramCollection.m_hNAllPfoMatches->GetEntries()));
     }
 }
 
