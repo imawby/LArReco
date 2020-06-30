@@ -101,11 +101,11 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
         IntVector *pMCPrimaryId(nullptr), *pMCPrimaryPdg(nullptr), *pNMCHitsTotal(nullptr), *pNMCHitsU(nullptr), *pNMCHitsV(nullptr), *pNMCHitsW(nullptr);
         FloatVector *pMCPrimaryE(nullptr), *pMCPrimaryPX(nullptr), *pMCPrimaryPY(nullptr), *pMCPrimaryPZ(nullptr);
         FloatVector *pMCPrimaryVtxX(nullptr), *pMCPrimaryVtxY(nullptr), *pMCPrimaryVtxZ(nullptr), *pMCPrimaryEndX(nullptr), *pMCPrimaryEndY(nullptr), *pMCPrimaryEndZ(nullptr);
-        IntVector *pNPrimaryMatchedPfos(nullptr), *pNPrimaryMatchedNuPfos(nullptr), *pNPrimaryMatchedCRPfos(nullptr), *pNAllPrimaryMatchedPfos(nullptr);
+        IntVector *pNPrimaryMatchedPfos(nullptr), *pNPrimaryMatchedNuPfos(nullptr), *pNPrimaryMatchedCRPfos(nullptr);//, *pNAllPrimaryMatchedPfos(nullptr);
         IntVector *pBestMatchPfoId(nullptr), *pBestMatchPfoPdg(nullptr), *pBestMatchPfoIsRecoNu(nullptr), *pBestMatchPfoRecoNuId(nullptr), *pBestMatchPfoIsTestBeam(nullptr);
         IntVector *pBestMatchPfoNHitsTotal(nullptr), *pBestMatchPfoNHitsU(nullptr), *pBestMatchPfoNHitsV(nullptr), *pBestMatchPfoNHitsW(nullptr);
         IntVector *pBestMatchPfoNSharedHitsTotal(nullptr), *pBestMatchPfoNSharedHitsU(nullptr), *pBestMatchPfoNSharedHitsV(nullptr), *pBestMatchPfoNSharedHitsW(nullptr);
-        FloatVector *pBestMatchPfoTrackLength(nullptr);
+        /*FloatVector *pBestMatchPfoTrackLength(nullptr);*/
 
         pTChain->SetBranchAddress("mcPrimaryId", &pMCPrimaryId);
         pTChain->SetBranchAddress("mcPrimaryPdg", &pMCPrimaryPdg);
@@ -124,7 +124,7 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
         pTChain->SetBranchAddress("mcPrimaryNHitsV", &pNMCHitsV);
         pTChain->SetBranchAddress("mcPrimaryNHitsW", &pNMCHitsW);
         pTChain->SetBranchAddress("nPrimaryMatchedPfos", &pNPrimaryMatchedPfos);
-        pTChain->SetBranchAddress("nAllPrimaryMatchedPfos", &pNAllPrimaryMatchedPfos);
+        //pTChain->SetBranchAddress("nAllPrimaryMatchedPfos", &pNAllPrimaryMatchedPfos);
         pTChain->SetBranchAddress("nPrimaryMatchedCRPfos", &pNPrimaryMatchedCRPfos);
         pTChain->SetBranchAddress("bestMatchPfoNHitsTotal", &pBestMatchPfoNHitsTotal);
         pTChain->SetBranchAddress("bestMatchPfoNHitsU", &pBestMatchPfoNHitsU);
@@ -136,7 +136,7 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
         pTChain->SetBranchAddress("bestMatchPfoNSharedHitsU", &pBestMatchPfoNSharedHitsU);
         pTChain->SetBranchAddress("bestMatchPfoNSharedHitsV", &pBestMatchPfoNSharedHitsV);
         pTChain->SetBranchAddress("bestMatchPfoNSharedHitsW", &pBestMatchPfoNSharedHitsW);
-        pTChain->SetBranchAddress("bestMatchPfoTrackLength", &pBestMatchPfoTrackLength);
+        //pTChain->SetBranchAddress("bestMatchPfoTrackLength", &pBestMatchPfoTrackLength);
         
         if (parameters.m_testBeamMode)
         {
@@ -178,7 +178,8 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
             simpleMCPrimary.m_nMCHitsW = pNMCHitsW->at(iPrimary);
             simpleMCPrimary.m_nPrimaryMatchedPfos = pNPrimaryMatchedPfos->at(iPrimary);
             simpleMCPrimary.m_nPrimaryMatchedCRPfos = pNPrimaryMatchedCRPfos->at(iPrimary);
-            simpleMCPrimary.m_nAllPrimaryMatchedPfos = pNAllPrimaryMatchedPfos->at(iPrimary);
+            //simpleMCPrimary.m_nAllPrimaryMatchedPfos = pNAllPrimaryMatchedPfos->at(iPrimary); //ISOBEL
+            simpleMCPrimary.m_nAllPrimaryMatchedPfos = 0; //ISOBEL
             simpleMCPrimary.m_bestMatchPfoId = pBestMatchPfoId->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoPdgCode = pBestMatchPfoPdg->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoNHitsTotal = pBestMatchPfoNHitsTotal->at(iPrimary);
@@ -189,7 +190,8 @@ int ReadNextEvent(TChain *const pTChain, const int iEntry, SimpleMCEvent &simple
             simpleMCPrimary.m_bestMatchPfoNSharedHitsU = pBestMatchPfoNSharedHitsU->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoNSharedHitsV = pBestMatchPfoNSharedHitsV->at(iPrimary);
             simpleMCPrimary.m_bestMatchPfoNSharedHitsW = pBestMatchPfoNSharedHitsW->at(iPrimary);
-            simpleMCPrimary.m_bestMatchPfoTrackLength = pBestMatchPfoTrackLength->at(iPrimary);
+            //simpleMCPrimary.m_bestMatchPfoTrackLength = pBestMatchPfoTrackLength->at(iPrimary); //ISOBEL
+            simpleMCPrimary.m_bestMatchPfoTrackLength = 0; //ISOBEL CHANGE
             
             if (parameters.m_testBeamMode)
             {
