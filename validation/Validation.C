@@ -325,8 +325,21 @@ void CountPfoMatches(const SimpleMCEvent &simpleMCEvent, const Parameters &param
             (parameters.m_triggeredBeamOnly && simpleMCTarget.m_isBeamParticle && simpleMCTarget.m_mcNuanceCode != 2001))
             continue;
 
-	if (simpleMCTarget.m_isCosmicRay && parameters.m_applyFiducialCutToCosmicRays && !PassFiducialCut(simpleMCTarget, parameters))
-	  continue;
+	    if (simpleMCTarget.m_isCosmicRay && parameters.m_applyFiducialCutToCosmicRays && !PassFiducialCut(simpleMCTarget, parameters))
+            continue;
+
+        if (simpleMCTarget.m_isCosmicRay && parameters.m_applyCollectionPlaneHitCut)
+        {
+            if (simpleMCTarget.m_mcPrimaryList.size() != 1)
+            {
+                std::cout << "NOT EQUAL TO ONE" << std::endl;
+            }
+                const SimpleMCPrimary mcCR(simpleMCTarget.m_mcPrimaryList.front());
+
+                if (mcCR.m_nMCHitsW < 50)
+                    continue;
+            
+        }
 
         TargetResult targetResult;
         targetResult.m_fileIdentifier = simpleMCEvent.m_fileIdentifier;
@@ -461,6 +474,7 @@ bool PassSBNDFiducialCut(const SimpleMCTarget &simpleMCTarget)
 
 bool PassDUNEFDFiducialCut(const SimpleMCTarget &simpleMCTarget)
 {
+   
   const float xMin(-745.f), xMax(745.f), yMin(-604.f), yMax(604.f), zMin(-1.f), zMax(5809.f);
   const float xBorder(10.f), yBorder(20.f), zBorder(10.f);
 
@@ -479,6 +493,8 @@ bool PassDUNEFDFiducialCut(const SimpleMCTarget &simpleMCTarget)
 
   std::cout << "OUTSIDE THE DETECTOR" << std::endl;
   return false;
+   
+
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -30,7 +30,8 @@ public:
     bool                    m_applyUbooneFiducialCut;   ///< Whether to apply uboone fiducial volume cut to true neutrino vertex position
     bool                    m_applySBNDFiducialCut;     ///< Whether to apply sbnd fiducial volume cut to true neutrino vertex position
     bool                    m_applyDUNEFDFiducialCut;
-    bool                    m_applyFiducialCutToCosmicRays; 
+    bool                    m_applyFiducialCutToCosmicRays;
+    bool m_applyCollectionPlaneHitCut;
     bool                    m_correctTrackShowerId;     ///< Whether to demand that pfos are correctly flagged as tracks or showers
     float                   m_vertexXCorrection;        ///< The vertex x correction, added to reported mc neutrino endpoint x value, in cm
     bool                    m_histogramOutput;          ///< Whether to produce output histograms
@@ -39,6 +40,7 @@ public:
     std::string             m_histPrefix;               ///< Histogram name prefix
     std::string             m_mapFileName;              ///< File name to which to write output ascii tables, etc.
     std::string             m_eventFileName;            ///< File name to which to write list of correct events
+    
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -731,6 +733,7 @@ Parameters::Parameters() :
     m_applySBNDFiducialCut(false),
     m_applyDUNEFDFiducialCut(false),
     m_applyFiducialCutToCosmicRays(false),
+    m_applyCollectionPlaneHitCut(false),
     m_correctTrackShowerId(false),
     m_vertexXCorrection(0.495694f),
     m_histogramOutput(false),
