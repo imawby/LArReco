@@ -15,16 +15,26 @@
     </algorithm>
     <algorithm type = "LArVisualMonitoring">
         <CaloHitListNames>CaloHitListU CaloHitListV CaloHitListW</CaloHitListNames>
+        <!--ShowCurrentMCParticles>true</ShowCurrentMCParticles-->
         <ShowDetector>true</ShowDetector>
-    </algorithm>
+     </algorithm>
+
+     <!--algorithm type = "LArMCDeltaRay">
+        <CaloHitListName>CaloHitList2D</CaloHitListName>
+        <MCParticleListName>Input</MCParticleListName>
+     </algorithm-->
 
     <algorithm type = "LArMaster">
         <CRSettingsFile>PandoraSettings_Cosmic_Standard.xml</CRSettingsFile>
         <NuSettingsFile>PandoraSettings_TestBeam_ProtoDUNE.xml</NuSettingsFile>
         <SlicingSettingsFile>PandoraSettings_Slicing_ProtoDUNE.xml</SlicingSettingsFile>
         <StitchingTools>
-            <tool type = "LArStitchingCosmicRayMerging"><ThreeDStitchingMode>true</ThreeDStitchingMode></tool>
-            <tool type = "LArStitchingCosmicRayMerging"><ThreeDStitchingMode>false</ThreeDStitchingMode></tool>
+          <tool type = "LArStitchingCosmicRayMerging">
+            <ThreeDStitchingMode>true</ThreeDStitchingMode>
+          </tool>
+          <tool type = "LArStitchingCosmicRayMerging">
+            <ThreeDStitchingMode>false</ThreeDStitchingMode>
+          </tool>
         </StitchingTools>
         <CosmicRayTaggingTools>
             <tool type = "LArCosmicRayTagging"/>
@@ -32,7 +42,7 @@
         <SliceIdTools>
             <tool type = "LArBdtBeamParticleId">
                 <BdtName>ProtoDUNESP_BeamParticleId</BdtName>
-                <BdtFileName>PandoraBdt_v03_20_00.xml</BdtFileName>
+                <BdtFileName>PandoraBdt_v03_15_02.xml</BdtFileName>
                 <MinAdaBDTScore>-0.225</MinAdaBDTScore>
             </tool>
         </SliceIdTools>
@@ -41,9 +51,11 @@
         <RecreatedClusterListName>RecreatedClusters</RecreatedClusterListName>
         <RecreatedVertexListName>RecreatedVertices</RecreatedVertexListName>
         <VisualizeOverallRecoStatus>false</VisualizeOverallRecoStatus>
+        <PassMCParticlesToWorkerInstances>true</PassMCParticlesToWorkerInstances>
+        <InputMCParticleListName>Input</InputMCParticleListName>
     </algorithm>
 
-    <algorithm type = "LArTestBeamEventValidation">
+    <!--algorithm type = "LArTestBeamEventValidation">
         <CaloHitListName>CaloHitList2D</CaloHitListName>
         <MCParticleListName>Input</MCParticleListName>
         <PfoListName>RecreatedPfos</PfoListName>
@@ -52,8 +64,25 @@
         <WriteToTree>false</WriteToTree>
         <OutputTree>Validation</OutputTree>
         <OutputFile>Validation.root</OutputFile>
-    </algorithm>
+    </algorithm-->
 
+
+    <algorithm type = "LArDeltaRayEventValidation">
+        <CaloHitListName>CaloHitList2D</CaloHitListName>
+        <MCParticleListName>Input</MCParticleListName>
+        <PfoListName>RecreatedPfos</PfoListName>
+        <PrintAllToScreen>true</PrintAllToScreen>
+        <PrintMatchingToScreen>true</PrintMatchingToScreen>
+        <WriteToTree>false</WriteToTree>
+        <OutputTree>Validation</OutputTree>
+        <OutputFile>Validation.root</OutputFile>
+        <FoldToPrimaries>true</FoldToPrimaries>
+        <MatchingMinSharedHits>5</MatchingMinSharedHits>
+        <MatchingMinCompleteness>0.1</MatchingMinCompleteness>
+        <MatchingMinPurity>0.5</MatchingMinPurity>
+        <!--MaximumContributingTier>1</MaximumContributingTier-->
+    </algorithm>
+    
     <algorithm type = "LArVisualMonitoring">
         <ShowCurrentPfos>true</ShowCurrentPfos>
         <ShowDetector>true</ShowDetector>
