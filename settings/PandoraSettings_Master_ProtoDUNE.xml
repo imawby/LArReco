@@ -73,7 +73,7 @@
         <PfoListName>RecreatedPfos</PfoListName>
         <PrintAllToScreen>true</PrintAllToScreen>
         <PrintMatchingToScreen>true</PrintMatchingToScreen>
-        <WriteToTree>false</WriteToTree>
+        <WriteToTree>true</WriteToTree>
         <OutputTree>Validation</OutputTree>
         <OutputFile>Validation.root</OutputFile>
         <FoldToPrimaries>true</FoldToPrimaries>
@@ -81,6 +81,8 @@
         <MatchingMinCompleteness>0.1</MatchingMinCompleteness>
         <MatchingMinPurity>0.5</MatchingMinPurity>
         <!--MaximumContributingTier>1</MaximumContributingTier-->
+        <OutputFile>DeltaRayValidation.root</OutputFile>
+        <!--SET PHOTON TO BE REALLY HIGH-->
     </algorithm>
     
     <algorithm type = "LArVisualMonitoring">
