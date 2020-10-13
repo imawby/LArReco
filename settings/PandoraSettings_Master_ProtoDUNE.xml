@@ -67,7 +67,7 @@
     </algorithm-->
 
 
-    <algorithm type = "LArDeltaRayEventValidation">
+    <algorithm type = "LArMuonLeadingEventValidation">
         <CaloHitListName>CaloHitList2D</CaloHitListName>
         <MCParticleListName>Input</MCParticleListName>
         <PfoListName>RecreatedPfos</PfoListName>
@@ -80,8 +80,11 @@
         <MatchingMinSharedHits>5</MatchingMinSharedHits>
         <MatchingMinCompleteness>0.1</MatchingMinCompleteness>
         <MatchingMinPurity>0.5</MatchingMinPurity>
+        <DeltaRayMode>true</DeltaRayMode>
+        <MichelMode>false</MichelMode>
         <!--MaximumContributingTier>1</MaximumContributingTier-->
         <OutputFile>DeltaRayValidation.root</OutputFile>
+        <SelectInputHits>false</SelectInputHits>
         <!--SET PHOTON TO BE REALLY HIGH-->
     </algorithm>
     
