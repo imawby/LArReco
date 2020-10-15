@@ -84,8 +84,8 @@
         <MichelMode>false</MichelMode>
         <!--MaximumContributingTier>1</MaximumContributingTier-->
         <OutputFile>DeltaRayValidation.root</OutputFile>
-        <SelectInputHits>false</SelectInputHits>
         <!--SET PHOTON TO BE REALLY HIGH-->
+        <MuonsToSkip>4</MuonsToSkip>
     </algorithm>
     
     <algorithm type = "LArVisualMonitoring">

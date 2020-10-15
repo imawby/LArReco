@@ -199,6 +199,13 @@
         <InputClusterListNameV>ClustersV</InputClusterListNameV>
         <InputClusterListNameW>ClustersW</InputClusterListNameW>
     </algorithm>
+
+<!--algorithm type = "LArVisualMonitoring">
+  <ShowCurrentPfos>true</ShowCurrentPfos>
+  <PfoListNames>DeltaRayParticles3D</PfoListNames>
+  <ShowDetector>true</ShowDetector>
+</algorithm-->
+    
     <algorithm type = "LArUnattachedDeltaRays">
         <PfoListName>DeltaRayParticles3D</PfoListName>
     </algorithm>
