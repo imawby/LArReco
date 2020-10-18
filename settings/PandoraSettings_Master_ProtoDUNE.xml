@@ -75,17 +75,17 @@
         <PrintMatchingToScreen>true</PrintMatchingToScreen>
         <WriteToTree>true</WriteToTree>
         <OutputTree>Validation</OutputTree>
-        <OutputFile>Validation.root</OutputFile>
+        <OutputFile>DeltaRayValidation.root</OutputFile>
         <FoldToPrimaries>true</FoldToPrimaries>
         <MatchingMinSharedHits>5</MatchingMinSharedHits>
         <MatchingMinCompleteness>0.1</MatchingMinCompleteness>
         <MatchingMinPurity>0.5</MatchingMinPurity>
         <DeltaRayMode>true</DeltaRayMode>
         <MichelMode>false</MichelMode>
-        <!--MaximumContributingTier>1</MaximumContributingTier-->
-        <OutputFile>DeltaRayValidation.root</OutputFile>
+        <MaxPhotonPropagation>10000</MaxPhotonPropagation>
         <!--SET PHOTON TO BE REALLY HIGH-->
-        <MuonsToSkip>4</MuonsToSkip>
+        <MuonsToSkip>0</MuonsToSkip>
+        <Visualize>false</Visualize>
     </algorithm>
     
     <algorithm type = "LArVisualMonitoring">
