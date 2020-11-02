@@ -14,11 +14,10 @@
         <CurrentCaloHitListReplacement>CaloHitList2D</CurrentCaloHitListReplacement>
     </algorithm>
     <algorithm type = "LArVisualMonitoring">
-        <CaloHitListNames>CaloHitListU CaloHitListV CaloHitListW</CaloHitListNames>
-        <!--ShowCurrentMCParticles>true</ShowCurrentMCParticles-->
+      <CaloHitListNames>CaloHitListU CaloHitListV CaloHitListW</CaloHitListNames>
         <ShowDetector>true</ShowDetector>
-     </algorithm>
-
+    </algorithm>
+    
      <!--algorithm type = "LArMCDeltaRay">
         <CaloHitListName>CaloHitList2D</CaloHitListName>
         <MCParticleListName>Input</MCParticleListName>
@@ -64,9 +63,18 @@
         <WriteToTree>false</WriteToTree>
         <OutputTree>Validation</OutputTree>
         <OutputFile>Validation.root</OutputFile>
+        </algorithm-->
+
+    <!--algorithm type = "LArVisualMonitoring">
+        <ShowDetector>true</ShowDetector>
+        <ShowCurrentPfos>true</ShowCurrentPfos>
+    </algorithm-->    
+
+    <!--algorithm type = "LArVisualMonitoring">
+        <ShowCurrentPfos>true</ShowCurrentPfos>
+        <ShowDetector>true</ShowDetector>
     </algorithm-->
-
-
+    
     <algorithm type = "LArMuonLeadingEventValidation">
         <CaloHitListName>CaloHitList2D</CaloHitListName>
         <MCParticleListName>Input</MCParticleListName>
@@ -82,14 +90,11 @@
         <MatchingMinPurity>0.5</MatchingMinPurity>
         <DeltaRayMode>true</DeltaRayMode>
         <MichelMode>false</MichelMode>
-        <MaxPhotonPropagation>10000</MaxPhotonPropagation>
         <!--SET PHOTON TO BE REALLY HIGH-->
         <MuonsToSkip>0</MuonsToSkip>
         <Visualize>false</Visualize>
+        <MinHitSharingFraction>0.9</MinHitSharingFraction>
     </algorithm>
     
-    <algorithm type = "LArVisualMonitoring">
-        <ShowCurrentPfos>true</ShowCurrentPfos>
-        <ShowDetector>true</ShowDetector>
-    </algorithm>
+
 </pandora>
