@@ -35,7 +35,10 @@ void DeltaRayValidation(const std::string &inputFileName, const Parameters &para
 
         ProcessHistograms(deltaRayMCHistogramCollection, deltaRayRecoHistogramCollection);
 
-        WriteHistograms(cosmicRayMCHistogramCollection, deltaRayMCHistogramCollection, deltaRayRecoHistogramCollection);
+        DeltaRayContaminationHistogramCollection deltaRayContaminationHistogramCollection;
+        FillDeltaRayContaminationHistogramCollection(deltaRayVector, deltaRayContaminationHistogramCollection);
+
+        WriteHistograms(cosmicRayMCHistogramCollection, deltaRayMCHistogramCollection, deltaRayRecoHistogramCollection, deltaRayContaminationHistogramCollection);
     }
 }
 
@@ -43,11 +46,17 @@ void DeltaRayValidation(const std::string &inputFileName, const Parameters &para
 
 void ReadTree(const std::string &inputFileName, CosmicRayVector &cosmicRayVector, DeltaRayVector &deltaRayVector)
 {
-    TFile * validationFile = new TFile(inputFileName.c_str(), "READ"); 
-    TTree * validationTree = (TTree*)validationFile->Get("Validation");
+    TFile * validationFile = new TFile(inputFileName.c_str(), "READ");
     
-    CosmicRay cosmicRay; 
+    TTree * validationTree = (TTree*)validationFile->Get("Validation");
+    TTree * otherShowerContaminationTree = (TTree*)validationFile->Get("OtherShowerContamination");
+    TTree * otherTrackContaminationTree = (TTree*)validationFile->Get("OtherTrackContamination");
+    TTree * parentTrackContaminationTree = (TTree*)validationFile->Get("ParentTrackContamination");
+    TTree * CRLHitsInCRTree = (TTree*)validationFile->Get("CRLHitsInCR");
 
+    int eventNumber;    
+    CosmicRay cosmicRay;
+    validationTree->SetBranchAddress("eventNumber", &eventNumber);
     validationTree->SetBranchAddress("mcE_CR", &cosmicRay.m_energy);
     validationTree->SetBranchAddress("mcPX_CR", &cosmicRay.m_momentum.m_x);
     validationTree->SetBranchAddress("mcPY_CR", &cosmicRay.m_momentum.m_y);
@@ -56,73 +65,75 @@ void ReadTree(const std::string &inputFileName, CosmicRayVector &cosmicRayVector
     validationTree->SetBranchAddress("nMCHitsU_CR", &cosmicRay.m_nMCHitsU);  
     validationTree->SetBranchAddress("nMCHitsV_CR", &cosmicRay.m_nMCHitsV);
     validationTree->SetBranchAddress("nMCHitsW_CR", &cosmicRay.m_nMCHitsW);
-    validationTree->SetBranchAddress("nReconstructableChildDRs", &cosmicRay.m_nReconstructableChildDRs);
-    validationTree->SetBranchAddress("nCorrectChildDRs", &cosmicRay.m_nCorrectChildDRs);
+    validationTree->SetBranchAddress("nReconstructableChildCRLs", &cosmicRay.m_nReconstructableChildCRLs);
+    validationTree->SetBranchAddress("nCorrectChildCRLs", &cosmicRay.m_nCorrectChildCRLs);
 
-    FloatVector *mcE_DR(nullptr), *mcPX_DR(nullptr), *mcPY_DR(nullptr), *mcPZ_DR(nullptr);
-    IntVector *nMCHitsTotal_DR(nullptr), *nMCHitsU_DR(nullptr), *nMCHitsV_DR(nullptr), *nMCHitsW_DR(nullptr);
-    FloatVector *mcVertexX_DR(nullptr), *mcVertexY_DR(nullptr), *mcVertexZ_DR(nullptr), *mcEndX_DR(nullptr), *mcEndY_DR(nullptr), *mcEndZ_DR(nullptr);
-    IntVector *nAboveThresholdMatches_DR(nullptr), *isCorrect_DR(nullptr), *isCorrectParentLink_DR(nullptr);
-    IntVector *bestMatchNHitsTotal_DR(nullptr), *bestMatchNHitsU_DR(nullptr), *bestMatchNHitsV_DR(nullptr), *bestMatchNHitsW_DR(nullptr);
-    IntVector *bestMatchNSharedHitsTotal_DR(nullptr), *bestMatchNSharedHitsU_DR(nullptr), *bestMatchNSharedHitsV_DR(nullptr), *bestMatchNSharedHitsW_DR(nullptr);
-    IntVector *bestMatchNParentTrackHitsTotal_DR(nullptr), *bestMatchNParentTrackHitsU_DR(nullptr), *bestMatchNParentTrackHitsV_DR(nullptr), *bestMatchNParentTrackHitsW_DR(nullptr);
-    IntVector *bestMatchNOtherTrackHitsTotal_DR(nullptr), *bestMatchNOtherTrackHitsU_DR(nullptr), *bestMatchNOtherTrackHitsV_DR(nullptr), *bestMatchNOtherTrackHitsW_DR(nullptr);
-    IntVector *bestMatchNOtherShowerHitsTotal_DR(nullptr), *bestMatchNOtherShowerHitsU_DR(nullptr), *bestMatchNOtherShowerHitsV_DR(nullptr), *bestMatchNOtherShowerHitsW_DR(nullptr);
-    IntVector *totalDRHitsInBestMatchParentCR_DR(nullptr), *uDRHitsInBestMatchParentCR_DR(nullptr), *vDRHitsInBestMatchParentCR_DR(nullptr), *wDRHitsInBestMatchParentCR_DR(nullptr);
+    FloatVector *mcE_CRL(nullptr), *mcPX_CRL(nullptr), *mcPY_CRL(nullptr), *mcPZ_CRL(nullptr);
+    IntVector *nMCHitsTotal_CRL(nullptr), *nMCHitsU_CRL(nullptr), *nMCHitsV_CRL(nullptr), *nMCHitsW_CRL(nullptr);
+    IntVector *nAboveThresholdMatches_CRL(nullptr), *isCorrect_CRL(nullptr), *isCorrectParentLink_CRL(nullptr), *isBestMatchedCorrectParentLink_CRL(nullptr);
+    IntVector *bestMatchNHitsTotal_CRL(nullptr), *bestMatchNHitsU_CRL(nullptr), *bestMatchNHitsV_CRL(nullptr), *bestMatchNHitsW_CRL(nullptr);
+    IntVector *bestMatchNSharedHitsTotal_CRL(nullptr), *bestMatchNSharedHitsU_CRL(nullptr), *bestMatchNSharedHitsV_CRL(nullptr), *bestMatchNSharedHitsW_CRL(nullptr);
+    IntVector *bestMatchNParentTrackHitsTotal_CRL(nullptr), *bestMatchNParentTrackHitsU_CRL(nullptr), *bestMatchNParentTrackHitsV_CRL(nullptr), *bestMatchNParentTrackHitsW_CRL(nullptr);
+    IntVector *bestMatchNOtherTrackHitsTotal_CRL(nullptr), *bestMatchNOtherTrackHitsU_CRL(nullptr), *bestMatchNOtherTrackHitsV_CRL(nullptr), *bestMatchNOtherTrackHitsW_CRL(nullptr);
+    IntVector *bestMatchNOtherShowerHitsTotal_CRL(nullptr), *bestMatchNOtherShowerHitsU_CRL(nullptr), *bestMatchNOtherShowerHitsV_CRL(nullptr), *bestMatchNOtherShowerHitsW_CRL(nullptr);
+    IntVector *totalCRLHitsInBestMatchParentCR_CRL(nullptr), *uCRLHitsInBestMatchParentCR_CRL(nullptr), *vCRLHitsInBestMatchParentCR_CRL(nullptr), *wCRLHitsInBestMatchParentCR_CRL(nullptr);
+    
+    validationTree->SetBranchAddress("mcE_CRL", &mcE_CRL);
+    validationTree->SetBranchAddress("mcPX_CRL", &mcPX_CRL);
+    validationTree->SetBranchAddress("mcPY_CRL", &mcPY_CRL);
+    validationTree->SetBranchAddress("mcPZ_CRL", &mcPZ_CRL);
+    validationTree->SetBranchAddress("nMCHitsTotal_CRL", &nMCHitsTotal_CRL);
+    validationTree->SetBranchAddress("nMCHitsU_CRL", &nMCHitsU_CRL);  
+    validationTree->SetBranchAddress("nMCHitsV_CRL", &nMCHitsV_CRL);
+    validationTree->SetBranchAddress("nMCHitsW_CRL", &nMCHitsW_CRL);
+    validationTree->SetBranchAddress("nAboveThresholdMatches_CRL", &nAboveThresholdMatches_CRL);
+    validationTree->SetBranchAddress("isCorrect_CRL", &isCorrect_CRL);
+    validationTree->SetBranchAddress("isCorrectParentLink_CRL", &isCorrectParentLink_CRL);
+    validationTree->SetBranchAddress("isBestMatchedCorrectParentLink_CRL", &isBestMatchedCorrectParentLink_CRL);
+    validationTree->SetBranchAddress("bestMatchNHitsTotal_CRL", &bestMatchNHitsTotal_CRL);    
+    validationTree->SetBranchAddress("bestMatchNHitsU_CRL", &bestMatchNHitsU_CRL);  
+    validationTree->SetBranchAddress("bestMatchNHitsV_CRL", &bestMatchNHitsV_CRL);
+    validationTree->SetBranchAddress("bestMatchNHitsW_CRL", &bestMatchNHitsW_CRL);
+    validationTree->SetBranchAddress("bestMatchNSharedHitsTotal_CRL", &bestMatchNSharedHitsTotal_CRL);    
+    validationTree->SetBranchAddress("bestMatchNSharedHitsU_CRL", &bestMatchNSharedHitsU_CRL);        
+    validationTree->SetBranchAddress("bestMatchNSharedHitsV_CRL", &bestMatchNSharedHitsV_CRL);
+    validationTree->SetBranchAddress("bestMatchNSharedHitsW_CRL", &bestMatchNSharedHitsW_CRL);
+    validationTree->SetBranchAddress("bestMatchNParentTrackHitsTotal_CRL", &bestMatchNParentTrackHitsTotal_CRL);    
+    validationTree->SetBranchAddress("bestMatchNParentTrackHitsU_CRL", &bestMatchNParentTrackHitsU_CRL);
+    validationTree->SetBranchAddress("bestMatchNParentTrackHitsV_CRL", &bestMatchNParentTrackHitsV_CRL);
+    validationTree->SetBranchAddress("bestMatchNParentTrackHitsW_CRL", &bestMatchNParentTrackHitsW_CRL);
+    validationTree->SetBranchAddress("bestMatchNOtherTrackHitsTotal_CRL", &bestMatchNOtherTrackHitsTotal_CRL);
+    validationTree->SetBranchAddress("bestMatchNOtherTrackHitsU_CRL", &bestMatchNOtherTrackHitsU_CRL);
+    validationTree->SetBranchAddress("bestMatchNOtherTrackHitsV_CRL", &bestMatchNOtherTrackHitsV_CRL);
+    validationTree->SetBranchAddress("bestMatchNOtherTrackHitsW_CRL", &bestMatchNOtherTrackHitsW_CRL);
+    validationTree->SetBranchAddress("bestMatchNOtherShowerHitsTotal_CRL", &bestMatchNOtherShowerHitsTotal_CRL);    
+    validationTree->SetBranchAddress("bestMatchNOtherShowerHitsU_CRL", &bestMatchNOtherShowerHitsU_CRL);    
+    validationTree->SetBranchAddress("bestMatchNOtherShowerHitsV_CRL", &bestMatchNOtherShowerHitsV_CRL);
+    validationTree->SetBranchAddress("bestMatchNOtherShowerHitsW_CRL", &bestMatchNOtherShowerHitsW_CRL);
+    validationTree->SetBranchAddress("totalCRLHitsInBestMatchParentCR_CRL", &totalCRLHitsInBestMatchParentCR_CRL);    
+    validationTree->SetBranchAddress("uCRLHitsInBestMatchParentCR_CRL", &uCRLHitsInBestMatchParentCR_CRL);
+    validationTree->SetBranchAddress("vCRLHitsInBestMatchParentCR_CRL", &vCRLHitsInBestMatchParentCR_CRL);
+    validationTree->SetBranchAddress("wCRLHitsInBestMatchParentCR_CRL", &wCRLHitsInBestMatchParentCR_CRL);
 
-    validationTree->SetBranchAddress("mcE_DR", &mcE_DR);
-    validationTree->SetBranchAddress("mcPX_DR", &mcPX_DR);
-    validationTree->SetBranchAddress("mcPY_DR", &mcPY_DR);
-    validationTree->SetBranchAddress("mcPZ_DR", &mcPZ_DR);
-    validationTree->SetBranchAddress("nMCHitsTotal_DR", &nMCHitsTotal_DR);
-    validationTree->SetBranchAddress("nMCHitsU_DR", &nMCHitsU_DR);  
-    validationTree->SetBranchAddress("nMCHitsV_DR", &nMCHitsV_DR);
-    validationTree->SetBranchAddress("nMCHitsW_DR", &nMCHitsW_DR);
-    validationTree->SetBranchAddress("nAboveThresholdMatches_DR", &nAboveThresholdMatches_DR);
-    validationTree->SetBranchAddress("isCorrect_DR", &isCorrect_DR);
-    validationTree->SetBranchAddress("isCorrectParentLink_DR", &isCorrectParentLink_DR);
-    validationTree->SetBranchAddress("bestMatchNHitsTotal_DR", &bestMatchNHitsTotal_DR);    
-    validationTree->SetBranchAddress("bestMatchNHitsU_DR", &bestMatchNHitsU_DR);  
-    validationTree->SetBranchAddress("bestMatchNHitsV_DR", &bestMatchNHitsV_DR);
-    validationTree->SetBranchAddress("bestMatchNHitsW_DR", &bestMatchNHitsW_DR);
-    validationTree->SetBranchAddress("bestMatchNSharedHitsTotal_DR", &bestMatchNSharedHitsTotal_DR);    
-    validationTree->SetBranchAddress("bestMatchNSharedHitsU_DR", &bestMatchNSharedHitsU_DR);        
-    validationTree->SetBranchAddress("bestMatchNSharedHitsV_DR", &bestMatchNSharedHitsV_DR);
-    validationTree->SetBranchAddress("bestMatchNSharedHitsW_DR", &bestMatchNSharedHitsW_DR);
-    validationTree->SetBranchAddress("bestMatchNParentTrackHitsTotal_DR", &bestMatchNParentTrackHitsTotal_DR);    
-    validationTree->SetBranchAddress("bestMatchNParentTrackHitsU_DR", &bestMatchNParentTrackHitsU_DR);
-    validationTree->SetBranchAddress("bestMatchNParentTrackHitsV_DR", &bestMatchNParentTrackHitsV_DR);
-    validationTree->SetBranchAddress("bestMatchNParentTrackHitsW_DR", &bestMatchNParentTrackHitsW_DR);
-    validationTree->SetBranchAddress("bestMatchNOtherTrackHitsTotal_DR", &bestMatchNOtherTrackHitsTotal_DR);
-    validationTree->SetBranchAddress("bestMatchNOtherTrackHitsU_DR", &bestMatchNOtherTrackHitsU_DR);
-    validationTree->SetBranchAddress("bestMatchNOtherTrackHitsV_DR", &bestMatchNOtherTrackHitsV_DR);
-    validationTree->SetBranchAddress("bestMatchNOtherTrackHitsW_DR", &bestMatchNOtherTrackHitsW_DR);
-    validationTree->SetBranchAddress("bestMatchNOtherShowerHitsTotal_DR", &bestMatchNOtherShowerHitsTotal_DR);    
-    validationTree->SetBranchAddress("bestMatchNOtherShowerHitsU_DR", &bestMatchNOtherShowerHitsU_DR);    
-    validationTree->SetBranchAddress("bestMatchNOtherShowerHitsV_DR", &bestMatchNOtherShowerHitsV_DR);
-    validationTree->SetBranchAddress("bestMatchNOtherShowerHitsW_DR", &bestMatchNOtherShowerHitsW_DR);
-    validationTree->SetBranchAddress("totalDRHitsInBestMatchParentCR_DR", &totalDRHitsInBestMatchParentCR_DR);    
-    validationTree->SetBranchAddress("uDRHitsInBestMatchParentCR_DR", &uDRHitsInBestMatchParentCR_DR);
-    validationTree->SetBranchAddress("vDRHitsInBestMatchParentCR_DR", &vDRHitsInBestMatchParentCR_DR);
-    validationTree->SetBranchAddress("wDRHitsInBestMatchParentCR_DR", &wDRHitsInBestMatchParentCR_DR);
 
-    DeltaRay deltaRay;
+    CosmicRayOwnershipMap cosmicRayOwnershipMap;
+    //int count(0);
     for (Int_t i(0); i < (Int_t)validationTree->GetEntries(); ++i)
     {
         validationTree->GetEntry(i);
 
-        //std::cout << "COSMIC RAY" << std::endl;
-        //cosmicRay.Print();
+        //++count;
 
-        for (int i = 0; i < cosmicRay.m_nReconstructableChildDRs; ++i)
+        for (Int_t j = 0; j < cosmicRay.m_nReconstructableChildCRLs; ++j)
         {
-            deltaRay.m_energy = mcE_DR->at(i);
-            deltaRay.m_momentum = SimpleThreeVector(mcPX_DR->at(i), mcPY_DR->at(i), mcPZ_DR->at(i));
-            deltaRay.m_nMCHitsTotal = nMCHitsTotal_DR->at(i);
-            deltaRay.m_nMCHitsU = nMCHitsU_DR->at(i);
-            deltaRay.m_nMCHitsV = nMCHitsV_DR->at(i);
-            deltaRay.m_nMCHitsW = nMCHitsW_DR->at(i);
-
+            DeltaRay deltaRay;
+            deltaRay.m_energy = mcE_CRL->at(j);
+            deltaRay.m_momentum = SimpleThreeVector(mcPX_CRL->at(j), mcPY_CRL->at(j), mcPZ_CRL->at(j));
+            deltaRay.m_nMCHitsTotal = nMCHitsTotal_CRL->at(j);
+            deltaRay.m_nMCHitsU = nMCHitsU_CRL->at(j);
+            deltaRay.m_nMCHitsV = nMCHitsV_CRL->at(j);
+            deltaRay.m_nMCHitsW = nMCHitsW_CRL->at(j);
+            
             if ((cosmicRay.m_momentum.GetMagnitude() < std::numeric_limits<float>::epsilon()) || (deltaRay.m_momentum.GetMagnitude() < std::numeric_limits<float>::epsilon()))
             {
                 deltaRay.m_openingAngleFromMuon = -1.f;
@@ -131,55 +142,161 @@ void ReadTree(const std::string &inputFileName, CosmicRayVector &cosmicRayVector
             {
                 deltaRay.m_openingAngleFromMuon = cosmicRay.m_momentum.GetOpeningAngle(deltaRay.m_momentum);
             }
+            
+            deltaRay.m_nAboveThresholdMatches = nAboveThresholdMatches_CRL->at(j);
+            deltaRay.m_isCorrect = isCorrect_CRL->at(j);
+            deltaRay.m_isCorrectParentLink = isCorrectParentLink_CRL->at(j);
+            deltaRay.m_isBestMatchedCorrectParentLink = isBestMatchedCorrectParentLink_CRL->at(j);
+            
+            deltaRay.m_bestMatchNHitsTotal = bestMatchNHitsTotal_CRL->at(j);
+            deltaRay.m_bestMatchNHitsU = bestMatchNHitsU_CRL->at(j);
+            deltaRay.m_bestMatchNHitsV = bestMatchNHitsV_CRL->at(j);
+            deltaRay.m_bestMatchNHitsW = bestMatchNHitsW_CRL->at(j);
+
+            deltaRay.m_bestMatchNSharedHitsTotal = bestMatchNSharedHitsTotal_CRL->at(j);
+            deltaRay.m_bestMatchNSharedHitsU = bestMatchNSharedHitsU_CRL->at(j);
+            deltaRay.m_bestMatchNSharedHitsV = bestMatchNSharedHitsV_CRL->at(j);
+            deltaRay.m_bestMatchNSharedHitsW = bestMatchNSharedHitsW_CRL->at(j);
     
-            deltaRay.m_nAboveThresholdMatches = nAboveThresholdMatches_DR->at(i);
-            deltaRay.m_isCorrect = isCorrect_DR->at(i);
-            deltaRay.m_isCorrectParentLink = isCorrectParentLink_DR->at(i);
+            deltaRay.m_bestMatchNParentTrackHitsTotal = bestMatchNParentTrackHitsTotal_CRL->at(j);
+            deltaRay.m_bestMatchNParentTrackHitsU = bestMatchNParentTrackHitsU_CRL->at(j);
+            deltaRay.m_bestMatchNParentTrackHitsV = bestMatchNParentTrackHitsV_CRL->at(j);
+            deltaRay.m_bestMatchNParentTrackHitsW = bestMatchNParentTrackHitsW_CRL->at(j);
 
-            deltaRay.m_bestMatchNHitsTotal = bestMatchNHitsTotal_DR->at(i);
-            deltaRay.m_bestMatchNHitsU = bestMatchNHitsU_DR->at(i);
-            deltaRay.m_bestMatchNHitsV = bestMatchNHitsV_DR->at(i);
-            deltaRay.m_bestMatchNHitsW = bestMatchNHitsW_DR->at(i);
+            deltaRay.m_bestMatchNOtherTrackHitsTotal = bestMatchNOtherTrackHitsTotal_CRL->at(j);
+            deltaRay.m_bestMatchNOtherTrackHitsU = bestMatchNOtherTrackHitsU_CRL->at(j);
+            deltaRay.m_bestMatchNOtherTrackHitsV = bestMatchNOtherTrackHitsV_CRL->at(j);
+            deltaRay.m_bestMatchNOtherTrackHitsW = bestMatchNOtherTrackHitsW_CRL->at(j);
 
-            deltaRay.m_bestMatchNSharedHitsTotal = bestMatchNSharedHitsTotal_DR->at(i);
-            deltaRay.m_bestMatchNSharedHitsU = bestMatchNSharedHitsU_DR->at(i);
-            deltaRay.m_bestMatchNSharedHitsV = bestMatchNSharedHitsV_DR->at(i);
-            deltaRay.m_bestMatchNSharedHitsW = bestMatchNSharedHitsW_DR->at(i);
-    
-            deltaRay.m_bestMatchNParentTrackHitsTotal = bestMatchNParentTrackHitsTotal_DR->at(i);
-            deltaRay.m_bestMatchNParentTrackHitsU = bestMatchNParentTrackHitsU_DR->at(i);
-            deltaRay.m_bestMatchNParentTrackHitsV = bestMatchNParentTrackHitsV_DR->at(i);
-            deltaRay.m_bestMatchNParentTrackHitsW = bestMatchNParentTrackHitsW_DR->at(i);
+            deltaRay.m_bestMatchNOtherShowerHitsTotal = bestMatchNOtherShowerHitsTotal_CRL->at(j);
+            deltaRay.m_bestMatchNOtherShowerHitsU = bestMatchNOtherShowerHitsU_CRL->at(j);
+            deltaRay.m_bestMatchNOtherShowerHitsV = bestMatchNOtherShowerHitsV_CRL->at(j);
+            deltaRay.m_bestMatchNOtherShowerHitsW = bestMatchNOtherShowerHitsW_CRL->at(j);
 
-            deltaRay.m_bestMatchNOtherTrackHitsTotal = bestMatchNOtherTrackHitsTotal_DR->at(i);
-            deltaRay.m_bestMatchNOtherTrackHitsU = bestMatchNOtherTrackHitsU_DR->at(i);
-            deltaRay.m_bestMatchNOtherTrackHitsV = bestMatchNOtherTrackHitsV_DR->at(i);
-            deltaRay.m_bestMatchNOtherTrackHitsW = bestMatchNOtherTrackHitsW_DR->at(i);
-
-            deltaRay.m_bestMatchNOtherShowerHitsTotal = bestMatchNOtherShowerHitsTotal_DR->at(i);
-            deltaRay.m_bestMatchNOtherShowerHitsU = bestMatchNOtherShowerHitsU_DR->at(i);
-            deltaRay.m_bestMatchNOtherShowerHitsV = bestMatchNOtherShowerHitsV_DR->at(i);
-            deltaRay.m_bestMatchNOtherShowerHitsW = bestMatchNOtherShowerHitsW_DR->at(i);
-
-            deltaRay.m_totalDRHitsInBestMatchParentCR = totalDRHitsInBestMatchParentCR_DR->at(i);
-            deltaRay.m_uDRHitsInBestMatchParentCR = uDRHitsInBestMatchParentCR_DR->at(i);
-            deltaRay.m_vDRHitsInBestMatchParentCR = vDRHitsInBestMatchParentCR_DR->at(i);
-            deltaRay.m_wDRHitsInBestMatchParentCR = wDRHitsInBestMatchParentCR_DR->at(i);
-
-            //std::cout << "DELTA RAY" << std::endl;
-            //deltaRay.Print();
+            deltaRay.m_totalCRLHitsInBestMatchParentCR = totalCRLHitsInBestMatchParentCR_CRL->at(j);
+            deltaRay.m_uCRLHitsInBestMatchParentCR = uCRLHitsInBestMatchParentCR_CRL->at(j);
+            deltaRay.m_vCRLHitsInBestMatchParentCR = vCRLHitsInBestMatchParentCR_CRL->at(j);
+            deltaRay.m_wCRLHitsInBestMatchParentCR = wCRLHitsInBestMatchParentCR_CRL->at(j);
+            
             deltaRayVector.push_back(deltaRay);
+            cosmicRayOwnershipMap[eventNumber][i + 1].push_back(deltaRay);
         }
 
         cosmicRayVector.push_back(cosmicRay);
+        /*
+        if (count == 2)
+            break;
+        */
     }
+
+
+    /*
+    int bestMatchOtherShowerHitsEventNumber, bestMatchOtherShowerHitsID_CR;
+    IntVector *bestMatchOtherShowerHitsID_CRL(nullptr);
+    FloatVector *bestMatchOtherShowerHitsDistance_CRL(nullptr);
+
+    otherShowerContaminationTree->SetBranchAddress("bestMatchOtherShowerHitsEventNumber", &bestMatchOtherShowerHitsEventNumber);
+    otherShowerContaminationTree->SetBranchAddress("bestMatchOtherShowerHitsID_CR", &bestMatchOtherShowerHitsID_CR);
+    otherShowerContaminationTree->SetBranchAddress("bestMatchOtherShowerHitsID_CRL", &bestMatchOtherShowerHitsID_CRL);
+    otherShowerContaminationTree->SetBranchAddress("bestMatchOtherShowerHitsDistance_CRL", &bestMatchOtherShowerHitsDistance_CRL);
+    
+    for (Int_t i(0); i < (Int_t)otherShowerContaminationTree->GetEntries(); ++i)
+    {
+        otherShowerContaminationTree->GetEntry(i);
+
+        const DeltaRayVector childDeltaRays(cosmicRayOwnershipMap.at(bestMatchOtherShowerHitsEventNumber).at(bestMatchOtherShowerHitsID_CR));
+        
+        for (Int_t j(0); j < (Int_t)bestMatchOtherShowerHitsID_CRL->size(); ++j)
+        {
+            const DeltaRay &deltaRayCopy(childDeltaRays.at(bestMatchOtherShowerHitsID_CRL->at(j) - 1));
+            auto iter(std::find(deltaRayVector.begin(), deltaRayVector.end(), deltaRayCopy));
+            (*iter).m_bestMatchOtherShowerHitsDistance.push_back(bestMatchOtherShowerHitsDistance_CRL->at(j));
+        }
+        
+    }
+    
+    int bestMatchOtherTrackHitsEventNumber, bestMatchOtherTrackHitsID_CR;
+    IntVector *bestMatchOtherTrackHitsID_CRL(nullptr);
+    FloatVector *bestMatchOtherTrackHitsDistance_CRL(nullptr);
+
+    otherTrackContaminationTree->SetBranchAddress("bestMatchOtherTrackHitsEventNumber", &bestMatchOtherTrackHitsEventNumber);
+    otherTrackContaminationTree->SetBranchAddress("bestMatchOtherTrackHitsID_CR", &bestMatchOtherTrackHitsID_CR);
+    otherTrackContaminationTree->SetBranchAddress("bestMatchOtherTrackHitsID_CRL", &bestMatchOtherTrackHitsID_CRL);
+    otherTrackContaminationTree->SetBranchAddress("bestMatchOtherTrackHitsDistance_CRL", &bestMatchOtherTrackHitsDistance_CRL);
+
+    for (Int_t i(0); i < (Int_t)otherTrackContaminationTree->GetEntries(); ++i)
+    {
+        otherTrackContaminationTree->GetEntry(i);
+
+        const DeltaRayVector childDeltaRays(cosmicRayOwnershipMap.at(bestMatchOtherTrackHitsEventNumber).at(bestMatchOtherTrackHitsID_CR));
+
+        for (Int_t j(0); j < (Int_t)bestMatchOtherTrackHitsID_CRL->size(); ++j)
+        {
+            const DeltaRay &deltaRayCopy(childDeltaRays.at(bestMatchOtherTrackHitsID_CRL->at(j) - 1));
+            auto iter(std::find(deltaRayVector.begin(), deltaRayVector.end(), deltaRayCopy));
+            (*iter).m_bestMatchOtherTrackHitsDistance.push_back(bestMatchOtherTrackHitsDistance_CRL->at(j));
+        }
+    }    
+
+    int bestMatchParentTrackHitsEventNumber, bestMatchParentTrackHitsID_CR;
+    IntVector *bestMatchParentTrackHitsID_CRL(nullptr);
+    FloatVector *bestMatchParentTrackHitsDistance_CRL(nullptr);
+
+    parentTrackContaminationTree->SetBranchAddress("bestMatchParentTrackHitsEventNumber", &bestMatchParentTrackHitsEventNumber);    
+    parentTrackContaminationTree->SetBranchAddress("bestMatchParentTrackHitsID_CR", &bestMatchParentTrackHitsID_CR);
+    parentTrackContaminationTree->SetBranchAddress("bestMatchParentTrackHitsID_CRL", &bestMatchParentTrackHitsID_CRL);
+    parentTrackContaminationTree->SetBranchAddress("bestMatchParentTrackHitsDistance_CRL", &bestMatchParentTrackHitsDistance_CRL);
+
+    for (Int_t i(0); i < (Int_t)parentTrackContaminationTree->GetEntries(); ++i)
+    {
+        parentTrackContaminationTree->GetEntry(i);
+
+        if (bestMatchParentTrackHitsID_CR > 2)
+            break;
+        
+        const DeltaRayVector childDeltaRays(cosmicRayOwnershipMap.at(bestMatchParentTrackHitsEventNumber).at(bestMatchParentTrackHitsID_CR));
+
+        for (Int_t j(0); j < (Int_t)bestMatchParentTrackHitsID_CRL->size(); ++j)
+        {
+            const DeltaRay &deltaRayCopy(childDeltaRays.at(bestMatchParentTrackHitsID_CRL->at(j) - 1));
+            auto iter(std::find(deltaRayVector.begin(), deltaRayVector.end(), deltaRayCopy));
+            (*iter).m_bestMatchParentTrackHitsDistance.push_back(bestMatchParentTrackHitsDistance_CRL->at(j));
+        }
+    }       
+    
+    int bestMatchCRLHitsInCREventNumber, bestMatchCRLHitsInCRID_CR;
+    IntVector *bestMatchCRLHitsInCRID_CRL(nullptr);
+    FloatVector *bestMatchCRLHitsInCRDistance_CRL(nullptr);
+
+    CRLHitsInCRTree->SetBranchAddress("bestMatchCRLHitsInCREventNumber", &bestMatchCRLHitsInCREventNumber);
+    CRLHitsInCRTree->SetBranchAddress("bestMatchCRLHitsInCRID_CR", &bestMatchCRLHitsInCRID_CR);
+    CRLHitsInCRTree->SetBranchAddress("bestMatchCRLHitsInCRID_CRL", &bestMatchCRLHitsInCRID_CRL);
+    CRLHitsInCRTree->SetBranchAddress("bestMatchCRLHitsInCRDistance_CRL", &bestMatchCRLHitsInCRDistance_CRL);
+
+    for (Int_t i(0); i < (Int_t)CRLHitsInCRTree->GetEntries(); ++i)
+    {
+        CRLHitsInCRTree->GetEntry(i);
+        
+        if (bestMatchCRLHitsInCRID_CR > 2)
+            break;
+        
+        const DeltaRayVector childDeltaRays(cosmicRayOwnershipMap.at(bestMatchCRLHitsInCREventNumber).at(bestMatchCRLHitsInCRID_CR));
+
+        for (Int_t j(0); j < (Int_t)bestMatchCRLHitsInCRID_CRL->size(); ++j)
+        {
+            const DeltaRay &deltaRayCopy(childDeltaRays.at(bestMatchCRLHitsInCRID_CRL->at(j) - 1));
+            auto iter(std::find(deltaRayVector.begin(), deltaRayVector.end(), deltaRayCopy));            
+            (*iter).m_bestMatchCRLHitsInCRDistance.push_back(bestMatchCRLHitsInCRDistance_CRL->at(j));
+        }
+    }
+    */
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 void DisplayOverallRecoMetrics(const DeltaRayVector &deltaRayVector)
 {
-    unsigned int nCorrectParentLinks(0), nCorrectlyReconstructedDRs(0);
+    unsigned int nCorrectParentLinks(0), nCorrectlyReconstructedCRLs(0);
     unsigned int nZeroMatches(0), nOneMatches(0), nTwoMatches(0), nThreePlusMatches(0);
     
     for (const DeltaRay &deltaRay : deltaRayVector)
@@ -188,7 +305,7 @@ void DisplayOverallRecoMetrics(const DeltaRayVector &deltaRayVector)
             ++nCorrectParentLinks;
 
         if (deltaRay.m_isCorrect)
-            ++nCorrectlyReconstructedDRs;
+            ++nCorrectlyReconstructedCRLs;
         
         switch (deltaRay.m_nAboveThresholdMatches)
         {
@@ -206,16 +323,16 @@ void DisplayOverallRecoMetrics(const DeltaRayVector &deltaRayVector)
         }
     }
 
-    const unsigned int nReconstructableDRs(deltaRayVector.size());
-    const float fCorrectParentLinks(nReconstructableDRs == 0 ? 0.f : static_cast<float>(nCorrectParentLinks) / static_cast<float>(nReconstructableDRs));
-    const float fCorrectlyReconstructedDRs(nReconstructableDRs == 0 ? 0.f : static_cast<float>(nCorrectlyReconstructedDRs) / static_cast<float>(nReconstructableDRs));
-    const float fZeroMatches(nReconstructableDRs == 0 ? 0.f : static_cast<float>(nZeroMatches) / static_cast<float>(nReconstructableDRs));
-    const float fOneMatches(nReconstructableDRs == 0 ? 0.f : static_cast<float>(nOneMatches) / static_cast<float>(nReconstructableDRs));
-    const float fTwoMatches(nReconstructableDRs == 0 ? 0.f : static_cast<float>(nTwoMatches) / static_cast<float>(nReconstructableDRs));
-    const float fThreePlusMatches(nReconstructableDRs == 0 ? 0.f : static_cast<float>(nThreePlusMatches) / static_cast<float>(nReconstructableDRs));
+    const unsigned int nReconstructableCRLs(deltaRayVector.size());
+    const float fCorrectParentLinks(nReconstructableCRLs == 0 ? 0.f : static_cast<float>(nCorrectParentLinks) / static_cast<float>(nReconstructableCRLs));
+    const float fCorrectlyReconstructedCRLs(nReconstructableCRLs == 0 ? 0.f : static_cast<float>(nCorrectlyReconstructedCRLs) / static_cast<float>(nReconstructableCRLs));
+    const float fZeroMatches(nReconstructableCRLs == 0 ? 0.f : static_cast<float>(nZeroMatches) / static_cast<float>(nReconstructableCRLs));
+    const float fOneMatches(nReconstructableCRLs == 0 ? 0.f : static_cast<float>(nOneMatches) / static_cast<float>(nReconstructableCRLs));
+    const float fTwoMatches(nReconstructableCRLs == 0 ? 0.f : static_cast<float>(nTwoMatches) / static_cast<float>(nReconstructableCRLs));
+    const float fThreePlusMatches(nReconstructableCRLs == 0 ? 0.f : static_cast<float>(nThreePlusMatches) / static_cast<float>(nReconstructableCRLs));
 
-    std::cout << "nReconstructableDeltaRays: " << nReconstructableDRs << std::endl
-              << "nCorrectlyReconstructedDeltaRays: " << nCorrectlyReconstructedDRs << " (" << fCorrectlyReconstructedDRs * 100.f << "%)" << std::endl
+    std::cout << "nReconstructableDeltaRays: " << nReconstructableCRLs << std::endl
+              << "nCorrectlyReconstructedDeltaRays: " << nCorrectlyReconstructedCRLs << " (" << fCorrectlyReconstructedCRLs * 100.f << "%)" << std::endl
               << "nCorrectParentLinks: " << nCorrectParentLinks << " (" << fCorrectParentLinks * 100.f << "%)" << std::endl
               << "Above threshold pfo match distribution: "
               << "|0: " << fZeroMatches * 100.f << "%|, |1: " << fOneMatches * 100.f << "%|, |2: " << fTwoMatches * 100.f << "%|, |3+: " << fThreePlusMatches * 100.f <<  "%|" << std::endl;
@@ -234,7 +351,7 @@ void FillCosmicRayMCHistogramCollection(const CosmicRayVector &cosmicRayVector, 
     
     for (const CosmicRay &cosmicRay : cosmicRayVector)
     {
-        cosmicRayMCHistogramCollection.m_hReconstructableChildDeltaRays->Fill(cosmicRay.m_nReconstructableChildDRs);
+        cosmicRayMCHistogramCollection.m_hReconstructableChildDeltaRays->Fill(cosmicRay.m_nReconstructableChildCRLs);
     }   
 }
 
@@ -244,21 +361,21 @@ void FillDeltaRayMCHistogramCollection(const DeltaRayVector &deltaRayVector, Del
 {
    if (!deltaRayMCHistogramCollection.m_hEnergyDistribution)
    {
-        deltaRayMCHistogramCollection.m_hEnergyDistribution = new TH1F("hEnergyDistribution_DR", "hEnergyDistribution_DR", 40000, -100., 1900.);
-        deltaRayMCHistogramCollection.m_hEnergyDistribution->SetTitle(";TrueDREnergy [GeV];Occurance");
+        deltaRayMCHistogramCollection.m_hEnergyDistribution = new TH1F("hEnergyDistribution_CRL", "hEnergyDistribution_CRL", 100, 0., 1.);
+        deltaRayMCHistogramCollection.m_hEnergyDistribution->SetTitle(";TrueCRLEnergy [GeV];Occurance");
         //deltaRayMCHistogramCollection.m_hEnergyDistribution->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayMCHistogramCollection.m_hTotalHitDistribution)
    {
-        deltaRayMCHistogramCollection.m_hTotalHitDistribution = new TH1F("hTotalHitDistribution_DR", "hTotalHitDistribution_DR", 40000, -100., 1900.);
+        deltaRayMCHistogramCollection.m_hTotalHitDistribution = new TH1F("hTotalHitDistribution_CRL", "hTotalHitDistribution_CRL", 40000, 0., 100.);
         deltaRayMCHistogramCollection.m_hTotalHitDistribution->SetTitle(";nMCTotalHits;Occurance");
         //deltaRayMCHistogramCollection.m_hTotalHitDistribution->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayMCHistogramCollection.m_hOpeningAngleDistribution)
    {
-        deltaRayMCHistogramCollection.m_hOpeningAngleDistribution = new TH1F("hOpeningAngleDistribution_DR", "hOpeningAngleDistribution_DR", 40000, -100., 1900.);
+        deltaRayMCHistogramCollection.m_hOpeningAngleDistribution = new TH1F("hOpeningAngleDistribution_CRL", "hOpeningAngleDistribution_CRL", 40000, 0., 180.);
         deltaRayMCHistogramCollection.m_hOpeningAngleDistribution->SetTitle(";TrueOpeningAngle [degrees];Occurance");
         //deltaRayMCHistogramCollection.m_hOpeningAngleDistribution->GetXaxis()->SetRangeUser(0.f, 50.f);
     }      
@@ -277,112 +394,112 @@ void FillDeltaRayRecoHistogramCollection(const DeltaRayVector &deltaRayVector, D
 {
    if (!deltaRayRecoHistogramCollection.m_hCompleteness)
    {
-        deltaRayRecoHistogramCollection.m_hCompleteness = new TH1F("hCompleteness_DR", "hCompleteness_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hCompleteness = new TH1F("hCompleteness_CRL", "hCompleteness_CRL", 100, 0., 1.);
         deltaRayRecoHistogramCollection.m_hCompleteness->SetTitle(";Completeness;Occurance");
         //deltaRayRecoHistogramCollection.m_hCompleteness->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hPurity)
    {
-        deltaRayRecoHistogramCollection.m_hPurity = new TH1F("hPurity_DR", "hPurity_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hPurity = new TH1F("hPurity_CRL", "hPurity_CRL", 100, 0., 1.);
         deltaRayRecoHistogramCollection.m_hPurity->SetTitle(";Purity;Occurance");
         //deltaRayRecoHistogramCollection.m_hPurity->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hAboveThresholdMatches)
    {
-        deltaRayRecoHistogramCollection.m_hAboveThresholdMatches = new TH1F("hAboveThresholdMatches_DR", "hAboveThresholdMatches_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hAboveThresholdMatches = new TH1F("hAboveThresholdMatches_CRL", "hAboveThresholdMatches_CRL", 40000, 0., 4.);
         deltaRayRecoHistogramCollection.m_hAboveThresholdMatches->SetTitle(";nAboveThresholdMatches;Occurance");
         //deltaRayRecoHistogramCollection.m_hAboveThresholdMatches->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal)
    {
-        deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal = new TH1F("hParentTrackHitsTotal_DR", "hParentTrackHitsTotal_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal = new TH1F("hParentTrackHitsTotal_CRL", "hParentTrackHitsTotal_CRL", 40000, 0., 50.);
         deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal->SetTitle(";nParentTrackHitsTotal;Occurance");
         //deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal)
    {
-        deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal = new TH1F("hOtherTrackHitsTotal_DR", "hOtherTrackHitsTotal_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal = new TH1F("hOtherTrackHitsTotal_CRL", "hOtherTrackHitsTotal_CRL", 40000, 0., 20.);
         deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal->SetTitle(";nOtherTrackHitsTotal;Occurance");
         //deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal)
    {
-        deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal = new TH1F("hOtherShowerHitsTotal_DR", "hOtherShowerHitsTotal_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal = new TH1F("hOtherShowerHitsTotal_CRL", "hOtherShowerHitsTotal_CRL", 40000, 0., 20.);
         deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal->SetTitle(";nOtherShowerHitsTotal;Occurance");
         //deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay)
    {
-        deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay = new TH1F("hTotalHitsTakenByCosmicRay_DR", "hTotalHitsTakenByCosmicRay_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay = new TH1F("hTotalHitsTakenByCosmicRay_CRL", "hTotalHitsTakenByCosmicRay_CRL", 40000, 0., 50.);
         deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay->SetTitle(";hTotalHitsTakenByCosmicRay;Occurance");
         //deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hEfficiency_Energy)
    {
-        deltaRayRecoHistogramCollection.m_hEfficiency_Energy = new TH1F("hEfficiency_Energy_DR", "hEfficiency_Energy_DR", 40000, -100., 1900.);
-        deltaRayRecoHistogramCollection.m_hEfficiency_Energy->SetTitle(";TrueDREnergy [GeV];Efficiency");
+        deltaRayRecoHistogramCollection.m_hEfficiency_Energy = new TH1F("hEfficiency_Energy_CRL", "hEfficiency_Energy_CRL", 100, 0., 1.);
+        deltaRayRecoHistogramCollection.m_hEfficiency_Energy->SetTitle(";TrueCRLEnergy [GeV];Efficiency");
         //deltaRayRecoHistogramCollection.m_hEfficiency_Energy->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits)
    {
-        deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits = new TH1F("hEfficiency_TotalHits_DR", "hEfficiency_TotalHits_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits = new TH1F("hEfficiency_TotalHits_CRL", "hEfficiency_TotalHits_CRL", 40000, 0., 100.);
         deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits->SetTitle(";nMCTotalHits;Efficiency");
         //deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle)
    {
-        deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle = new TH1F("hEfficiency_OpeningAngle_DR", "_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle = new TH1F("hEfficiency_OpeningAngle_CRL", "_CRL", 40000, 0., 180.);
         deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle->SetTitle(";TrueOpeningAngle [degrees];Efficiency");
         //deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy)
    {
-        deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy = new TH1F("hCorrectParentLink_Energy_DR", "hCorrectParentLink_Energy_DR", 40000, -100., 1900.);
-        deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy->SetTitle(";TrueDREnergy [GeV];CorrectParentLinkFraction");
+        deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy = new TH1F("hCorrectParentLink_Energy_CRL", "hCorrectParentLink_Energy_CRL", 100, 0., 1.);
+        deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy->SetTitle(";TrueCRLEnergy [GeV];CorrectParentLinkFraction");
         //deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits)
    {
-        deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits = new TH1F("hCorrectParentLink_TotalHits_DR", "hCorrectParentLink_TotalHits_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits = new TH1F("hCorrectParentLink_TotalHits_CRL", "hCorrectParentLink_TotalHits_CRL", 40000, 0., 100.);
         deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits->SetTitle(";nMCTotalHits;CorrectParentLinkFraction");
         //deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle)
    {
-        deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle = new TH1F("hCorrectParentLink_OpeningAngle_DR", "hCorrectParentLink_OpeningAngle_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle = new TH1F("hCorrectParentLink_OpeningAngle_CRL", "hCorrectParentLink_OpeningAngle_CRL", 40000, 0., 180.);
         deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle->SetTitle(";TrueOpeningAngle [degrees];CorrectParentLinkFraction");
         //deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle->GetXaxis()->SetRangeUser(0.f, 50.f);
     }      
 
    if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy)
    {
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy = new TH1F("hCorrectEvent_Energy_DR", "hCorrectEvent_Energy_DR", 40000, -100., 1900.);
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->SetTitle(";TrueDREnergy [GeV];CorrectlyReconstructedFraction");
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy = new TH1F("hCorrectEvent_Energy_CRL", "hCorrectEvent_Energy_CRL", 100, 0., 1.);
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->SetTitle(";TrueCRLEnergy [GeV];CorrectlyReconstructedFraction");
         //deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits)
    {
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits = new TH1F("hCorrectEvent_TotalHits_DR", "hCorrectEvent_TotalHits_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits = new TH1F("hCorrectEvent_TotalHits_CRL", "hCorrectEvent_TotalHits_CRL", 40000, 0., 100.);
         deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits->SetTitle(";nMCTotalHits;CorrectlyReconstructedFraction");
         //deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle)
    {
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle = new TH1F("hCorrectEvent_OpeningAngle_DR", "hCorrectEvent_OpeningAngle_DR", 40000, -100., 1900.);
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle = new TH1F("hCorrectEvent_OpeningAngle_CRL", "hCorrectEvent_OpeningAngle_CRL", 40000, 0., 180.);
         deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->SetTitle(";TrueOpeningAngle [degrees];CorrectlyReconstructedFraction");
         //deltaRayRecoHistogramCollection.m_-hCorrectEvent_OpeningAngle>GetXaxis()->SetRangeUser(0.f, 50.f);
     }   
@@ -407,7 +524,7 @@ void FillDeltaRayRecoHistogramCollection(const DeltaRayVector &deltaRayVector, D
 
         if (deltaRay.m_isCorrectParentLink)
         {
-            deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay->Fill(deltaRay.m_totalDRHitsInBestMatchParentCR);
+            deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay->Fill(deltaRay.m_totalCRLHitsInBestMatchParentCR);
             deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy->Fill(deltaRay.m_energy);
             deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits->Fill(deltaRay.m_nMCHitsTotal);
             deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle->Fill(deltaRay.m_openingAngleFromMuon);
@@ -459,8 +576,52 @@ void DivideHistogram(TH1F *&recoHistogram, TH1F *&mcDistribution)
     
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+void FillDeltaRayContaminationHistogramCollection(const DeltaRayVector &deltaRayVector, DeltaRayContaminationHistogramCollection &deltaRayContaminationHistogramCollection)
+{
+   if (!deltaRayContaminationHistogramCollection.m_hOtherShowerHitsDistance)
+   {
+        deltaRayContaminationHistogramCollection.m_hOtherShowerHitsDistance = new TH1F("hOtherShowerHitsDistance_CRL", "hOtherShowerHitsDistance_CRL", 40000, 0., 500.);
+        deltaRayContaminationHistogramCollection.m_hOtherShowerHitsDistance->SetTitle(";Distance From MC CRL [cm];Occurance");
+   }
+
+   if (!deltaRayContaminationHistogramCollection.m_hOtherTrackHitsDistance)
+   {
+        deltaRayContaminationHistogramCollection.m_hOtherTrackHitsDistance = new TH1F("hOtherTrackHitsDistance_CRL", "hOtherTrackHitsDistance_CRL", 40000, 0., 500.);
+        deltaRayContaminationHistogramCollection.m_hOtherTrackHitsDistance->SetTitle(";Distance From MC CRL [cm];Occurance");
+   }
+
+   if (!deltaRayContaminationHistogramCollection.m_hParentTrackHitsDistance)
+   {
+        deltaRayContaminationHistogramCollection.m_hParentTrackHitsDistance = new TH1F("hParentTrackHitsDistance_CRL", "hParentTrackHitsDistance_CRL", 40000, 0., 500.);
+        deltaRayContaminationHistogramCollection.m_hParentTrackHitsDistance->SetTitle(";Distance From MC CRL [cm];Occurance");
+   }  
+
+   if (!deltaRayContaminationHistogramCollection.m_hCRLHitsInCRDistance)
+   {
+        deltaRayContaminationHistogramCollection.m_hCRLHitsInCRDistance = new TH1F("hCRLHitsInCRDistance_CRL", "hCRLHitsInCRDistance_CRL", 40000, 0., 500.);
+        deltaRayContaminationHistogramCollection.m_hCRLHitsInCRDistance->SetTitle(";Distance From MC CR [cm];Occurance");
+   }     
+
+   for (const DeltaRay &deltaRay : deltaRayVector)
+   {
+       for (const float distance : deltaRay.m_bestMatchOtherShowerHitsDistance)
+           deltaRayContaminationHistogramCollection.m_hOtherShowerHitsDistance->Fill(distance);
+
+       for (const float distance : deltaRay.m_bestMatchOtherTrackHitsDistance)
+           deltaRayContaminationHistogramCollection.m_hOtherTrackHitsDistance->Fill(distance);
+
+       for (const float distance : deltaRay.m_bestMatchParentTrackHitsDistance)
+           deltaRayContaminationHistogramCollection.m_hParentTrackHitsDistance->Fill(distance);       
+       
+       for (const float distance : deltaRay.m_bestMatchCRLHitsInCRDistance)
+           deltaRayContaminationHistogramCollection.m_hCRLHitsInCRDistance->Fill(distance);
+   }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 void WriteHistograms(CosmicRayMCHistogramCollection &cosmicRayMCHistogramCollection, DeltaRayMCHistogramCollection &deltaRayMCHistogramCollection,
-    DeltaRayRecoHistogramCollection &deltaRayRecoHistogramCollection)
+    DeltaRayRecoHistogramCollection &deltaRayRecoHistogramCollection, DeltaRayContaminationHistogramCollection &deltaRayContaminationHistogramCollection)
 {
     TFile *histogramFile = new TFile("ValidationHistograms.root", "CREATE");
 
@@ -486,12 +647,17 @@ void WriteHistograms(CosmicRayMCHistogramCollection &cosmicRayMCHistogramCollect
     deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->Write("hCorrectEvent_Energy");
     deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits->Write("hCorrectEvent_TotalHits");
     deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->Write("hCorrectEvent_OpeningAngle");
+
+    deltaRayContaminationHistogramCollection.m_hOtherShowerHitsDistance->Write("hOtherShowerHitsDistance");
+    deltaRayContaminationHistogramCollection.m_hOtherTrackHitsDistance->Write("hOtherTrackHitsDistance");
+    deltaRayContaminationHistogramCollection.m_hParentTrackHitsDistance->Write("hParentTrackHitsDistance");
+    deltaRayContaminationHistogramCollection.m_hCRLHitsInCRDistance->Write("hCRLHitsInCRDistance");
 }
     
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-float SimpleThreeVector::GetMagnitude()
+float SimpleThreeVector::GetMagnitude() const
 {
     return std::sqrt((this->m_x * this->m_x) + (this->m_y * this->m_y) + (this->m_z * this->m_z));
 }
@@ -502,7 +668,7 @@ float SimpleThreeVector::GetOpeningAngle(const SimpleThreeVector &otherVector)
 {
     const float dotProduct = (this->m_x * otherVector.m_x) + (this->m_y * otherVector.m_y) + (this->m_z * otherVector.m_z);
     const float thisMagnitude = this->GetMagnitude();
-    const float otherMagnitude = otherVector->GetMagnitude();
+    const float otherMagnitude = otherVector.GetMagnitude();
 
     if ((thisMagnitude < std::numeric_limits<float>::epsilon()) || (otherMagnitude < std::numeric_limits<float>::epsilon()))
     {

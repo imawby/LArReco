@@ -49,7 +49,7 @@ public:
      */
     SimpleThreeVector(const float x, const float y, const float z); 
 
-    float GetMagnitude(); 
+    float GetMagnitude() const; 
     
     /**
      *  @brief  Calculate the opening angle of the vector with another vector
@@ -105,9 +105,9 @@ public:
     int                 m_nMCHitsU;                     ///< The number of u mc hits
     int                 m_nMCHitsV;                     ///< The number of v mc hits
     int                 m_nMCHitsW;                     ///< The number of w mc hits
-    int                 m_nReconstructableChildDRs;     ///< The number of reconstructable child delta rays 
+    int                 m_nReconstructableChildCRLs;     ///< The number of reconstructable child delta rays 
     
-    int                 m_nCorrectChildDRs;             ///< The number of correctly reconstructed child delta rays
+    int                 m_nCorrectChildCRLs;             ///< The number of correctly reconstructed child delta rays
 };
 
 typedef std::vector<CosmicRay> CosmicRayVector;
@@ -126,6 +126,13 @@ public:
      */
     DeltaRay();
 
+    bool operator== (const DeltaRay &deltaRay)
+    {
+        return (std::fabs(this->m_energy - deltaRay.m_energy) < std::numeric_limits<float>::epsilon() &&
+                std::fabs(this->m_momentum.m_x - deltaRay.m_momentum.m_x) < std::numeric_limits<float>::epsilon());
+    }
+ 
+
     void Print();
 
     float               m_energy;                       ///< The energy
@@ -139,6 +146,7 @@ public:
     int m_nAboveThresholdMatches;
     int m_isCorrect;
     int m_isCorrectParentLink;
+    int m_isBestMatchedCorrectParentLink;
 
     int m_bestMatchNHitsTotal;
     int m_bestMatchNHitsU;
@@ -165,14 +173,21 @@ public:
     int m_bestMatchNOtherShowerHitsV;
     int m_bestMatchNOtherShowerHitsW;
 
-    int m_totalDRHitsInBestMatchParentCR;
-    int m_uDRHitsInBestMatchParentCR;
-    int m_vDRHitsInBestMatchParentCR;
-    int m_wDRHitsInBestMatchParentCR;
-    
+    int m_totalCRLHitsInBestMatchParentCR;
+    int m_uCRLHitsInBestMatchParentCR;
+    int m_vCRLHitsInBestMatchParentCR;
+    int m_wCRLHitsInBestMatchParentCR;
+
+    FloatVector m_bestMatchOtherShowerHitsDistance;
+    FloatVector m_bestMatchOtherTrackHitsDistance;
+    FloatVector m_bestMatchParentTrackHitsDistance;
+    FloatVector m_bestMatchCRLHitsInCRDistance;  
 };
 
 typedef std::vector<DeltaRay> DeltaRayVector;
+typedef std::vector<DeltaRay*> DeltaRayPointerVector;
+
+typedef std::map<int, std::map<int, DeltaRayVector>> CosmicRayOwnershipMap;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -249,6 +264,25 @@ public:
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
+ *  @brief  DeltaRayRecoHistogramCollection class
+ */
+class DeltaRayContaminationHistogramCollection
+{
+public:
+    /**
+     *  @brief  Default constructor
+     */
+    DeltaRayContaminationHistogramCollection();
+
+    TH1F                   *m_hOtherShowerHitsDistance;
+    TH1F                   *m_hOtherTrackHitsDistance;
+    TH1F                   *m_hParentTrackHitsDistance;
+    TH1F                   *m_hCRLHitsInCRDistance;
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
  *  @brief  Delta Ray Validation - Main entry point for analysis
  *
  *  @param  inputFiles the regex identifying the input root files
@@ -268,10 +302,12 @@ void FillDeltaRayRecoHistogramCollection(const DeltaRayVector &deltaRayVector, D
 
 void ProcessHistograms(DeltaRayMCHistogramCollection &deltaRayMCHistogramCollection, DeltaRayRecoHistogramCollection &deltaRayRecoHistogramCollection);
 
+void FillDeltaRayContaminationHistogramCollection(const DeltaRayVector &deltaRayVector, DeltaRayContaminationHistogramCollection &deltaRayContaminationHistogramCollection);
+
 void DivideHistogram(TH1F *&recoHistogram, TH1F *&mcDistribution);
 
 void WriteHistograms(CosmicRayMCHistogramCollection &cosmicRayMCHistogramCollection, DeltaRayMCHistogramCollection &deltaRayMCHistogramCollection,
-    DeltaRayRecoHistogramCollection &deltaRayRecoHistogramCollection);
+    DeltaRayRecoHistogramCollection &deltaRayRecoHistogramCollection, DeltaRayContaminationHistogramCollection &deltaRayContaminationHistogramCollection);
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -325,8 +361,8 @@ CosmicRay::CosmicRay() :
     m_nMCHitsU(0),
     m_nMCHitsV(0),
     m_nMCHitsW(0),
-    m_nReconstructableChildDRs(0),
-    m_nCorrectChildDRs(0)
+    m_nReconstructableChildCRLs(0),
+    m_nCorrectChildCRLs(0)
 {
 }
 
@@ -364,10 +400,10 @@ DeltaRay::DeltaRay() :
     m_bestMatchNOtherShowerHitsU(0),
     m_bestMatchNOtherShowerHitsV(0),
     m_bestMatchNOtherShowerHitsW(0),
-    m_totalDRHitsInBestMatchParentCR(0),
-    m_uDRHitsInBestMatchParentCR(0),
-    m_vDRHitsInBestMatchParentCR(0),
-    m_wDRHitsInBestMatchParentCR(0)
+    m_totalCRLHitsInBestMatchParentCR(0),
+    m_uCRLHitsInBestMatchParentCR(0),
+    m_vCRLHitsInBestMatchParentCR(0),
+    m_wCRLHitsInBestMatchParentCR(0)
 {
 }
 
@@ -415,13 +451,24 @@ DeltaRayRecoHistogramCollection::DeltaRayRecoHistogramCollection() :
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+DeltaRayContaminationHistogramCollection::DeltaRayContaminationHistogramCollection() : 
+    m_hOtherShowerHitsDistance(nullptr),
+    m_hOtherTrackHitsDistance(nullptr),
+    m_hParentTrackHitsDistance(nullptr),
+    m_hCRLHitsInCRDistance(nullptr)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 inline void CosmicRay::Print()
 {
     std::cout << "energy: " << this->m_energy << std::endl;
     std::cout << "momentum: " << "(" << this->m_momentum.m_x << ", " << this->m_momentum.m_y << ", " << this->m_momentum.m_z << ")" << std::endl;
     std::cout << "nMCHits: " << this->m_nMCHitsTotal << " (" << this->m_nMCHitsU << ", " << this->m_nMCHitsV << ", " << this->m_nMCHitsW << ")" << std::endl;
-    std::cout << "nReconstructableChildDRs: " << this->m_nReconstructableChildDRs << std::endl;
-    std::cout << "nCorrectChildDRs: " << this->m_nCorrectChildDRs << std::endl;
+    std::cout << "nReconstructableChildCRLs: " << this->m_nReconstructableChildCRLs << std::endl;
+    std::cout << "nCorrectChildCRLs: " << this->m_nCorrectChildCRLs << std::endl;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -442,12 +489,32 @@ inline void DeltaRay::Print()
               << this->m_bestMatchNSharedHitsW << std::endl;
     std::cout << "bestMatchNParentTrackHitsTotal: " << this->m_bestMatchNParentTrackHitsTotal << " (" << this->m_bestMatchNParentTrackHitsU << ", " << this->m_bestMatchNParentTrackHitsV
               << ", " << m_bestMatchNParentTrackHitsW << ")" << std::endl;
+    for (unsigned long i = 0; i < m_bestMatchParentTrackHitsDistance.size(); ++i)
+    {
+        std::cout << m_bestMatchParentTrackHitsDistance.at(i) << (i == m_bestMatchParentTrackHitsDistance.size() - 1 ? "" : ", ");
+    }
+    std::cout << std::endl;
     std::cout << "bestMatchNOtherTrackHitsTotal: " << this->m_bestMatchNOtherTrackHitsTotal << " (" << this->m_bestMatchNOtherTrackHitsU << ", " << this->m_bestMatchNOtherTrackHitsV
               << ", " << this->m_bestMatchNOtherTrackHitsW << ")" << std::endl;
+    for (unsigned long i = 0; i < m_bestMatchOtherTrackHitsDistance.size(); ++i)
+    {
+        std::cout << m_bestMatchOtherTrackHitsDistance.at(i) << (i == m_bestMatchOtherTrackHitsDistance.size() - 1 ? "" : ", ");
+    }
+    std::cout << std::endl;    
     std::cout << "bestMatchNOtherShowerHitsTotal: " << this->m_bestMatchNOtherShowerHitsTotal << " (" << this->m_bestMatchNOtherShowerHitsU << ", " << this->m_bestMatchNOtherShowerHitsV
               << ", " << this->m_bestMatchNOtherShowerHitsW << ")" << std::endl;
-    std::cout << "totalDRHitsInBestMatchParentCR: " << this->m_totalDRHitsInBestMatchParentCR << " (" << this->m_uDRHitsInBestMatchParentCR << ", " << this->m_vDRHitsInBestMatchParentCR
-              << ", " << this->m_wDRHitsInBestMatchParentCR << std::endl;
+    for (unsigned long i = 0; i < m_bestMatchOtherShowerHitsDistance.size(); ++i)
+    {
+        std::cout << m_bestMatchOtherShowerHitsDistance.at(i) << (i == m_bestMatchOtherShowerHitsDistance.size() - 1 ? "" : ", ");
+    }
+    std::cout << std::endl;     
+    std::cout << "totalCRLHitsInBestMatchParentCR: " << this->m_totalCRLHitsInBestMatchParentCR << " (" << this->m_uCRLHitsInBestMatchParentCR << ", " << this->m_vCRLHitsInBestMatchParentCR
+              << ", " << this->m_wCRLHitsInBestMatchParentCR << std::endl;
+    for (unsigned long i = 0; i < m_bestMatchCRLHitsInCRDistance.size(); ++i)
+    {
+        std::cout << m_bestMatchCRLHitsInCRDistance.at(i) << (i == m_bestMatchCRLHitsInCRDistance.size() - 1 ? "" : ", ");
+    }
+    std::cout << std::endl; 
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
