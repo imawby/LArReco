@@ -1,7 +1,7 @@
 <pandora>
     <!-- GLOBAL SETTINGS -->
     <IsMonitoringEnabled>true</IsMonitoringEnabled>
-    <ShouldDisplayAlgorithmInfo>false</ShouldDisplayAlgorithmInfo>
+    <ShouldDisplayAlgorithmInfo>true</ShouldDisplayAlgorithmInfo>
     <SingleHitTypeClusteringMode>true</SingleHitTypeClusteringMode>
 
     <!-- ALGORITHM SETTINGS -->
@@ -192,6 +192,25 @@
         <ParentPfoListName>MuonParticles3D</ParentPfoListName>
         <DaughterPfoListName>DeltaRayParticles3D</DaughterPfoListName>
     </algorithm>
+
+    
+    <algorithm type = "LArThreeViewDeltaRayMatching">
+        <InputClusterListNameU>ClustersU</InputClusterListNameU>
+        <InputClusterListNameV>ClustersV</InputClusterListNameV>
+        <InputClusterListNameW>ClustersW</InputClusterListNameW>
+        <OutputPfoListName>DeltaRayParticles3D</OutputPfoListName>
+        <DeltaRayTools>
+          <tool type = "LArDeltaRayTensorVisualization"/>
+        </DeltaRayTools>
+    </algorithm>
+    
+    <algorithm type = "LArThreeViewDeltaRayMatching">
+      <InputClusterListNameU>ClustersU</InputClusterListNameU>
+      <InputClusterListNameV>ClustersV</InputClusterListNameV>
+      <InputClusterListNameW>ClustersW</InputClusterListNameW>      
+      <OutputPfoListName>DeltaRayParticles3D</OutputPfoListName>
+    </algorithm>
+      
     <algorithm type = "LArDeltaRayMatching">
         <ParentPfoListName>MuonParticles3D</ParentPfoListName>
         <DaughterPfoListName>DeltaRayParticles3D</DaughterPfoListName>
