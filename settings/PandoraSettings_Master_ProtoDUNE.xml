@@ -94,7 +94,9 @@
         <MuonsToSkip>0</MuonsToSkip>
         <Visualize>false</Visualize>
         <MinHitSharingFraction>0.9</MinHitSharingFraction>
+        <MinPrimaryGoodHits>10</MinPrimaryGoodHits>
+        <MinHitsForGoodView>5</MinHitsForGoodView>
     </algorithm>
-    
 
+    
 </pandora>

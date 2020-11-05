@@ -98,7 +98,8 @@ public:
     CosmicRay();
 
     void Print();
-    
+
+    int                 m_eventNumber;
     float               m_energy;                       ///< The energy
     SimpleThreeVector   m_momentum;                     ///< The momentum
     int                 m_nMCHitsTotal;                 ///< The total number of mc hits
@@ -204,7 +205,9 @@ public:
      */
     CosmicRayMCHistogramCollection();
 
+    TH1F                   *m_hTotalCRsWithReconstructableCRLs;
     TH1F                   *m_hReconstructableChildDeltaRays;
+    TH1F                   *m_hTotalReconstructableCRLs;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -411,7 +414,9 @@ DeltaRay::DeltaRay() :
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 CosmicRayMCHistogramCollection::CosmicRayMCHistogramCollection() :
-    m_hReconstructableChildDeltaRays(nullptr)
+    m_hTotalCRsWithReconstructableCRLs(nullptr),
+    m_hReconstructableChildDeltaRays(nullptr),
+    m_hTotalReconstructableCRLs(nullptr)
 {
 }
 
