@@ -41,6 +41,8 @@
         <RecreatedClusterListName>RecreatedClusters</RecreatedClusterListName>
         <RecreatedVertexListName>RecreatedVertices</RecreatedVertexListName>
         <VisualizeOverallRecoStatus>false</VisualizeOverallRecoStatus>
+        <PassMCParticlesToWorkerInstances>true</PassMCParticlesToWorkerInstances>
+        <InputMCParticleListName>Input</InputMCParticleListName>
     </algorithm>
 
     <!--algorithm type = "LArTestBeamEventValidation">
