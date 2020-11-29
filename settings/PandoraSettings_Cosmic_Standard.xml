@@ -212,9 +212,9 @@
         <InputClusterListNameU>ClustersU</InputClusterListNameU>
         <InputClusterListNameV>ClustersV</InputClusterListNameV>
         <InputClusterListNameW>ClustersW</InputClusterListNameW>
-     </algorithm>
+     </algorithm-->
 
-    <algorithm type = "LArVisualMonitoring">
+    <!--algorithm type = "LArVisualMonitoring">
       <PfoListNames>DeltaRayParticles3D MuonParticles3D</PfoListNames>
       <ShowPfoHierarchy>false</ShowPfoHierarchy>
       <ShowDetector>true</ShowDetector>
@@ -225,14 +225,15 @@
         <InputClusterListNameU>ClustersU</InputClusterListNameU>
         <InputClusterListNameV>ClustersV</InputClusterListNameV>
         <InputClusterListNameW>ClustersW</InputClusterListNameW>
+        <PfoListNames>DeltaRayParticles3D MuonParticles3D</PfoListNames>
         <OutputPfoListName>DeltaRayParticles3D</OutputPfoListName>
-        <MinClusterCaloHits>5</MinClusterCaloHits>        
-        <DeltaRayTools>     
-          <!--tool type = "LArDeltaRayTensorVisualization">
-            <ShowEachIndividualElement>false</ShowEachIndividualElement>
+        <MuonPfoListName>MuonParticles3D</MuonPfoListName>
+        <DeltaRayTools>
+          <tool type = "LArClearDeltaRay"/>             
+          <tool type = "LArDeltaRayTensorVisualization">
+            <ShowEachIndividualElement>true</ShowEachIndividualElement>
             <IgnoreUnavailableClusters>true</IgnoreUnavailableClusters>
-          </tool-->
-          <tool type = "LArClearDeltaRay"/>          
+          </tool>          
         </DeltaRayTools>
     </algorithm>
 
@@ -245,13 +246,12 @@
         <OutputPfoListName>DeltaRayParticles3D</OutputPfoListName>
         <DeltaRayPfoListName>DeltaRayParticles3D</DeltaRayPfoListName>
         <OverlapWindow>1.0</OverlapWindow>
-        <MinClusterCaloHits>5</MinClusterCaloHits>
-        <DeltaRayTools>     
+        <DeltaRayTools>
+          <tool type = "LArTwoViewClearDeltaRay"/>          
           <!--tool type = "LArDeltaRayMatrixVisualization">
-            <ShowEachIndividualElement>false</ShowEachIndividualElement>
+            <ShowEachIndividualElement>true</ShowEachIndividualElement>
             <IgnoreUnavailableClusters>true</IgnoreUnavailableClusters>
           </tool-->
-          <tool type = "LArTwoViewClearDeltaRay"/>
         </DeltaRayTools>
     </algorithm>
 
@@ -263,7 +263,6 @@
         <OutputPfoListName>DeltaRayParticles3D</OutputPfoListName>
         <DeltaRayPfoListName>DeltaRayParticles3D</DeltaRayPfoListName>
         <OverlapWindow>1.0</OverlapWindow>
-        <MinClusterCaloHits>5</MinClusterCaloHits>
         <DeltaRayTools>     
           <!--tool type = "LArDeltaRayMatrixVisualization">
             <ShowEachIndividualElement>false</ShowEachIndividualElement>
@@ -281,7 +280,6 @@
         <OutputPfoListName>DeltaRayParticles3D</OutputPfoListName>
         <DeltaRayPfoListName>DeltaRayParticles3D</DeltaRayPfoListName>
         <OverlapWindow>1.0</OverlapWindow>
-        <MinClusterCaloHits>5</MinClusterCaloHits>
         <DeltaRayTools>     
           <!--tool type = "LArDeltaRayMatrixVisualization">
             <ShowEachIndividualElement>false</ShowEachIndividualElement>
