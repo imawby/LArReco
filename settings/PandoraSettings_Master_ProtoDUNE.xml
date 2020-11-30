@@ -81,7 +81,7 @@
         <PfoListName>RecreatedPfos</PfoListName>
         <PrintAllToScreen>true</PrintAllToScreen>
         <PrintMatchingToScreen>true</PrintMatchingToScreen>
-        <WriteToTree>true</WriteToTree>
+        <WriteToTree>false</WriteToTree>
         <OutputTree>Validation</OutputTree>
         <OutputFile>DeltaRayValidation.root</OutputFile>
         <FoldToPrimaries>true</FoldToPrimaries>
@@ -93,7 +93,7 @@
         <!--SET PHOTON TO BE REALLY HIGH-->
         <MuonsToSkip>0</MuonsToSkip>
         <Visualize>false</Visualize>
-        <MinHitSharingFraction>0.9</MinHitSharingFraction>
+        <!--MinHitSharingFraction>0.9</MinHitSharingFraction-->
         <MinPrimaryGoodHits>10</MinPrimaryGoodHits>
         <MinHitsForGoodView>5</MinHitsForGoodView>
     </algorithm>
