@@ -91,8 +91,8 @@
         <DeltaRayMode>true</DeltaRayMode>
         <MichelMode>false</MichelMode>
         <!--SET PHOTON TO BE REALLY HIGH-->
-        <MuonsToSkip>0</MuonsToSkip>
-        <Visualize>false</Visualize>
+        <MuonsToSkip>9</MuonsToSkip>
+        <Visualize>true</Visualize>
         <!--MinHitSharingFraction>0.9</MinHitSharingFraction-->
         <MinPrimaryGoodHits>10</MinPrimaryGoodHits>
         <MinHitsForGoodView>5</MinHitsForGoodView>

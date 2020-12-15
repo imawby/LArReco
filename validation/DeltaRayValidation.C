@@ -306,7 +306,6 @@ void FillCosmicRayMCHistogramCollection(const CosmicRayVector &cosmicRayVector, 
    for (const CosmicRay &cosmicRay : cosmicRayVector)
    {
 
-       std::cout << cosmicRay.m_eventNumber << std::endl;
        if (cosmicRay.m_eventNumber != eventNumberCounter)
        {
            cosmicRayMCHistogramCollection.m_hTotalCRsWithReconstructableCRLs->Fill(nMuonsInReadoutWindow);
@@ -463,21 +462,21 @@ void FillDeltaRayRecoHistogramCollection(const DeltaRayVector &deltaRayVector, D
    if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy)
    {
         deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy = new TH1F("hCorrectEvent_Energy_CRL", "hCorrectEvent_Energy_CRL", 100, 0., 1.);
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->SetTitle(";TrueCRLEnergy [GeV];CorrectlyReconstructedFraction");
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->SetTitle(";True Delta Ray Energy [GeV];Correct Reconstruction Fraction");
         //deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits)
    {
         deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits = new TH1F("hCorrectEvent_TotalHits_CRL", "hCorrectEvent_TotalHits_CRL", 40000, 0., 100.);
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits->SetTitle(";nMCTotalHits;CorrectlyReconstructedFraction");
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits->SetTitle(";nMCTotalHits;Correct Reconstruction Fraction");
         //deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle)
    {
         deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle = new TH1F("hCorrectEvent_OpeningAngle_CRL", "hCorrectEvent_OpeningAngle_CRL", 100, 0., 180.);
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->SetTitle(";TrueOpeningAngle [degrees];CorrectlyReconstructedFraction");
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->SetTitle(";True Opening Angle [degrees];Correct Reconstruction Fraction");
         //deltaRayRecoHistogramCollection.m_-hCorrectEvent_OpeningAngle>GetXaxis()->SetRangeUser(0.f, 50.f);
     }   
    //ISOBEL - CHANGE CORRECT EVENT TO SOMETHING ELSE (NOT ACTUALLY AN EVENT)

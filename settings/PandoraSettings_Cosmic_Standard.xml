@@ -1,7 +1,7 @@
 <pandora>
     <!-- GLOBAL SETTINGS -->
     <IsMonitoringEnabled>true</IsMonitoringEnabled>
-    <ShouldDisplayAlgorithmInfo>false</ShouldDisplayAlgorithmInfo>
+    <ShouldDisplayAlgorithmInfo>true</ShouldDisplayAlgorithmInfo>
     <SingleHitTypeClusteringMode>true</SingleHitTypeClusteringMode>
 
     <!-- ALGORITHM SETTINGS -->
@@ -143,6 +143,13 @@
         <OutputPfoListName>MuonParticles3D</OutputPfoListName>
     </algorithm>
 
+    <!--algorithm type = "LArVisualMonitoring">
+      <PfoListNames>DeltaRayParticles3D MuonParticles3D</PfoListNames>
+      <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
+      <ShowPfoHierarchy>false</ShowPfoHierarchy>
+      <ShowDetector>true</ShowDetector>
+    </algorithm-->    
+
     <!-- PruneClusters -->
     <algorithm type = "LArListPruning" description = "ListPruning">
         <WarnIfObjectsUnavailable>false</WarnIfObjectsUnavailable>
@@ -172,11 +179,27 @@
         <ReplaceCurrentClusterList>false</ReplaceCurrentClusterList>
     </algorithm>
 
+    <!--algorithm type = "LArVisualMonitoring">
+      <PfoListNames>DeltaRayParticles3D MuonParticles3D</PfoListNames>
+      <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
+      <ShowPfoHierarchy>false</ShowPfoHierarchy>
+      <ShowDetector>true</ShowDetector>
+    </algorithm-->    
+
     <!-- DeltaRayAlgorithms -->
     <algorithm type = "LArDeltaRayIdentification">
         <ParentPfoListName>MuonParticles3D</ParentPfoListName>
         <DaughterPfoListName>DeltaRayParticles3D</DaughterPfoListName>
     </algorithm>
+
+    <!--algorithm type = "LArVisualMonitoring">
+      <PfoListNames>DeltaRayParticles3D MuonParticles3D</PfoListNames>
+      <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
+      <ShowPfoHierarchy>false</ShowPfoHierarchy>
+      <ShowDetector>true</ShowDetector>
+    </algorithm-->   
+
+    
     <algorithm type = "LArDeltaRayGrowing">
         <InputClusterListName>ClustersW</InputClusterListName>
         <ParentPfoListName>MuonParticles3D</ParentPfoListName>
@@ -203,6 +226,14 @@
     <algorithm type = "LArUnattachedDeltaRays">
         <PfoListName>DeltaRayParticles3D</PfoListName>
     </algorithm>
+
+    <!--algorithm type = "LArVisualMonitoring">
+      <PfoListNames>DeltaRayParticles3D MuonParticles3D</PfoListNames>
+      <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
+      <ShowPfoHierarchy>false</ShowPfoHierarchy>
+      <ShowDetector>true</ShowDetector>
+    </algorithm-->    
+
 
     <!-- TwoDRemnantAlgorithms -->
     <algorithm type = "LArSimpleClusterGrowing">
