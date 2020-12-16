@@ -6,6 +6,7 @@
  *  $Log: $
  */
 #include "TH1F.h"
+#include "TH2F.h"
 #include "TFile.h"
 #include "TTree.h"
 
@@ -33,6 +34,23 @@ void DeltaRayValidation(const std::string &inputFileName, const Parameters &para
         DeltaRayRecoHistogramCollection deltaRayRecoHistogramCollection;
         FillDeltaRayRecoHistogramCollection(deltaRayVector, deltaRayRecoHistogramCollection);
 
+        //std::cout << "completeness: " << deltaRayRecoHistogramCollection.m_hCompleteness->GetEntries() << std::endl;
+        //std::cout << "purity: " << deltaRayRecoHistogramCollection.m_hPurity->GetEntries() << std::endl;
+        //std::cout << "correct event fraction energy: " << deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->GetEntries() << std::endl;
+        //std::cout << "correct event fraction opening angle: : " << deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->GetEntries() << std::endl;
+
+        int sum(0);
+        for (int n = -1; n <= deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->GetXaxis()->GetNbins(); ++n)
+        {
+            if (deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->GetBinCenter(n + 1) < 25)
+            {
+                const float found = deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->GetBinContent(n + 1);
+                sum += found;
+            }
+        }
+
+        std::cout << "total events in range: " << sum << std::endl;
+        
         ProcessHistograms(deltaRayMCHistogramCollection, deltaRayRecoHistogramCollection);
 
         DeltaRayContaminationHistogramCollection deltaRayContaminationHistogramCollection;
@@ -382,6 +400,14 @@ void FillDeltaRayRecoHistogramCollection(const DeltaRayVector &deltaRayVector, D
         //deltaRayRecoHistogramCollection.m_hPurity->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
+   if (!deltaRayRecoHistogramCollection.m_hCompletenessVsHits)
+   {
+         deltaRayRecoHistogramCollection.m_hCompletenessVsHits = new TH2F("hCompletenessVsHits_CRL", "hCompletenessVsHits_CRL", 100, 0., 1., 50, 0., 200.);
+        deltaRayRecoHistogramCollection.m_hCompletenessVsHits->SetTitle(";Completeness;Hits");
+        //deltaRayRecoHistogramCollection.m_hCompletenessVsHits->GetXaxis()->SetRangeUser(0.f, 50.f);
+    }
+
+   
    if (!deltaRayRecoHistogramCollection.m_hAboveThresholdMatches)
    {
         deltaRayRecoHistogramCollection.m_hAboveThresholdMatches = new TH1F("hAboveThresholdMatches_CRL", "hAboveThresholdMatches_CRL", 40000, 0., 4.);
@@ -490,6 +516,8 @@ void FillDeltaRayRecoHistogramCollection(const DeltaRayVector &deltaRayVector, D
         {
             deltaRayRecoHistogramCollection.m_hCompleteness->Fill(static_cast<float>(deltaRay.m_bestMatchNSharedHitsTotal) / static_cast<float>(deltaRay.m_nMCHitsTotal));
             deltaRayRecoHistogramCollection.m_hPurity->Fill(static_cast<float>(deltaRay.m_bestMatchNSharedHitsTotal) / static_cast<float>(deltaRay.m_bestMatchNHitsTotal));
+            deltaRayRecoHistogramCollection.m_hCompletenessVsHits->Fill(static_cast<float>(deltaRay.m_bestMatchNSharedHitsTotal) / static_cast<float>(deltaRay.m_nMCHitsTotal),
+                                                                        deltaRay.m_nMCHitsTotal, 1.f);
             deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal->Fill(deltaRay.m_bestMatchNParentTrackHitsTotal);
             deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal->Fill(deltaRay.m_bestMatchNOtherTrackHitsTotal);
             deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal->Fill(deltaRay.m_bestMatchNOtherShowerHitsTotal);
@@ -533,6 +561,7 @@ void ProcessHistograms(DeltaRayMCHistogramCollection &deltaRayMCHistogramCollect
 
     deltaRayRecoHistogramCollection.m_hCompleteness->Scale(1. / static_cast<double>(deltaRayRecoHistogramCollection.m_hCompleteness->GetEntries()));
     deltaRayRecoHistogramCollection.m_hPurity->Scale(1. / static_cast<double>(deltaRayRecoHistogramCollection.m_hPurity->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hCompletenessVsHits->Scale(1. / static_cast<double>(deltaRayRecoHistogramCollection.m_hCompletenessVsHits->GetEntries()));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -611,6 +640,7 @@ void WriteHistograms(CosmicRayMCHistogramCollection &cosmicRayMCHistogramCollect
 
     deltaRayRecoHistogramCollection.m_hCompleteness->Write("hCompleteness");
     deltaRayRecoHistogramCollection.m_hPurity->Write("hPurity");
+    deltaRayRecoHistogramCollection.m_hCompletenessVsHits->Write("hCompletenessVsHits");
     deltaRayRecoHistogramCollection.m_hAboveThresholdMatches->Write("hAboveThresholdMatches");
     deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal->Write("hParentTrackHitsTotal");
     deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal->Write("hOtherTrackHitsTotal");

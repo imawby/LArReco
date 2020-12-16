@@ -193,6 +193,7 @@ typedef std::map<int, std::map<int, DeltaRayVector>> CosmicRayOwnershipMap;
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 class TH1F;
+class TH2F;
 
 /**
  *  @brief  CosmicRayMCHistogramCollection class
@@ -244,6 +245,8 @@ public:
     TH1F                   *m_hCompleteness;
     TH1F                   *m_hPurity;
 
+    TH2F                   *m_hCompletenessVsHits;
+    
     TH1F                   *m_hAboveThresholdMatches;
 
     TH1F                   *m_hParentTrackHitsTotal;
@@ -435,6 +438,7 @@ DeltaRayMCHistogramCollection::DeltaRayMCHistogramCollection() :
 
 DeltaRayRecoHistogramCollection::DeltaRayRecoHistogramCollection() : 
     m_hCompleteness(nullptr),
+    m_hCompletenessVsHits(nullptr),
     m_hPurity(nullptr),
     m_hAboveThresholdMatches(nullptr),
     m_hParentTrackHitsTotal(nullptr),
