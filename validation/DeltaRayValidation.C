@@ -388,14 +388,14 @@ void FillDeltaRayRecoHistogramCollection(const DeltaRayVector &deltaRayVector, D
 {
    if (!deltaRayRecoHistogramCollection.m_hCompleteness)
    {
-        deltaRayRecoHistogramCollection.m_hCompleteness = new TH1F("hCompleteness_CRL", "hCompleteness_CRL", 100, 0., 1.);
+        deltaRayRecoHistogramCollection.m_hCompleteness = new TH1F("hCompleteness_CRL", "hCompleteness_CRL", 100, 0., 1.1);
         deltaRayRecoHistogramCollection.m_hCompleteness->SetTitle(";Completeness;Occurance");
         //deltaRayRecoHistogramCollection.m_hCompleteness->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
 
    if (!deltaRayRecoHistogramCollection.m_hPurity)
    {
-        deltaRayRecoHistogramCollection.m_hPurity = new TH1F("hPurity_CRL", "hPurity_CRL", 100, 0., 1.);
+        deltaRayRecoHistogramCollection.m_hPurity = new TH1F("hPurity_CRL", "hPurity_CRL", 100, 0., 1.1);
         deltaRayRecoHistogramCollection.m_hPurity->SetTitle(";Purity;Occurance");
         //deltaRayRecoHistogramCollection.m_hPurity->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
