@@ -34,11 +34,6 @@ void DeltaRayValidation(const std::string &inputFileName, const Parameters &para
         DeltaRayRecoHistogramCollection deltaRayRecoHistogramCollection;
         FillDeltaRayRecoHistogramCollection(deltaRayVector, deltaRayRecoHistogramCollection);
 
-        //std::cout << "completeness: " << deltaRayRecoHistogramCollection.m_hCompleteness->GetEntries() << std::endl;
-        //std::cout << "purity: " << deltaRayRecoHistogramCollection.m_hPurity->GetEntries() << std::endl;
-        //std::cout << "correct event fraction energy: " << deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->GetEntries() << std::endl;
-        //std::cout << "correct event fraction opening angle: : " << deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->GetEntries() << std::endl;
-
         int sum(0);
         for (int n = -1; n <= deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->GetXaxis()->GetNbins(); ++n)
         {
@@ -49,8 +44,6 @@ void DeltaRayValidation(const std::string &inputFileName, const Parameters &para
             }
         }
 
-        std::cout << "total events in range: " << sum << std::endl;
-        
         ProcessHistograms(deltaRayMCHistogramCollection, deltaRayRecoHistogramCollection);
 
         DeltaRayContaminationHistogramCollection deltaRayContaminationHistogramCollection;
@@ -257,6 +250,8 @@ void DisplayOverallRecoMetrics(const DeltaRayVector &deltaRayVector)
 {
     unsigned int nCorrectParentLinks(0), nCorrectlyReconstructedCRLs(0);
     unsigned int nZeroMatches(0), nOneMatches(0), nTwoMatches(0), nThreePlusMatches(0);
+
+    unsigned int CRHitsInDRTotal(0), DRHitsInCRTotal(0);
     
     for (const DeltaRay &deltaRay : deltaRayVector)
     {
@@ -280,6 +275,12 @@ void DisplayOverallRecoMetrics(const DeltaRayVector &deltaRayVector)
         default:
             ++nThreePlusMatches;
         }
+
+        if (deltaRay.m_nAboveThresholdMatches > 0)
+            CRHitsInDRTotal += deltaRay.m_bestMatchNParentTrackHitsTotal;
+
+        if (deltaRay.m_isCorrectParentLink)
+            DRHitsInCRTotal += deltaRay.m_totalCRLHitsInBestMatchParentCR;
     }
 
     const unsigned int nReconstructableCRLs(deltaRayVector.size());
@@ -290,6 +291,9 @@ void DisplayOverallRecoMetrics(const DeltaRayVector &deltaRayVector)
     const float fTwoMatches(nReconstructableCRLs == 0 ? 0.f : static_cast<float>(nTwoMatches) / static_cast<float>(nReconstructableCRLs));
     const float fThreePlusMatches(nReconstructableCRLs == 0 ? 0.f : static_cast<float>(nThreePlusMatches) / static_cast<float>(nReconstructableCRLs));
 
+    std::cout << "CRHitsInDRTotal: " << CRHitsInDRTotal << std::endl;
+    std::cout << "DRHitsInCRTotal: " << DRHitsInCRTotal << std::endl;
+    
     std::cout << "nReconstructableDeltaRays: " << nReconstructableCRLs << std::endl
               << "nCorrectlyReconstructedDeltaRays: " << nCorrectlyReconstructedCRLs << " (" << fCorrectlyReconstructedCRLs * 100.f << "%)" << std::endl
               << "nCorrectParentLinks: " << nCorrectParentLinks << " (" << fCorrectParentLinks * 100.f << "%)" << std::endl
@@ -402,7 +406,7 @@ void FillDeltaRayRecoHistogramCollection(const DeltaRayVector &deltaRayVector, D
 
    if (!deltaRayRecoHistogramCollection.m_hCompletenessVsHits)
    {
-         deltaRayRecoHistogramCollection.m_hCompletenessVsHits = new TH2F("hCompletenessVsHits_CRL", "hCompletenessVsHits_CRL", 100, 0., 1., 50, 0., 200.);
+         deltaRayRecoHistogramCollection.m_hCompletenessVsHits = new TH2F("hCompletenessVsHits_CRL", "hCompletenessVsHits_CRL", 100, 0., 1.1, 50, 0., 200.);
         deltaRayRecoHistogramCollection.m_hCompletenessVsHits->SetTitle(";Completeness;Hits");
         //deltaRayRecoHistogramCollection.m_hCompletenessVsHits->GetXaxis()->SetRangeUser(0.f, 50.f);
     }
