@@ -249,9 +249,11 @@ void ReadTree(const std::string &inputFileName, CosmicRayVector &cosmicRayVector
 void DisplayOverallRecoMetrics(const DeltaRayVector &deltaRayVector)
 {
     unsigned int nCorrectParentLinks(0), nCorrectlyReconstructedCRLs(0);
-    unsigned int nZeroMatches(0), nOneMatches(0), nTwoMatches(0), nThreePlusMatches(0);
+    unsigned int nZeroMatches(0), nOneMatches(0), nTwoMatches(0), nThreePlusMatches(0), nAboveThresholdMatches(0);
 
     unsigned int CRHitsInDRTotal(0), DRHitsInCRTotal(0);
+
+    float completenessSum(0), puritySum(0);
     
     for (const DeltaRay &deltaRay : deltaRayVector)
     {
@@ -277,12 +279,20 @@ void DisplayOverallRecoMetrics(const DeltaRayVector &deltaRayVector)
         }
 
         if (deltaRay.m_nAboveThresholdMatches > 0)
+        {
+            ++nAboveThresholdMatches;
+            completenessSum += static_cast<float>(deltaRay.m_bestMatchNSharedHitsTotal) / static_cast<float>(deltaRay.m_nMCHitsTotal);
+            puritySum += static_cast<float>(deltaRay.m_bestMatchNSharedHitsTotal) / static_cast<float>(deltaRay.m_bestMatchNHitsTotal);
             CRHitsInDRTotal += deltaRay.m_bestMatchNParentTrackHitsTotal;
+        }
 
         if (deltaRay.m_isCorrectParentLink)
             DRHitsInCRTotal += deltaRay.m_totalCRLHitsInBestMatchParentCR;
     }
 
+    const float averageCompleteness(completenessSum / static_cast<float>(nAboveThresholdMatches));
+    const float averagePurity(puritySum / static_cast<float>(nAboveThresholdMatches));
+    
     const unsigned int nReconstructableCRLs(deltaRayVector.size());
     const float fCorrectParentLinks(nReconstructableCRLs == 0 ? 0.f : static_cast<float>(nCorrectParentLinks) / static_cast<float>(nReconstructableCRLs));
     const float fCorrectlyReconstructedCRLs(nReconstructableCRLs == 0 ? 0.f : static_cast<float>(nCorrectlyReconstructedCRLs) / static_cast<float>(nReconstructableCRLs));
@@ -291,6 +301,9 @@ void DisplayOverallRecoMetrics(const DeltaRayVector &deltaRayVector)
     const float fTwoMatches(nReconstructableCRLs == 0 ? 0.f : static_cast<float>(nTwoMatches) / static_cast<float>(nReconstructableCRLs));
     const float fThreePlusMatches(nReconstructableCRLs == 0 ? 0.f : static_cast<float>(nThreePlusMatches) / static_cast<float>(nReconstructableCRLs));
 
+    std::cout << "averageCompleteness: " << averageCompleteness << std::endl;
+    std::cout << "averagePurity: " << averagePurity << std::endl;
+    
     std::cout << "CRHitsInDRTotal: " << CRHitsInDRTotal << std::endl;
     std::cout << "DRHitsInCRTotal: " << DRHitsInCRTotal << std::endl;
     
