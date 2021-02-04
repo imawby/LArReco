@@ -26,23 +26,16 @@ void DeltaRayValidation(const std::string &inputFileName, const Parameters &para
     if (parameters.m_histogramOutput)
     {
         CosmicRayMCHistogramCollection cosmicRayMCHistogramCollection;
+        CreateCosmicRayMCHistogramCollection(cosmicRayMCHistogramCollection);
         FillCosmicRayMCHistogramCollection(cosmicRayVector, cosmicRayMCHistogramCollection);
 
         DeltaRayMCHistogramCollection deltaRayMCHistogramCollection;
+        CreateDeltaRayMCHistogramCollection(deltaRayMCHistogramCollection);
         FillDeltaRayMCHistogramCollection(deltaRayVector, deltaRayMCHistogramCollection);
 
         DeltaRayRecoHistogramCollection deltaRayRecoHistogramCollection;
+        CreateDeltaRayRecoHistogramCollection(deltaRayRecoHistogramCollection);
         FillDeltaRayRecoHistogramCollection(deltaRayVector, deltaRayRecoHistogramCollection);
-
-        int sum(0);
-        for (int n = -1; n <= deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->GetXaxis()->GetNbins(); ++n)
-        {
-            if (deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->GetBinCenter(n + 1) < 25)
-            {
-                const float found = deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->GetBinContent(n + 1);
-                sum += found;
-            }
-        }
 
         ProcessHistograms(deltaRayMCHistogramCollection, deltaRayRecoHistogramCollection);
 
@@ -136,6 +129,14 @@ void ReadTree(const std::string &inputFileName, CosmicRayVector &cosmicRayVector
     {
         validationTree->GetEntry(i);
 
+        const float pTot(std::sqrt(cosmicRay.m_momentum.m_x * cosmicRay.m_momentum.m_x + cosmicRay.m_momentum.m_y * cosmicRay.m_momentum.m_y +
+            cosmicRay.m_momentum.m_z * cosmicRay.m_momentum.m_z));
+
+        float theta0XZ = std::atan2(cosmicRay.m_momentum.m_x, cosmicRay.m_momentum.m_z);
+        theta0XZ *= (180.f / M_PI);
+        float theta0YZ = std::asin(cosmicRay.m_momentum.m_y / pTot);
+        theta0YZ *= (180.f / M_PI);
+        
         for (Int_t j = 0; j < cosmicRay.m_nReconstructableChildCRLs; ++j)
         {
             DeltaRay deltaRay;
@@ -145,6 +146,9 @@ void ReadTree(const std::string &inputFileName, CosmicRayVector &cosmicRayVector
             deltaRay.m_nMCHitsU = nMCHitsU_CRL->at(j);
             deltaRay.m_nMCHitsV = nMCHitsV_CRL->at(j);
             deltaRay.m_nMCHitsW = nMCHitsW_CRL->at(j);
+
+            deltaRay.m_parentMuonTheta0XZ = theta0XZ;
+            deltaRay.m_parentMuonTheta0YZ = theta0YZ;
             
             if ((cosmicRay.m_momentum.GetMagnitude() < std::numeric_limits<float>::epsilon()) || (deltaRay.m_momentum.GetMagnitude() < std::numeric_limits<float>::epsilon()))
             {
@@ -318,29 +322,10 @@ void DisplayOverallRecoMetrics(const DeltaRayVector &deltaRayVector)
 
 void FillCosmicRayMCHistogramCollection(const CosmicRayVector &cosmicRayVector, CosmicRayMCHistogramCollection &cosmicRayMCHistogramCollection)
 {
-   if (!cosmicRayMCHistogramCollection.m_hTotalCRsWithReconstructableCRLs)
-   {
-        cosmicRayMCHistogramCollection.m_hTotalCRsWithReconstructableCRLs = new TH1F("hTotalCRsWithReconstructableCRLs_CR", "hTotalCRsWithReconstructableCRLs_CR", 50, 0., 100.);
-        cosmicRayMCHistogramCollection.m_hTotalCRsWithReconstructableCRLs->SetTitle(";nCRsWithReconstructableCRLsInReadoutWindow;Occurance");
-   }
-    
-   if (!cosmicRayMCHistogramCollection.m_hReconstructableChildDeltaRays)
-   {
-        cosmicRayMCHistogramCollection.m_hReconstructableChildDeltaRays = new TH1F("hReconstructableChildDeltaRays_CR", "hReconstructableChildDeltaRays_CR", 40000, 0., 10.);
-        cosmicRayMCHistogramCollection.m_hReconstructableChildDeltaRays->SetTitle(";nReconstructableChildDeltaRays;Occurance");
-   }
-
-   if (!cosmicRayMCHistogramCollection.m_hTotalReconstructableCRLs)
-   {
-        cosmicRayMCHistogramCollection.m_hTotalReconstructableCRLs = new TH1F("hTotalReconstructableCRLs_CR", "hTotalReconstructableCRLs_CR", 50, 0., 100.);
-        cosmicRayMCHistogramCollection.m_hTotalReconstructableCRLs->SetTitle(";nReconstructableCRLsInReadoutWindow;Occurance");
-   }
-
    int eventNumberCounter(0), nMuonsInReadoutWindow(0), nCRLsInReadoutWindow(0);
     
    for (const CosmicRay &cosmicRay : cosmicRayVector)
    {
-
        if (cosmicRay.m_eventNumber != eventNumberCounter)
        {
            cosmicRayMCHistogramCollection.m_hTotalCRsWithReconstructableCRLs->Fill(nMuonsInReadoutWindow);
@@ -370,32 +355,24 @@ void FillCosmicRayMCHistogramCollection(const CosmicRayVector &cosmicRayVector, 
 
 void FillDeltaRayMCHistogramCollection(const DeltaRayVector &deltaRayVector, DeltaRayMCHistogramCollection &deltaRayMCHistogramCollection)
 {
-   if (!deltaRayMCHistogramCollection.m_hEnergyDistribution)
-   {
-        deltaRayMCHistogramCollection.m_hEnergyDistribution = new TH1F("hEnergyDistribution_CRL", "hEnergyDistribution_CRL", 100, 0., 1.);
-        deltaRayMCHistogramCollection.m_hEnergyDistribution->SetTitle(";TrueCRLEnergy [GeV];Occurance");
-        //deltaRayMCHistogramCollection.m_hEnergyDistribution->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayMCHistogramCollection.m_hTotalHitDistribution)
-   {
-        deltaRayMCHistogramCollection.m_hTotalHitDistribution = new TH1F("hTotalHitDistribution_CRL", "hTotalHitDistribution_CRL", 40000, 0., 100.);
-        deltaRayMCHistogramCollection.m_hTotalHitDistribution->SetTitle(";nMCTotalHits;Occurance");
-        //deltaRayMCHistogramCollection.m_hTotalHitDistribution->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayMCHistogramCollection.m_hOpeningAngleDistribution)
-   {
-        deltaRayMCHistogramCollection.m_hOpeningAngleDistribution = new TH1F("hOpeningAngleDistribution_CRL", "hOpeningAngleDistribution_CRL", 100, 0., 180.);
-        deltaRayMCHistogramCollection.m_hOpeningAngleDistribution->SetTitle(";TrueOpeningAngle [degrees];Occurance");
-        //deltaRayMCHistogramCollection.m_hOpeningAngleDistribution->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }      
-    
     for (const DeltaRay &deltaRay : deltaRayVector)
     {
+        int lowestViewNHits(0);
+        if (deltaRay.m_nMCHitsU < deltaRay.m_nMCHitsV)
+        {
+            lowestViewNHits = (deltaRay.m_nMCHitsU < deltaRay.m_nMCHitsW ? deltaRay.m_nMCHitsU : deltaRay.m_nMCHitsW);
+        }
+        else 
+        {
+            lowestViewNHits = (deltaRay.m_nMCHitsV < deltaRay.m_nMCHitsW ? deltaRay.m_nMCHitsV : deltaRay.m_nMCHitsW);
+        }
+        
         deltaRayMCHistogramCollection.m_hEnergyDistribution->Fill(deltaRay.m_energy);
         deltaRayMCHistogramCollection.m_hTotalHitDistribution->Fill(deltaRay.m_nMCHitsTotal);
-        deltaRayMCHistogramCollection.m_hOpeningAngleDistribution->Fill(deltaRay.m_openingAngleFromMuon);        
+        deltaRayMCHistogramCollection.m_hOpeningAngleDistribution->Fill(deltaRay.m_openingAngleFromMuon);
+        deltaRayMCHistogramCollection.m_hParentMuonTheta0XZDistribution->Fill(deltaRay.m_parentMuonTheta0XZ);  
+        deltaRayMCHistogramCollection.m_hParentMuonTheta0YZDistribution->Fill(deltaRay.m_parentMuonTheta0YZ);
+        deltaRayMCHistogramCollection.m_hLowestViewNHitsDistribution->Fill(lowestViewNHits);
     }   
 }
 
@@ -403,144 +380,80 @@ void FillDeltaRayMCHistogramCollection(const DeltaRayVector &deltaRayVector, Del
 
 void FillDeltaRayRecoHistogramCollection(const DeltaRayVector &deltaRayVector, DeltaRayRecoHistogramCollection &deltaRayRecoHistogramCollection)
 {
-   if (!deltaRayRecoHistogramCollection.m_hCompleteness)
-   {
-        deltaRayRecoHistogramCollection.m_hCompleteness = new TH1F("hCompleteness_CRL", "hCompleteness_CRL", 100, 0., 1.1);
-        deltaRayRecoHistogramCollection.m_hCompleteness->SetTitle(";Completeness;Occurance");
-        //deltaRayRecoHistogramCollection.m_hCompleteness->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hPurity)
-   {
-        deltaRayRecoHistogramCollection.m_hPurity = new TH1F("hPurity_CRL", "hPurity_CRL", 100, 0., 1.1);
-        deltaRayRecoHistogramCollection.m_hPurity->SetTitle(";Purity;Occurance");
-        //deltaRayRecoHistogramCollection.m_hPurity->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hCompletenessVsHits)
-   {
-         deltaRayRecoHistogramCollection.m_hCompletenessVsHits = new TH2F("hCompletenessVsHits_CRL", "hCompletenessVsHits_CRL", 100, 0., 1.1, 50, 0., 200.);
-        deltaRayRecoHistogramCollection.m_hCompletenessVsHits->SetTitle(";Completeness;Hits");
-        //deltaRayRecoHistogramCollection.m_hCompletenessVsHits->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   
-   if (!deltaRayRecoHistogramCollection.m_hAboveThresholdMatches)
-   {
-        deltaRayRecoHistogramCollection.m_hAboveThresholdMatches = new TH1F("hAboveThresholdMatches_CRL", "hAboveThresholdMatches_CRL", 40000, 0., 4.);
-        deltaRayRecoHistogramCollection.m_hAboveThresholdMatches->SetTitle(";nAboveThresholdMatches;Occurance");
-        //deltaRayRecoHistogramCollection.m_hAboveThresholdMatches->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal)
-   {
-        deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal = new TH1F("hParentTrackHitsTotal_CRL", "hParentTrackHitsTotal_CRL", 40000, 0., 50.);
-        deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal->SetTitle(";nParentTrackHitsTotal;Occurance");
-        //deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal)
-   {
-        deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal = new TH1F("hOtherTrackHitsTotal_CRL", "hOtherTrackHitsTotal_CRL", 40000, 0., 20.);
-        deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal->SetTitle(";nOtherTrackHitsTotal;Occurance");
-        //deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal)
-   {
-        deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal = new TH1F("hOtherShowerHitsTotal_CRL", "hOtherShowerHitsTotal_CRL", 40000, 0., 20.);
-        deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal->SetTitle(";nOtherShowerHitsTotal;Occurance");
-        //deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay)
-   {
-        deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay = new TH1F("hTotalHitsTakenByCosmicRay_CRL", "hTotalHitsTakenByCosmicRay_CRL", 40000, 0., 50.);
-        deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay->SetTitle(";hTotalHitsTakenByCosmicRay;Occurance");
-        //deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hEfficiency_Energy)
-   {
-        deltaRayRecoHistogramCollection.m_hEfficiency_Energy = new TH1F("hEfficiency_Energy_CRL", "hEfficiency_Energy_CRL", 100, 0., 1.);
-        deltaRayRecoHistogramCollection.m_hEfficiency_Energy->SetTitle(";TrueCRLEnergy [GeV];Efficiency");
-        //deltaRayRecoHistogramCollection.m_hEfficiency_Energy->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits)
-   {
-        deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits = new TH1F("hEfficiency_TotalHits_CRL", "hEfficiency_TotalHits_CRL", 40000, 0., 100.);
-        deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits->SetTitle(";nMCTotalHits;Efficiency");
-        //deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle)
-   {
-        deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle = new TH1F("hEfficiency_OpeningAngle_CRL", "_CRL", 100, 0., 180.);
-        deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle->SetTitle(";TrueOpeningAngle [degrees];Efficiency");
-        //deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy)
-   {
-        deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy = new TH1F("hCorrectParentLink_Energy_CRL", "hCorrectParentLink_Energy_CRL", 100, 0., 1.);
-        deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy->SetTitle(";TrueCRLEnergy [GeV];CorrectParentLinkFraction");
-        //deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits)
-   {
-        deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits = new TH1F("hCorrectParentLink_TotalHits_CRL", "hCorrectParentLink_TotalHits_CRL", 40000, 0., 100.);
-        deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits->SetTitle(";nMCTotalHits;CorrectParentLinkFraction");
-        //deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle)
-   {
-        deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle = new TH1F("hCorrectParentLink_OpeningAngle_CRL", "hCorrectParentLink_OpeningAngle_CRL", 100, 0., 180.);
-        deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle->SetTitle(";TrueOpeningAngle [degrees];CorrectParentLinkFraction");
-        //deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }      
-
-   if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy)
-   {
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy = new TH1F("hCorrectEvent_Energy_CRL", "hCorrectEvent_Energy_CRL", 100, 0., 1.);
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->SetTitle(";True Delta Ray Energy [GeV];Correct Reconstruction Fraction");
-        //deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits)
-   {
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits = new TH1F("hCorrectEvent_TotalHits_CRL", "hCorrectEvent_TotalHits_CRL", 40000, 0., 100.);
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits->SetTitle(";nMCTotalHits;Correct Reconstruction Fraction");
-        //deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits->GetXaxis()->SetRangeUser(0.f, 50.f);
-    }
-
-   if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle)
-   {
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle = new TH1F("hCorrectEvent_OpeningAngle_CRL", "hCorrectEvent_OpeningAngle_CRL", 100, 0., 180.);
-        deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->SetTitle(";True Opening Angle [degrees];Correct Reconstruction Fraction");
-        //deltaRayRecoHistogramCollection.m_-hCorrectEvent_OpeningAngle>GetXaxis()->SetRangeUser(0.f, 50.f);
-    }   
-   //ISOBEL - CHANGE CORRECT EVENT TO SOMETHING ELSE (NOT ACTUALLY AN EVENT)
-   
-
     for (const DeltaRay &deltaRay : deltaRayVector)
     {
+        const float completeness(static_cast<float>(deltaRay.m_bestMatchNSharedHitsTotal) / static_cast<float>(deltaRay.m_nMCHitsTotal));
+        const float purity(static_cast<float>(deltaRay.m_bestMatchNSharedHitsTotal) / static_cast<float>(deltaRay.m_bestMatchNHitsTotal));
+
+        const float completenessU(deltaRay.m_nMCHitsU == 0 ? 1.f : static_cast<float>(deltaRay.m_bestMatchNSharedHitsU) / static_cast<float>(deltaRay.m_nMCHitsU));
+        const float completenessV(deltaRay.m_nMCHitsV == 0 ? 1.f : static_cast<float>(deltaRay.m_bestMatchNSharedHitsV) / static_cast<float>(deltaRay.m_nMCHitsV));
+        const float completenessW(deltaRay.m_nMCHitsW == 0 ? 1.f : static_cast<float>(deltaRay.m_bestMatchNSharedHitsW) / static_cast<float>(deltaRay.m_nMCHitsW));
+
+        float lowestCompletenessView(0.f);
+        if (completenessU < completenessV)
+        {
+            lowestCompletenessView = (completenessU < completenessW ? completenessU : completenessW);
+        }
+        else 
+        {
+            lowestCompletenessView = (completenessV < completenessW ? completenessV : completenessW);
+        }
+
+        int lowestViewNHits(0);
+        if (deltaRay.m_nMCHitsU < deltaRay.m_nMCHitsV)
+        {
+            lowestViewNHits = (deltaRay.m_nMCHitsU < deltaRay.m_nMCHitsW ? deltaRay.m_nMCHitsU : deltaRay.m_nMCHitsW);
+        }
+        else 
+        {
+            lowestViewNHits = (deltaRay.m_nMCHitsV < deltaRay.m_nMCHitsW ? deltaRay.m_nMCHitsV : deltaRay.m_nMCHitsW);
+        }
+        
         deltaRayRecoHistogramCollection.m_hAboveThresholdMatches->Fill(deltaRay.m_nAboveThresholdMatches);
+
+        if (deltaRay.m_nAboveThresholdMatches == 0)
+        {
+            deltaRayRecoHistogramCollection.m_hMatches0_TotalHits->Fill(deltaRay.m_nMCHitsTotal);
+            deltaRayRecoHistogramCollection.m_hMatches0_OpeningAngle->Fill(deltaRay.m_openingAngleFromMuon);
+            deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0XZ->Fill(deltaRay.m_parentMuonTheta0XZ);
+            deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0YZ->Fill(deltaRay.m_parentMuonTheta0YZ);
+            deltaRayRecoHistogramCollection.m_hMatches0_LowestViewNHits->Fill(lowestViewNHits);
+        }
+        else if (deltaRay.m_nAboveThresholdMatches == 1)
+        {
+            deltaRayRecoHistogramCollection.m_hMatches1_TotalHits->Fill(deltaRay.m_nMCHitsTotal);
+            deltaRayRecoHistogramCollection.m_hMatches1_OpeningAngle->Fill(deltaRay.m_openingAngleFromMuon);
+            deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0XZ->Fill(deltaRay.m_parentMuonTheta0XZ);
+            deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0YZ->Fill(deltaRay.m_parentMuonTheta0YZ);
+            deltaRayRecoHistogramCollection.m_hMatches1_LowestViewNHits->Fill(lowestViewNHits);
+        }
+        else
+        {
+            deltaRayRecoHistogramCollection.m_hMatchesMultiple_TotalHits->Fill(deltaRay.m_nMCHitsTotal);
+            deltaRayRecoHistogramCollection.m_hMatchesMultiple_OpeningAngle->Fill(deltaRay.m_openingAngleFromMuon);
+            deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0XZ->Fill(deltaRay.m_parentMuonTheta0XZ);
+            deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0YZ->Fill(deltaRay.m_parentMuonTheta0YZ);
+            deltaRayRecoHistogramCollection.m_hMatchesMultiple_LowestViewNHits->Fill(lowestViewNHits);
+        }
 
         if (deltaRay.m_nAboveThresholdMatches > 0)
         {
-            deltaRayRecoHistogramCollection.m_hCompleteness->Fill(static_cast<float>(deltaRay.m_bestMatchNSharedHitsTotal) / static_cast<float>(deltaRay.m_nMCHitsTotal));
-            deltaRayRecoHistogramCollection.m_hPurity->Fill(static_cast<float>(deltaRay.m_bestMatchNSharedHitsTotal) / static_cast<float>(deltaRay.m_bestMatchNHitsTotal));
-            deltaRayRecoHistogramCollection.m_hCompletenessVsHits->Fill(static_cast<float>(deltaRay.m_bestMatchNSharedHitsTotal) / static_cast<float>(deltaRay.m_nMCHitsTotal),
-                                                                        deltaRay.m_nMCHitsTotal, 1.f);
+            deltaRayRecoHistogramCollection.m_hCompleteness->Fill(completeness);
+            deltaRayRecoHistogramCollection.m_hLowestCompletenessView->Fill(lowestCompletenessView);
+            deltaRayRecoHistogramCollection.m_hPurity->Fill(purity);
+            
+            deltaRayRecoHistogramCollection.m_hCompletenessVsHits->Fill(completeness, deltaRay.m_nMCHitsTotal, 1.f);
+            
             deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal->Fill(deltaRay.m_bestMatchNParentTrackHitsTotal);
             deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal->Fill(deltaRay.m_bestMatchNOtherTrackHitsTotal);
             deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal->Fill(deltaRay.m_bestMatchNOtherShowerHitsTotal);
+            
             deltaRayRecoHistogramCollection.m_hEfficiency_Energy->Fill(deltaRay.m_energy);
             deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits->Fill(deltaRay.m_nMCHitsTotal);            
-            deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle->Fill(deltaRay.m_openingAngleFromMuon);              
+            deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle->Fill(deltaRay.m_openingAngleFromMuon);
+            deltaRayRecoHistogramCollection.m_hEfficiency_ParentMuonTheta0XZ->Fill(deltaRay.m_parentMuonTheta0XZ);
+            deltaRayRecoHistogramCollection.m_hEfficiency_ParentMuonTheta0YZ->Fill(deltaRay.m_parentMuonTheta0YZ);
+            deltaRayRecoHistogramCollection.m_hEfficiency_LowestViewNHits->Fill(lowestViewNHits);   
         }
 
         if (deltaRay.m_isCorrectParentLink)
@@ -555,7 +468,10 @@ void FillDeltaRayRecoHistogramCollection(const DeltaRayVector &deltaRayVector, D
         {
             deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->Fill(deltaRay.m_energy);
             deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits->Fill(deltaRay.m_nMCHitsTotal);
-            deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->Fill(deltaRay.m_openingAngleFromMuon);             
+            deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->Fill(deltaRay.m_openingAngleFromMuon);
+            deltaRayRecoHistogramCollection.m_hCorrectEvent_ParentMuonTheta0XZ->Fill(deltaRay.m_parentMuonTheta0XZ);
+            deltaRayRecoHistogramCollection.m_hCorrectEvent_ParentMuonTheta0YZ->Fill(deltaRay.m_parentMuonTheta0YZ);
+            deltaRayRecoHistogramCollection.m_hCorrectEvent_LowestViewNHits->Fill(lowestViewNHits);   
         }
     }   
 }
@@ -567,7 +483,10 @@ void ProcessHistograms(DeltaRayMCHistogramCollection &deltaRayMCHistogramCollect
     DivideHistogram(deltaRayRecoHistogramCollection.m_hEfficiency_Energy, deltaRayMCHistogramCollection.m_hEnergyDistribution);
     DivideHistogram(deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits, deltaRayMCHistogramCollection.m_hTotalHitDistribution);
     DivideHistogram(deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle, deltaRayMCHistogramCollection.m_hOpeningAngleDistribution);
-
+    DivideHistogram(deltaRayRecoHistogramCollection.m_hEfficiency_ParentMuonTheta0XZ, deltaRayMCHistogramCollection.m_hParentMuonTheta0XZDistribution);
+    DivideHistogram(deltaRayRecoHistogramCollection.m_hEfficiency_ParentMuonTheta0YZ, deltaRayMCHistogramCollection.m_hParentMuonTheta0YZDistribution);
+    DivideHistogram(deltaRayRecoHistogramCollection.m_hEfficiency_LowestViewNHits, deltaRayMCHistogramCollection.m_hLowestViewNHitsDistribution);
+    
     DivideHistogram(deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy, deltaRayMCHistogramCollection.m_hEnergyDistribution);
     DivideHistogram(deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits, deltaRayMCHistogramCollection.m_hTotalHitDistribution);
     DivideHistogram(deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle, deltaRayMCHistogramCollection.m_hOpeningAngleDistribution);
@@ -575,10 +494,32 @@ void ProcessHistograms(DeltaRayMCHistogramCollection &deltaRayMCHistogramCollect
     DivideHistogram(deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy, deltaRayMCHistogramCollection.m_hEnergyDistribution);
     DivideHistogram(deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits, deltaRayMCHistogramCollection.m_hTotalHitDistribution);
     DivideHistogram(deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle, deltaRayMCHistogramCollection.m_hOpeningAngleDistribution);
+    DivideHistogram(deltaRayRecoHistogramCollection.m_hCorrectEvent_ParentMuonTheta0XZ, deltaRayMCHistogramCollection.m_hParentMuonTheta0XZDistribution);
+    DivideHistogram(deltaRayRecoHistogramCollection.m_hCorrectEvent_ParentMuonTheta0YZ, deltaRayMCHistogramCollection.m_hParentMuonTheta0YZDistribution);
+    DivideHistogram(deltaRayRecoHistogramCollection.m_hCorrectEvent_LowestViewNHits, deltaRayMCHistogramCollection.m_hLowestViewNHitsDistribution);    
 
     deltaRayRecoHistogramCollection.m_hCompleteness->Scale(1. / static_cast<double>(deltaRayRecoHistogramCollection.m_hCompleteness->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hLowestCompletenessView->Scale(1. / static_cast<double>(deltaRayRecoHistogramCollection.m_hLowestCompletenessView->GetEntries()));
     deltaRayRecoHistogramCollection.m_hPurity->Scale(1. / static_cast<double>(deltaRayRecoHistogramCollection.m_hPurity->GetEntries()));
     deltaRayRecoHistogramCollection.m_hCompletenessVsHits->Scale(1. / static_cast<double>(deltaRayRecoHistogramCollection.m_hCompletenessVsHits->GetEntries()));
+
+    deltaRayRecoHistogramCollection.m_hMatches0_TotalHits->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatches0_TotalHits->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hMatches0_OpeningAngle->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatches0_OpeningAngle->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0XZ->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0XZ->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0YZ->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0YZ->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hMatches0_LowestViewNHits->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatches0_LowestViewNHits->GetEntries()));
+
+    deltaRayRecoHistogramCollection.m_hMatches1_TotalHits->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatches1_TotalHits->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hMatches1_OpeningAngle->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatches1_OpeningAngle->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0XZ->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0XZ->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0YZ->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0YZ->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hMatches1_LowestViewNHits->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatches1_LowestViewNHits->GetEntries()));
+
+    deltaRayRecoHistogramCollection.m_hMatchesMultiple_TotalHits->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatchesMultiple_TotalHits->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hMatchesMultiple_OpeningAngle->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatchesMultiple_OpeningAngle->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0XZ->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0XZ->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0YZ->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0YZ->GetEntries()));
+    deltaRayRecoHistogramCollection.m_hMatchesMultiple_LowestViewNHits->Scale(1.f / static_cast<float>(deltaRayRecoHistogramCollection.m_hMatchesMultiple_LowestViewNHits->GetEntries()));    
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -652,32 +593,371 @@ void WriteHistograms(CosmicRayMCHistogramCollection &cosmicRayMCHistogramCollect
     cosmicRayMCHistogramCollection.m_hTotalReconstructableCRLs->Write("hTotalReconstructableCRLs");         
 
     deltaRayMCHistogramCollection.m_hEnergyDistribution->Write("hEnergyDistribution");
-    deltaRayMCHistogramCollection.m_hTotalHitDistribution->Write("hTotalHitDistribution");
+    deltaRayMCHistogramCollection.m_hTotalHitDistribution->Write("hTotalHitsDistribution");
     deltaRayMCHistogramCollection.m_hOpeningAngleDistribution->Write("hOpeningAngleDistribution");
-
+    deltaRayMCHistogramCollection.m_hParentMuonTheta0XZDistribution->Write("hParentMuonTheta0XZDistribution");
+    deltaRayMCHistogramCollection.m_hParentMuonTheta0YZDistribution->Write("hParentMuonTheta0YZDistribution");
+    deltaRayMCHistogramCollection.m_hLowestViewNHitsDistribution->Write("hLowestViewNHitsDistribution");
+    
     deltaRayRecoHistogramCollection.m_hCompleteness->Write("hCompleteness");
+    deltaRayRecoHistogramCollection.m_hLowestCompletenessView->Write("hLowestCompletenessView");
     deltaRayRecoHistogramCollection.m_hPurity->Write("hPurity");
+
     deltaRayRecoHistogramCollection.m_hCompletenessVsHits->Write("hCompletenessVsHits");
     deltaRayRecoHistogramCollection.m_hAboveThresholdMatches->Write("hAboveThresholdMatches");
+    
     deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal->Write("hParentTrackHitsTotal");
     deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal->Write("hOtherTrackHitsTotal");
     deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal->Write("hOtherShowerHitsTotal");
     deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay->Write("hTotalHitsTakenByCosmicRay");
+    
     deltaRayRecoHistogramCollection.m_hEfficiency_Energy->Write("hEfficiency_Energy");
     deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits->Write("hEfficiency_TotalHits");
     deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle->Write("hEfficiency_OpeningAngle");
+    deltaRayRecoHistogramCollection.m_hEfficiency_ParentMuonTheta0XZ->Write("hEfficiency_ParentMuonTheta0XZ");
+    deltaRayRecoHistogramCollection.m_hEfficiency_ParentMuonTheta0YZ->Write("hEfficiency_ParentMuonTheta0YZ");
+    deltaRayRecoHistogramCollection.m_hEfficiency_LowestViewNHits->Write("hEfficiency_LowestViewNHits");
+    
     deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy->Write("hCorrectParentLink_Energy");
     deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits->Write("hCorrectParentLink_TotalHits");
     deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle->Write("hCorrectParentLink_OpeningAngle");
+    
     deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->Write("hCorrectEvent_Energy");
     deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits->Write("hCorrectEvent_TotalHits");
     deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->Write("hCorrectEvent_OpeningAngle");
+    deltaRayRecoHistogramCollection.m_hCorrectEvent_ParentMuonTheta0XZ->Write("hCorrectEvent_ParentMuonTheta0XZ");
+    deltaRayRecoHistogramCollection.m_hCorrectEvent_ParentMuonTheta0YZ->Write("hCorrectEvent_ParentMuonTheta0YZ");
+    deltaRayRecoHistogramCollection.m_hCorrectEvent_LowestViewNHits->Write("hCorrectEvent_LowestViewNHits");
 
     deltaRayContaminationHistogramCollection.m_hOtherShowerHitsDistance->Write("hOtherShowerHitsDistance");
     deltaRayContaminationHistogramCollection.m_hOtherTrackHitsDistance->Write("hOtherTrackHitsDistance");
     deltaRayContaminationHistogramCollection.m_hParentTrackHitsDistance->Write("hParentTrackHitsDistance");
     deltaRayContaminationHistogramCollection.m_hCRLHitsInCRDistance->Write("hCRLHitsInCRDistance");
+
+    deltaRayRecoHistogramCollection.m_hMatches0_TotalHits->Write("hMatches0_TotalHits");
+    deltaRayRecoHistogramCollection.m_hMatches0_OpeningAngle->Write("hMatches0_OpeningAngle");
+    deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0XZ->Write("hMatches0_ParentMuonTheta0XZ");
+    deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0YZ->Write("hMatches0_ParentMuonTheta0YZ");
+    deltaRayRecoHistogramCollection.m_hMatches0_LowestViewNHits->Write("hMatches0_LowestViewNHits");
+
+    deltaRayRecoHistogramCollection.m_hMatches1_TotalHits->Write("hMatches1_TotalHits");
+    deltaRayRecoHistogramCollection.m_hMatches1_OpeningAngle->Write("hMatches1_OpeningAngle");
+    deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0XZ->Write("hMatches1_ParentMuonTheta0XZ");
+    deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0YZ->Write("hMatches1_ParentMuonTheta0YZ");
+    deltaRayRecoHistogramCollection.m_hMatches1_LowestViewNHits->Write("hMatches1_LowestViewNHits");
+
+    deltaRayRecoHistogramCollection.m_hMatchesMultiple_TotalHits->Write("hMatchesMultiple_TotalHits");
+    deltaRayRecoHistogramCollection.m_hMatchesMultiple_OpeningAngle->Write("hMatchesMultiple_OpeningAngle");
+    deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0XZ->Write("hMatchesMultiple_ParentMuonTheta0XZ");
+    deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0YZ->Write("hMatchesMultiple_ParentMuonTheta0YZ");
+    deltaRayRecoHistogramCollection.m_hMatchesMultiple_LowestViewNHits->Write("hMatchesMultiple_LowestViewNHits");    
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void CreateCosmicRayMCHistogramCollection(CosmicRayMCHistogramCollection &cosmicRayMCHistogramCollection)
+{
+   if (!cosmicRayMCHistogramCollection.m_hTotalCRsWithReconstructableCRLs)
+   {
+        cosmicRayMCHistogramCollection.m_hTotalCRsWithReconstructableCRLs = new TH1F("hTotalCRsWithReconstructableCRLs_CR", "hTotalCRsWithReconstructableCRLs_CR", 50, 0., 100.);
+        cosmicRayMCHistogramCollection.m_hTotalCRsWithReconstructableCRLs->SetTitle(";nCRsWithReconstructableCRLsInReadoutWindow;Occurance");
+   }
+    
+   if (!cosmicRayMCHistogramCollection.m_hReconstructableChildDeltaRays)
+   {
+        cosmicRayMCHistogramCollection.m_hReconstructableChildDeltaRays = new TH1F("hReconstructableChildDeltaRays_CR", "hReconstructableChildDeltaRays_CR", 40000, 0., 10.);
+        cosmicRayMCHistogramCollection.m_hReconstructableChildDeltaRays->SetTitle(";nReconstructableChildDeltaRays;Occurance");
+   }
+
+   if (!cosmicRayMCHistogramCollection.m_hTotalReconstructableCRLs)
+   {
+        cosmicRayMCHistogramCollection.m_hTotalReconstructableCRLs = new TH1F("hTotalReconstructableCRLs_CR", "hTotalReconstructableCRLs_CR", 50, 0., 100.);
+        cosmicRayMCHistogramCollection.m_hTotalReconstructableCRLs->SetTitle(";nReconstructableCRLsInReadoutWindow;Occurance");
+   }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void CreateDeltaRayMCHistogramCollection(DeltaRayMCHistogramCollection &deltaRayMCHistogramCollection)
+{
+    if (!deltaRayMCHistogramCollection.m_hEnergyDistribution)
+    {
+        deltaRayMCHistogramCollection.m_hEnergyDistribution = new TH1F("hEnergyDistribution_CRL", "hEnergyDistribution_CRL", 100, 0., 1.);
+        deltaRayMCHistogramCollection.m_hEnergyDistribution->SetTitle(";TrueCRLEnergy [GeV];Occurance");
+    }
+
+    if (!deltaRayMCHistogramCollection.m_hTotalHitDistribution)
+    {
+        deltaRayMCHistogramCollection.m_hTotalHitDistribution = new TH1F("hTotalHitDistribution_CRL", "hTotalHitDistribution_CRL", 100, 0., 100.);
+        deltaRayMCHistogramCollection.m_hTotalHitDistribution->SetTitle(";nMCTotalHits;Occurance");
+    }
+
+    if (!deltaRayMCHistogramCollection.m_hOpeningAngleDistribution)
+    {
+        deltaRayMCHistogramCollection.m_hOpeningAngleDistribution = new TH1F("hOpeningAngleDistribution_CRL", "hOpeningAngleDistribution_CRL", 100, 0., 180.);
+        deltaRayMCHistogramCollection.m_hOpeningAngleDistribution->SetTitle(";TrueOpeningAngle [degrees];Occurance");
+    }      
+
+    if (!deltaRayMCHistogramCollection.m_hParentMuonTheta0XZDistribution)
+    {
+        deltaRayMCHistogramCollection.m_hParentMuonTheta0XZDistribution = new TH1F("hParentMuonTheta0XZDistribution_CRL", "hParentMuonTheta0XZDistribution_CRL", 100, -180., 180.);
+        deltaRayMCHistogramCollection.m_hParentMuonTheta0XZDistribution->SetTitle(";ParentMuonTheta0XZ [degrees];Occurance");
+    }
+
+    if (!deltaRayMCHistogramCollection.m_hParentMuonTheta0YZDistribution)
+    {
+        deltaRayMCHistogramCollection.m_hParentMuonTheta0YZDistribution = new TH1F("hParentMuonTheta0YZDistribution_CRL", "hParentMuonTheta0YZDistribution_CRL", 200, -180., 180.);
+        deltaRayMCHistogramCollection.m_hParentMuonTheta0YZDistribution->SetTitle(";ParentMuonTheta0YZ [degrees];Occurance");
+    }
+
+    if (!deltaRayMCHistogramCollection.m_hLowestViewNHitsDistribution)
+    {
+        deltaRayMCHistogramCollection.m_hLowestViewNHitsDistribution = new TH1F("hLowestViewNHitsDistribution_CRL", "hLowestViewNHitsDistribution_CRL", 100, 0., 100.);
+        deltaRayMCHistogramCollection.m_hLowestViewNHitsDistribution->SetTitle("; nMCHits;Occurance");
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void CreateDeltaRayRecoHistogramCollection(DeltaRayRecoHistogramCollection &deltaRayRecoHistogramCollection)
+{
+    if (!deltaRayRecoHistogramCollection.m_hCompleteness)
+    {
+        deltaRayRecoHistogramCollection.m_hCompleteness = new TH1F("hCompleteness_CRL", "hCompleteness_CRL", 100, 0., 1.1);
+        deltaRayRecoHistogramCollection.m_hCompleteness->SetTitle(";Completeness;Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hLowestCompletenessView)
+    {
+        deltaRayRecoHistogramCollection.m_hLowestCompletenessView = new TH1F("hLowestCompletenessView_CRL", "hLowestCompletenessView_CRL", 100, -0.1, 1.1);
+        deltaRayRecoHistogramCollection.m_hLowestCompletenessView->SetTitle(";Completeness;Occurance");
+    }
+    
+    if (!deltaRayRecoHistogramCollection.m_hPurity)
+    {
+        deltaRayRecoHistogramCollection.m_hPurity = new TH1F("hPurity_CRL", "hPurity_CRL", 100, 0., 1.1);
+        deltaRayRecoHistogramCollection.m_hPurity->SetTitle(";Purity;Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hCompletenessVsHits)
+    {
+         deltaRayRecoHistogramCollection.m_hCompletenessVsHits = new TH2F("hCompletenessVsHits_CRL", "hCompletenessVsHits_CRL", 100, 0., 1.1, 50, 0., 200.);
+         deltaRayRecoHistogramCollection.m_hCompletenessVsHits->SetTitle(";Completeness;Hits");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hAboveThresholdMatches)
+    {
+        deltaRayRecoHistogramCollection.m_hAboveThresholdMatches = new TH1F("hAboveThresholdMatches_CRL", "hAboveThresholdMatches_CRL", 40000, 0., 4.);
+        deltaRayRecoHistogramCollection.m_hAboveThresholdMatches->SetTitle(";nAboveThresholdMatches;Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal)
+    {
+        deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal = new TH1F("hParentTrackHitsTotal_CRL", "hParentTrackHitsTotal_CRL", 40000, 0., 50.);
+        deltaRayRecoHistogramCollection.m_hParentTrackHitsTotal->SetTitle(";nParentTrackHitsTotal;Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal)
+    {
+        deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal = new TH1F("hOtherTrackHitsTotal_CRL", "hOtherTrackHitsTotal_CRL", 40000, 0., 20.);
+        deltaRayRecoHistogramCollection.m_hOtherTrackHitsTotal->SetTitle(";nOtherTrackHitsTotal;Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal)
+    {
+        deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal = new TH1F("hOtherShowerHitsTotal_CRL", "hOtherShowerHitsTotal_CRL", 40000, 0., 20.);
+        deltaRayRecoHistogramCollection.m_hOtherShowerHitsTotal->SetTitle(";nOtherShowerHitsTotal;Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay)
+    {
+        deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay = new TH1F("hTotalHitsTakenByCosmicRay_CRL", "hTotalHitsTakenByCosmicRay_CRL", 40000, 0., 50.);
+        deltaRayRecoHistogramCollection.m_hTotalHitsTakenByCosmicRay->SetTitle(";hTotalHitsTakenByCosmicRay;Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hEfficiency_Energy)
+    {
+        deltaRayRecoHistogramCollection.m_hEfficiency_Energy = new TH1F("hEfficiency_Energy_CRL", "hEfficiency_Energy_CRL", 100, 0., 1.);
+        deltaRayRecoHistogramCollection.m_hEfficiency_Energy->SetTitle(";TrueCRLEnergy [GeV];Efficiency");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits)
+    {
+        deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits = new TH1F("hEfficiency_TotalHits_CRL", "hEfficiency_TotalHits_CRL", 100, 0., 100.);
+        deltaRayRecoHistogramCollection.m_hEfficiency_TotalHits->SetTitle(";nMCTotalHits;Efficiency");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle)
+    {
+        deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle = new TH1F("hEfficiency_OpeningAngle_CRL", "_CRL", 100, 0., 180.);
+        deltaRayRecoHistogramCollection.m_hEfficiency_OpeningAngle->SetTitle(";TrueOpeningAngle [degrees];Efficiency");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hEfficiency_ParentMuonTheta0XZ)
+    {
+        deltaRayRecoHistogramCollection.m_hEfficiency_ParentMuonTheta0XZ = new TH1F("hEfficiency_ParentMuonTheta0XZ_CRL", "_CRL", 100, -180., 180.);
+        deltaRayRecoHistogramCollection.m_hEfficiency_ParentMuonTheta0XZ->SetTitle(";ParentMuonTheta0XZ [degrees];Efficiency");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hEfficiency_ParentMuonTheta0YZ)
+    {
+        deltaRayRecoHistogramCollection.m_hEfficiency_ParentMuonTheta0YZ = new TH1F("hEfficiency_ParentMuonTheta0YZ_CRL", "_CRL", 200, -180., 180.);
+        deltaRayRecoHistogramCollection.m_hEfficiency_ParentMuonTheta0YZ->SetTitle(";ParentMuonTheta0YZ [degrees];Efficiency");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hEfficiency_LowestViewNHits)
+    {
+        deltaRayRecoHistogramCollection.m_hEfficiency_LowestViewNHits = new TH1F("hEfficiency_LowestViewNHits_CRL", "_CRL", 100, 0., 100.);
+        deltaRayRecoHistogramCollection.m_hEfficiency_LowestViewNHits->SetTitle("; nMCHits;Efficiency");
+    }     
+
+    if (!deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy)
+    {
+        deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy = new TH1F("hCorrectParentLink_Energy_CRL", "hCorrectParentLink_Energy_CRL", 100, 0., 1.);
+        deltaRayRecoHistogramCollection.m_hCorrectParentLink_Energy->SetTitle(";TrueCRLEnergy [GeV];CorrectParentLinkFraction");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits)
+    {
+        deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits = new TH1F("hCorrectParentLink_TotalHits_CRL", "hCorrectParentLink_TotalHits_CRL", 100, 0., 100.);
+        deltaRayRecoHistogramCollection.m_hCorrectParentLink_TotalHits->SetTitle(";nMCTotalHits;CorrectParentLinkFraction");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle)
+    {
+        deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle = new TH1F("hCorrectParentLink_OpeningAngle_CRL", "hCorrectParentLink_OpeningAngle_CRL", 100, 0., 180.);
+        deltaRayRecoHistogramCollection.m_hCorrectParentLink_OpeningAngle->SetTitle(";TrueOpeningAngle [degrees];CorrectParentLinkFraction");
+    }      
+
+    if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy)
+    {
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy = new TH1F("hCorrectEvent_Energy_CRL", "hCorrectEvent_Energy_CRL", 100, 0., 1.);
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_Energy->SetTitle(";True Delta Ray Energy [GeV];Correct Reconstruction Fraction");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits)
+    {
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits = new TH1F("hCorrectEvent_TotalHits_CRL", "hCorrectEvent_TotalHits_CRL", 100, 0., 100.);
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_TotalHits->SetTitle(";nMCTotalHits;Correct Reconstruction Fraction");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle)
+    {
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle = new TH1F("hCorrectEvent_OpeningAngle_CRL", "hCorrectEvent_OpeningAngle_CRL", 100, 0., 180.);
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_OpeningAngle->SetTitle(";True Opening Angle [degrees];Correct Reconstruction Fraction");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_ParentMuonTheta0XZ)
+    {
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_ParentMuonTheta0XZ = new TH1F("hCorrectEvent_ParentMuonTheta0XZ_CRL", "hCorrectEvent_ParentMuonTheta0XZ_CRL", 100, -180., 180.);
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_ParentMuonTheta0XZ->SetTitle(";ParentMuonTheta0XZ [degrees];Correct Reconstruction Fraction");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_ParentMuonTheta0YZ)
+    {
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_ParentMuonTheta0YZ = new TH1F("hCorrectEvent_ParentMuonTheta0YZ_CRL", "hCorrectEvent_ParentMuonTheta0YZ_CRL", 200, -180., 180.);
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_ParentMuonTheta0YZ->SetTitle(";ParentMuonTheta0YZ [degrees];Correct Reconstruction Fraction");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hCorrectEvent_LowestViewNHits)
+    {
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_LowestViewNHits = new TH1F("hCorrectEvent_LowestViewNHits_CRL", "hCorrectEvent_LowestViewNHits_CRL", 100, 0., 100.);
+        deltaRayRecoHistogramCollection.m_hCorrectEvent_LowestViewNHits->SetTitle("; nMCHits;Correct Reconstruction Fraction");
+    }         
+
+    if (!deltaRayRecoHistogramCollection.m_hMatches0_TotalHits)
+    {
+        deltaRayRecoHistogramCollection.m_hMatches0_TotalHits = new TH1F("hMatches0_TotalHits_CRL", "hMatches0_TotalHits_CRL", 100, 0., 100.);
+        deltaRayRecoHistogramCollection.m_hMatches0_TotalHits->SetTitle(";TotalHits;Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatches0_OpeningAngle)
+    {
+        deltaRayRecoHistogramCollection.m_hMatches0_OpeningAngle = new TH1F("hMatches0_OpeningAngle_CRL", "hMatches0_OpeningAngle_CRL", 100, 0., 180.);
+        deltaRayRecoHistogramCollection.m_hMatches0_OpeningAngle->SetTitle(";OpeningAngle [degrees];Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0XZ)
+    {
+        deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0XZ = new TH1F("hMatches0_ParentMuonTheta0XZ_CRL", "hMatches0_ParentMuonTheta0XZ_CRL", 100, -180., 180.);
+        deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0XZ->SetTitle(";ParentMuonTheta0XZ [degrees];Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0YZ)
+    {
+        deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0YZ = new TH1F("hMatches0_ParentMuonTheta0YZ_CRL", "hMatches0_ParentMuonTheta0YZ_CRL", 200, -180., 180.);
+        deltaRayRecoHistogramCollection.m_hMatches0_ParentMuonTheta0YZ->SetTitle(";ParentMuonTheta0YZ [degrees];Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatches0_LowestViewNHits)
+    {
+        deltaRayRecoHistogramCollection.m_hMatches0_LowestViewNHits = new TH1F("hMatches0_LowestViewNHits_CRL", "hMatches0_LowestViewNHits_CRL", 100, 0., 100.);
+        deltaRayRecoHistogramCollection.m_hMatches0_LowestViewNHits->SetTitle("; LowestViewNHits;Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatches1_TotalHits)
+    {
+        deltaRayRecoHistogramCollection.m_hMatches1_TotalHits = new TH1F("hMatches1_TotalHits_CRL", "hMatches1_TotalHits_CRL", 100, 0., 100.);
+        deltaRayRecoHistogramCollection.m_hMatches1_TotalHits->SetTitle(";TotalHits;Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatches1_OpeningAngle)
+    {
+        deltaRayRecoHistogramCollection.m_hMatches1_OpeningAngle = new TH1F("hMatches1_OpeningAngle_CRL", "hMatches1_OpeningAngle_CRL", 100, 0., 180.);
+        deltaRayRecoHistogramCollection.m_hMatches1_OpeningAngle->SetTitle(";OpeningAngle [degrees];Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0XZ)
+    {
+        deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0XZ = new TH1F("hMatches1_ParentMuonTheta0XZ_CRL", "hMatches1_ParentMuonTheta0XZ_CRL", 100, -180., 180.);
+        deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0XZ->SetTitle(";ParentMuonTheta0XZ [degrees];Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0YZ)
+    {
+        deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0YZ = new TH1F("hMatches1_ParentMuonTheta0YZ_CRL", "hMatches1_ParentMuonTheta0YZ_CRL", 200, -180., 180.);
+        deltaRayRecoHistogramCollection.m_hMatches1_ParentMuonTheta0YZ->SetTitle(";ParentMuonTheta0YZ [degrees];Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatches1_LowestViewNHits)
+    {
+        deltaRayRecoHistogramCollection.m_hMatches1_LowestViewNHits = new TH1F("hMatches1_LowestViewNHits_CRL", "hMatches1_LowestViewNHits_CRL", 100, 0., 100.);
+        deltaRayRecoHistogramCollection.m_hMatches1_LowestViewNHits->SetTitle("; LowestViewNHits;Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatchesMultiple_TotalHits)
+    {
+        deltaRayRecoHistogramCollection.m_hMatchesMultiple_TotalHits = new TH1F("hMatchesMultiple_TotalHits_CRL", "hMatchesMultiple_TotalHits_CRL", 100, 0., 100.);
+        deltaRayRecoHistogramCollection.m_hMatchesMultiple_TotalHits->SetTitle(";TotalHits;Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatchesMultiple_OpeningAngle)
+    {
+        deltaRayRecoHistogramCollection.m_hMatchesMultiple_OpeningAngle = new TH1F("hMatchesMultiple_OpeningAngle_CRL", "hMatchesMultiple_OpeningAngle_CRL", 100, 0., 180.);
+        deltaRayRecoHistogramCollection.m_hMatchesMultiple_OpeningAngle->SetTitle(";OpeningAngle [degrees];Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0XZ)
+    {
+        deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0XZ = new TH1F("hMatchesMultiple_ParentMuonTheta0XZ_CRL", "hMatchesMultiple_ParentMuonTheta0XZ_CRL", 100, -180., 180.);
+        deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0XZ->SetTitle(";ParentMuonTheta0XZ [degrees];Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0YZ)
+    {
+        deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0YZ = new TH1F("hMatchesMultiple_ParentMuonTheta0YZ_CRL", "hMatchesMultiple_ParentMuonTheta0YZ_CRL", 200, -180., 180.);
+        deltaRayRecoHistogramCollection.m_hMatchesMultiple_ParentMuonTheta0YZ->SetTitle(";ParentMuonTheta0YZ [degrees];Occurance");
+    }
+
+    if (!deltaRayRecoHistogramCollection.m_hMatchesMultiple_LowestViewNHits)
+    {
+        deltaRayRecoHistogramCollection.m_hMatchesMultiple_LowestViewNHits = new TH1F("hMatchesMultiple_LowestViewNHits_CRL", "hMatchesMultiple_LowestViewNHits_CRL", 100, 0., 100.);
+        deltaRayRecoHistogramCollection.m_hMatchesMultiple_LowestViewNHits->SetTitle("; LowestViewNHits;Occurance");
+    }      
+
+}
+
     
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------

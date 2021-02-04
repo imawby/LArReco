@@ -143,6 +143,8 @@ public:
     int                 m_nMCHitsV;                     ///< The number of v mc hits
     int                 m_nMCHitsW;                     ///< The number of w mc hits
     float               m_openingAngleFromMuon;         ///< The opening angle wrt MC muon momentum vector
+    float               m_parentMuonTheta0XZ;
+    float               m_parentMuonTheta0YZ;
     
     int m_nAboveThresholdMatches;
     int m_isCorrect;
@@ -227,6 +229,9 @@ public:
     TH1F                   *m_hEnergyDistribution;
     TH1F                   *m_hTotalHitDistribution;       
     TH1F                   *m_hOpeningAngleDistribution;
+    TH1F                   *m_hParentMuonTheta0XZDistribution;
+    TH1F                   *m_hParentMuonTheta0YZDistribution;
+    TH1F                   *m_hLowestViewNHitsDistribution;    
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -243,10 +248,10 @@ public:
     DeltaRayRecoHistogramCollection();
 
     TH1F                   *m_hCompleteness;
+    TH1F                   *m_hLowestCompletenessView;
     TH1F                   *m_hPurity;
 
     TH2F                   *m_hCompletenessVsHits;
-    
     TH1F                   *m_hAboveThresholdMatches;
 
     TH1F                   *m_hParentTrackHitsTotal;
@@ -256,7 +261,10 @@ public:
 
     TH1F                   *m_hEfficiency_Energy;
     TH1F                   *m_hEfficiency_TotalHits;
-    TH1F                   *m_hEfficiency_OpeningAngle;  
+    TH1F                   *m_hEfficiency_OpeningAngle;
+    TH1F                   *m_hEfficiency_ParentMuonTheta0XZ;
+    TH1F                   *m_hEfficiency_ParentMuonTheta0YZ;
+    TH1F                   *m_hEfficiency_LowestViewNHits;    
     
     TH1F                   *m_hCorrectParentLink_Energy;
     TH1F                   *m_hCorrectParentLink_TotalHits;    
@@ -264,7 +272,28 @@ public:
 
     TH1F                   *m_hCorrectEvent_Energy;
     TH1F                   *m_hCorrectEvent_TotalHits;
-    TH1F                   *m_hCorrectEvent_OpeningAngle;  
+    TH1F                   *m_hCorrectEvent_OpeningAngle;
+    TH1F                   *m_hCorrectEvent_ParentMuonTheta0XZ;
+    TH1F                   *m_hCorrectEvent_ParentMuonTheta0YZ;
+    TH1F                   *m_hCorrectEvent_LowestViewNHits;    
+
+    TH1F                   *m_hMatches0_TotalHits;
+    TH1F                   *m_hMatches0_OpeningAngle;
+    TH1F                   *m_hMatches0_ParentMuonTheta0XZ;
+    TH1F                   *m_hMatches0_ParentMuonTheta0YZ;    
+    TH1F                   *m_hMatches0_LowestViewNHits;
+
+    TH1F                   *m_hMatches1_TotalHits;
+    TH1F                   *m_hMatches1_OpeningAngle;
+    TH1F                   *m_hMatches1_ParentMuonTheta0XZ;
+    TH1F                   *m_hMatches1_ParentMuonTheta0YZ;    
+    TH1F                   *m_hMatches1_LowestViewNHits;
+
+    TH1F                   *m_hMatchesMultiple_TotalHits;
+    TH1F                   *m_hMatchesMultiple_OpeningAngle;
+    TH1F                   *m_hMatchesMultiple_ParentMuonTheta0XZ;
+    TH1F                   *m_hMatchesMultiple_ParentMuonTheta0YZ;    
+    TH1F                   *m_hMatchesMultiple_LowestViewNHits;    
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -300,9 +329,15 @@ void ReadTree(const std::string &inputFileName, CosmicRayVector &cosmicRayVector
 
 void DisplayOverallRecoMetrics(const DeltaRayVector &deltaRayVector);
 
+void CreateCosmicRayMCHistogramCollection(CosmicRayMCHistogramCollection &cosmicRayMCHistogramCollection);
+
 void FillCosmicRayMCHistogramCollection(const CosmicRayVector &cosmicRayVector, CosmicRayMCHistogramCollection &cosmicRayMCHistogramCollection);
 
+void CreateDeltaRayMCHistogramCollection(DeltaRayMCHistogramCollection &deltaRayMCHistogramCollection);
+
 void FillDeltaRayMCHistogramCollection(const DeltaRayVector &deltaRayVector, DeltaRayMCHistogramCollection &deltaRayMCHistogramCollection);
+
+void CreateDeltaRayRecoHistogramCollection(DeltaRayRecoHistogramCollection &deltaRayRecoHistogramCollection);
 
 void FillDeltaRayRecoHistogramCollection(const DeltaRayVector &deltaRayVector, DeltaRayRecoHistogramCollection &deltaRayRecoHistogramCollection);
 
@@ -429,7 +464,10 @@ CosmicRayMCHistogramCollection::CosmicRayMCHistogramCollection() :
 DeltaRayMCHistogramCollection::DeltaRayMCHistogramCollection() :
     m_hEnergyDistribution(nullptr),
     m_hTotalHitDistribution(nullptr),
-    m_hOpeningAngleDistribution(nullptr)
+    m_hOpeningAngleDistribution(nullptr),
+    m_hParentMuonTheta0XZDistribution(nullptr),
+    m_hParentMuonTheta0YZDistribution(nullptr),
+    m_hLowestViewNHitsDistribution(nullptr)
 {
 }
 
@@ -438,6 +476,7 @@ DeltaRayMCHistogramCollection::DeltaRayMCHistogramCollection() :
 
 DeltaRayRecoHistogramCollection::DeltaRayRecoHistogramCollection() : 
     m_hCompleteness(nullptr),
+    m_hLowestCompletenessView(nullptr),
     m_hCompletenessVsHits(nullptr),
     m_hPurity(nullptr),
     m_hAboveThresholdMatches(nullptr),
@@ -448,12 +487,33 @@ DeltaRayRecoHistogramCollection::DeltaRayRecoHistogramCollection() :
     m_hEfficiency_Energy(nullptr),
     m_hEfficiency_TotalHits(nullptr),
     m_hEfficiency_OpeningAngle(nullptr),
+    m_hEfficiency_ParentMuonTheta0XZ(nullptr),
+    m_hEfficiency_ParentMuonTheta0YZ(nullptr),
+    m_hEfficiency_LowestViewNHits(nullptr),
     m_hCorrectParentLink_Energy(nullptr),
     m_hCorrectParentLink_TotalHits(nullptr),
     m_hCorrectParentLink_OpeningAngle(nullptr),
     m_hCorrectEvent_Energy(nullptr),
     m_hCorrectEvent_TotalHits(nullptr),
-    m_hCorrectEvent_OpeningAngle(nullptr)
+    m_hCorrectEvent_OpeningAngle(nullptr),
+    m_hCorrectEvent_ParentMuonTheta0XZ(nullptr),
+    m_hCorrectEvent_ParentMuonTheta0YZ(nullptr),
+    m_hCorrectEvent_LowestViewNHits(nullptr),
+    m_hMatches0_TotalHits(nullptr),
+    m_hMatches0_OpeningAngle(nullptr),
+    m_hMatches0_ParentMuonTheta0XZ(nullptr),
+    m_hMatches0_ParentMuonTheta0YZ(nullptr),
+    m_hMatches0_LowestViewNHits(nullptr),
+    m_hMatches1_TotalHits(nullptr),
+    m_hMatches1_OpeningAngle(nullptr),
+    m_hMatches1_ParentMuonTheta0XZ(nullptr),
+    m_hMatches1_ParentMuonTheta0YZ(nullptr),
+    m_hMatches1_LowestViewNHits(nullptr),
+    m_hMatchesMultiple_TotalHits(nullptr),
+    m_hMatchesMultiple_OpeningAngle(nullptr),
+    m_hMatchesMultiple_ParentMuonTheta0XZ(nullptr),
+    m_hMatchesMultiple_ParentMuonTheta0YZ(nullptr),
+    m_hMatchesMultiple_LowestViewNHits(nullptr)  
 {
 }
 
