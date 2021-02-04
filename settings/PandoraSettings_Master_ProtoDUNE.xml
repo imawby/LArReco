@@ -18,11 +18,6 @@
         <ShowDetector>true</ShowDetector>
     </algorithm>
     
-     <!--algorithm type = "LArMCDeltaRay">
-        <CaloHitListName>CaloHitList2D</CaloHitListName>
-        <MCParticleListName>Input</MCParticleListName>
-     </algorithm-->
-
     <algorithm type = "LArMaster">
         <CRSettingsFile>PandoraSettings_Cosmic_Standard.xml</CRSettingsFile>
         <NuSettingsFile>PandoraSettings_TestBeam_ProtoDUNE.xml</NuSettingsFile>
@@ -64,16 +59,6 @@
         <OutputTree>Validation</OutputTree>
         <OutputFile>Validation.root</OutputFile>
         </algorithm-->
-
-    <!--algorithm type = "LArVisualMonitoring">
-        <ShowDetector>true</ShowDetector>
-        <ShowCurrentPfos>true</ShowCurrentPfos>
-    </algorithm-->    
-
-    <!--algorithm type = "LArVisualMonitoring">
-        <ShowCurrentPfos>true</ShowCurrentPfos>
-        <ShowDetector>true</ShowDetector>
-    </algorithm-->
     
     <algorithm type = "LArMuonLeadingEventValidation">
         <CaloHitListName>CaloHitList2D</CaloHitListName>
@@ -88,12 +73,10 @@
         <MatchingMinSharedHits>5</MatchingMinSharedHits>
         <MatchingMinCompleteness>0.1</MatchingMinCompleteness>
         <MatchingMinPurity>0.5</MatchingMinPurity>
-        <DeltaRayMode>true</DeltaRayMode>
-        <MichelMode>false</MichelMode>
-        <!--SET PHOTON TO BE REALLY HIGH-->
+        <DeltaRayMode>false</DeltaRayMode>
+        <MichelMode>true</MichelMode>
         <MuonsToSkip>0</MuonsToSkip>
         <Visualize>false</Visualize>
-        <!--MinHitSharingFraction>0.9</MinHitSharingFraction-->
         <MinPrimaryGoodHits>10</MinPrimaryGoodHits>
         <MinHitsForGoodView>5</MinHitsForGoodView>
     </algorithm>

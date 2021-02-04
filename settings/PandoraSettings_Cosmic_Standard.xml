@@ -143,13 +143,6 @@
         <OutputPfoListName>MuonParticles3D</OutputPfoListName>
     </algorithm>
 
-    <!--algorithm type = "LArVisualMonitoring">
-      <PfoListNames>DeltaRayParticles3D MuonParticles3D</PfoListNames>
-      <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
-      <ShowPfoHierarchy>false</ShowPfoHierarchy>
-      <ShowDetector>true</ShowDetector>
-    </algorithm-->    
-
     <!-- PruneClusters -->
     <algorithm type = "LArListPruning" description = "ListPruning">
         <WarnIfObjectsUnavailable>false</WarnIfObjectsUnavailable>
@@ -179,26 +172,11 @@
         <ReplaceCurrentClusterList>false</ReplaceCurrentClusterList>
     </algorithm>
 
-    <!--algorithm type = "LArVisualMonitoring">
-      <PfoListNames>DeltaRayParticles3D MuonParticles3D</PfoListNames>
-      <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
-      <ShowPfoHierarchy>false</ShowPfoHierarchy>
-      <ShowDetector>true</ShowDetector>
-    </algorithm-->    
-
     <!-- DeltaRayAlgorithms -->
     <algorithm type = "LArDeltaRayIdentification">
         <ParentPfoListName>MuonParticles3D</ParentPfoListName>
         <DaughterPfoListName>DeltaRayParticles3D</DaughterPfoListName>
     </algorithm>
-
-    <!--algorithm type = "LArVisualMonitoring">
-      <PfoListNames>DeltaRayParticles3D MuonParticles3D</PfoListNames>
-      <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
-      <ShowPfoHierarchy>false</ShowPfoHierarchy>
-      <ShowDetector>true</ShowDetector>
-    </algorithm-->   
-
     
     <algorithm type = "LArDeltaRayGrowing">
         <InputClusterListName>ClustersW</InputClusterListName>
@@ -215,24 +193,106 @@
         <ParentPfoListName>MuonParticles3D</ParentPfoListName>
         <DaughterPfoListName>DeltaRayParticles3D</DaughterPfoListName>
     </algorithm>
-    <algorithm type = "LArDeltaRayMatching">
+
+
+    <algorithm type = "LArThreeViewDeltaRayMatching">
+      <PseudoChi2Cut>1.5</PseudoChi2Cut>
+      <InputClusterListNameU>ClustersU</InputClusterListNameU>
+      <InputClusterListNameV>ClustersV</InputClusterListNameV>
+      <InputClusterListNameW>ClustersW</InputClusterListNameW>
+      <PfoListNames>DeltaRayParticles3D MuonParticles3D</PfoListNames>
+      <OutputPfoListName>DeltaRayParticles3D</OutputPfoListName>
+      <MuonPfoListName>MuonParticles3D</MuonPfoListName>
+      <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
+      <DeltaRayTools>
+        <tool type = "LArDeltaRayRemoval"/>
+        <tool type = "LArCosmicRayRemoval"/>
+        <tool type = "LArSpanAcceptance"/>
+        <tool type = "LArDeltaRayMerge"/>
+      </DeltaRayTools>
+    </algorithm>
+
+    <algorithm type = "LArTwoViewDeltaRayMatching">
+      <PseudoChi2Cut>3.0</PseudoChi2Cut>
+      <MinMatchedPoints>2</MinMatchedPoints>
+      <InputClusterListName1>ClustersU</InputClusterListName1>
+      <InputClusterListName2>ClustersV</InputClusterListName2>
+      <InputClusterListName>ClustersW</InputClusterListName>
+      <MuonPfoListName>MuonParticles3D</MuonPfoListName>
+      <OutputPfoListName>DeltaRayParticles3D</OutputPfoListName>
+      <DeltaRayPfoListName>DeltaRayParticles3D</DeltaRayPfoListName>
+      <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
+      <OverlapWindow>1.0</OverlapWindow>
+      <DeltaRayTools>
+        <!--tool type = "LArTwoViewCosmicRayRemoval"/-->
+        <tool type = "LArTwoViewDeltaRayMerge"/>
+      </DeltaRayTools>
+    </algorithm>
+
+    <algorithm type = "LArTwoViewDeltaRayMatching">
+      <PseudoChi2Cut>3.0</PseudoChi2Cut>
+      <MinMatchedPoints>2</MinMatchedPoints>
+      <InputClusterListName1>ClustersV</InputClusterListName1>
+      <InputClusterListName2>ClustersW</InputClusterListName2>
+      <InputClusterListName>ClustersU</InputClusterListName>
+      <MuonPfoListName>MuonParticles3D</MuonPfoListName>
+      <OutputPfoListName>DeltaRayParticles3D</OutputPfoListName>
+      <DeltaRayPfoListName>DeltaRayParticles3D</DeltaRayPfoListName>
+      <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
+      <OverlapWindow>1.0</OverlapWindow>
+      <DeltaRayTools>
+        <!--tool type = "LArTwoViewCosmicRayRemoval"/-->
+        <tool type = "LArTwoViewDeltaRayMerge"/>
+      </DeltaRayTools>
+    </algorithm>
+
+    <algorithm type = "LArTwoViewDeltaRayMatching">
+      <PseudoChi2Cut>3.0</PseudoChi2Cut>
+      <MinMatchedPoints>2</MinMatchedPoints>
+      <InputClusterListName1>ClustersW</InputClusterListName1>
+      <InputClusterListName2>ClustersU</InputClusterListName2>
+      <InputClusterListName>ClustersV</InputClusterListName>
+      <MuonPfoListName>MuonParticles3D</MuonPfoListName>
+      <OutputPfoListName>DeltaRayParticles3D</OutputPfoListName>
+      <DeltaRayPfoListName>DeltaRayParticles3D</DeltaRayPfoListName>
+      <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
+      <OverlapWindow>1.0</OverlapWindow>
+      <DeltaRayTools>
+        <!--tool type = "LArTwoViewCosmicRayRemoval"/-->
+        <tool type = "LArTwoViewDeltaRayMerge"/>
+      </DeltaRayTools>
+    </algorithm>
+
+    <algorithm type = "LArOneViewDeltaRayMatching">
+      <InputClusterListNameU>ClustersU</InputClusterListNameU>
+      <InputClusterListNameV>ClustersV</InputClusterListNameV>
+      <InputClusterListNameW>ClustersW</InputClusterListNameW>
+      <MuonPfoListName>MuonParticles3D</MuonPfoListName>
+      <DeltaRayPfoListName>DeltaRayParticles3D</DeltaRayPfoListName>
+      <OutputPfoListName>DeltaRayParticles3D</OutputPfoListName>
+    </algorithm>
+
+
+    <algorithm type = "LArDeltaRayParent">
+      <DeltaRayPfoListName>DeltaRayParticles3D</DeltaRayPfoListName>
+      <MuonPfoListName>MuonParticles3D</MuonPfoListName>
+    </algorithm> 
+
+
+    
+    
+    <!-- OLD MATCHING ALG -->
+    <!--algorithm type = "LArDeltaRayMatching">
         <ParentPfoListName>MuonParticles3D</ParentPfoListName>
         <DaughterPfoListName>DeltaRayParticles3D</DaughterPfoListName>
         <InputClusterListNameU>ClustersU</InputClusterListNameU>
         <InputClusterListNameV>ClustersV</InputClusterListNameV>
         <InputClusterListNameW>ClustersW</InputClusterListNameW>
-    </algorithm>
+    </algorithm-->
 
     <algorithm type = "LArUnattachedDeltaRays">
         <PfoListName>DeltaRayParticles3D</PfoListName>
     </algorithm>
-
-    <!--algorithm type = "LArVisualMonitoring">
-      <PfoListNames>DeltaRayParticles3D MuonParticles3D</PfoListNames>
-      <ClusterListNames>ClustersU ClustersV ClustersW</ClusterListNames>
-      <ShowPfoHierarchy>false</ShowPfoHierarchy>
-      <ShowDetector>true</ShowDetector>
-    </algorithm-->    
 
 
     <!-- TwoDRemnantAlgorithms -->
