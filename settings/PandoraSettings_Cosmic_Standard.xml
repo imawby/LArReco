@@ -209,6 +209,7 @@
         <tool type = "LArCosmicRayRemoval"/>
         <tool type = "LArSpanAcceptance"/>
         <tool type = "LArDeltaRayMerge"/>
+        <tool type = "LArAmbiguousDeltaRay"/>
       </DeltaRayTools>
     </algorithm>
 
@@ -224,7 +225,7 @@
       <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
       <OverlapWindow>1.0</OverlapWindow>
       <DeltaRayTools>
-        <!--tool type = "LArTwoViewCosmicRayRemoval"/-->
+        <tool type = "LArTwoViewCosmicRayRemoval"/>
         <tool type = "LArTwoViewDeltaRayMerge"/>
       </DeltaRayTools>
     </algorithm>
@@ -241,7 +242,7 @@
       <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
       <OverlapWindow>1.0</OverlapWindow>
       <DeltaRayTools>
-        <!--tool type = "LArTwoViewCosmicRayRemoval"/-->
+        <tool type = "LArTwoViewCosmicRayRemoval"/>
         <tool type = "LArTwoViewDeltaRayMerge"/>
       </DeltaRayTools>
     </algorithm>
@@ -258,7 +259,7 @@
       <algorithm type = "LArSimpleClusterCreation" description = "ClusterRebuilding"/>
       <OverlapWindow>1.0</OverlapWindow>
       <DeltaRayTools>
-        <!--tool type = "LArTwoViewCosmicRayRemoval"/-->
+        <tool type = "LArTwoViewCosmicRayRemoval"/>
         <tool type = "LArTwoViewDeltaRayMerge"/>
       </DeltaRayTools>
     </algorithm>

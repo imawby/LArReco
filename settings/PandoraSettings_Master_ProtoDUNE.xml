@@ -60,7 +60,7 @@
         <OutputFile>Validation.root</OutputFile>
         </algorithm-->
     
-    <algorithm type = "LArMuonLeadingEventValidation">
+    <!--algorithm type = "LArMuonLeadingEventValidation">
         <CaloHitListName>CaloHitList2D</CaloHitListName>
         <MCParticleListName>Input</MCParticleListName>
         <PfoListName>RecreatedPfos</PfoListName>
@@ -79,7 +79,7 @@
         <Visualize>false</Visualize>
         <MinPrimaryGoodHits>10</MinPrimaryGoodHits>
         <MinHitsForGoodView>5</MinHitsForGoodView>
-    </algorithm>
+    </algorithm-->
 
     
 </pandora>
