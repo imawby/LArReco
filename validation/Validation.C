@@ -333,12 +333,13 @@ void CountPfoMatches(const SimpleMCEvent &simpleMCEvent, const Parameters &param
             if (simpleMCTarget.m_mcPrimaryList.size() != 1)
             {
                 std::cout << "NOT EQUAL TO ONE" << std::endl;
+                throw;
             }
-                const SimpleMCPrimary mcCR(simpleMCTarget.m_mcPrimaryList.front());
-
-                if (mcCR.m_nMCHitsW < 50)
-                    continue;
             
+            const SimpleMCPrimary mcCR(simpleMCTarget.m_mcPrimaryList.front());
+
+            if (mcCR.m_nMCHitsW < 50)
+                continue;
         }
 
         TargetResult targetResult;
